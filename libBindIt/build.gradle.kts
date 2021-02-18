@@ -42,17 +42,29 @@ dependencies {
     val constraint_layout_version:String by project
     val recycle_view_version:String by project
     val junit_version:String by project
+    val material_version:String by project
+    val lifecycle_ktx_version:String by project
+    val core_ktx_version:String by project
+    val appcompat_version:String by project
+    val android_junit_version:String by project
+    val espresso_version:String by project
+    val rx_java_version:String by project
+    val rx_android_version:String by project
+    val rx_kotlin_version:String by project
 
     implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
-    implementation("androidx.core:core-ktx:1.3.2")
-    implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("com.google.android.material:material:1.3.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.2.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
+    implementation("androidx.core:core-ktx:$core_ktx_version")
+    implementation("androidx.appcompat:appcompat:$appcompat_version")
+    implementation("com.google.android.material:material:$material_version")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_ktx_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_ktx_version")
     implementation("androidx.constraintlayout:constraintlayout:$constraint_layout_version")
     implementation("androidx.recyclerview:recyclerview:$recycle_view_version")
+    implementation("io.reactivex.rxjava3:rxjava:$rx_java_version")
+    implementation("io.reactivex.rxjava3:rxandroid:$rx_android_version")
+    implementation("io.reactivex.rxjava3:rxkotlin:$rx_kotlin_version")
 
     testImplementation("junit:$junit_version")
-    androidTestImplementation("androidx.test.ext:junit:1.1.2")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
+    androidTestImplementation("androidx.test.ext:junit:$android_junit_version")
+    androidTestImplementation("androidx.test.espresso:espresso-core:$espresso_version")
 }
