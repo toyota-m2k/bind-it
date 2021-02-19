@@ -74,7 +74,7 @@ class ObservableList<T> : MutableList<T> {
     }
 
     override fun iterator(): MutableIterator<T> {
-        return MIterator()
+        return OLIterator()
     }
 
     override fun lastIndexOf(element: T): Int {
@@ -118,58 +118,115 @@ class ObservableList<T> : MutableList<T> {
         mutationEvent.invoke(RefreshEventData())
     }
 
-    private open inner class MIterator:MutableIterator<T> {
-        protected var current = 0
-        override fun hasNext(): Boolean {
-            return internalList.size>current
-        }
+//    private open inner class MIterator:MutableIterator<T> {
+//        protected var current = 0
+//        override fun hasNext(): Boolean {
+//            return internalList.size>current
+//        }
+//
+//        override fun next(): T {
+//            return internalList[current++]
+//        }
+//
+//        override fun remove() {
+//            current--
+//            removeAt(current)
+//        }
+//    }
+//
+//    private open inner class MLIterator(initial:Int=0): MIterator(), MutableListIterator<T> {
+//        init {
+//            current = initial
+//        }
+//
+//        override fun hasPrevious(): Boolean {
+//            return current>0
+//        }
+//
+//        override fun nextIndex(): Int {
+//            return current
+//        }
+//
+//        override fun previous(): T {
+//            return internalList[--current]
+//        }
+//
+//        override fun previousIndex(): Int {
+//            return current-1
+//        }
+//
+//        override fun add(element: T) {
+//            add(current, element)
+//        }
+//
+//        override fun set(element: T) {
+//            set(current, element)
+//        }
+//    }
 
-        override fun next(): T {
-            return internalList[current++]
-        }
-
-        override fun remove() {
-            current--
-            removeAt(current)
-        }
-    }
-
-    private open inner class MLIterator(initial:Int=0): MIterator(), MutableListIterator<T> {
-        init {
-            current = initial
-        }
+    private inner class OLIterator(initial:Int=0) : MutableListIterator<T> {
+        private var current:Int = initial
+        private var next:Int = initial
+        private var prev:Int = initial-1
 
         override fun hasPrevious(): Boolean {
-            return current>0
+            return prev>=0
         }
+
+        override fun hasNext(): Boolean {
+            return next<size
+        }
+
 
         override fun nextIndex(): Int {
-            return current
-        }
-
-        override fun previous(): T {
-            return internalList[--current]
+            return next
         }
 
         override fun previousIndex(): Int {
-            return current-1
+            return prev
         }
+
+        override fun previous(): T {
+            next--
+            current = prev--
+            return internalList[current]
+        }
+
+        override fun next(): T {
+            prev++
+            current = next++
+            return internalList[current]
+        }
+
 
         override fun add(element: T) {
             add(current, element)
+            prev++
+            next++
+            current++
+        }
+
+        override fun remove() {
+            if(current>=0) {
+                removeAt(current)
+                current--
+                next = current+1
+                prev = current
+            }
         }
 
         override fun set(element: T) {
             set(current, element)
         }
+
     }
 
     override fun listIterator(): MutableListIterator<T> {
-        return MLIterator()
+        return OLIterator()
     }
 
     override fun listIterator(index: Int): MutableListIterator<T> {
-        return MLIterator(index)
+        return OLIterator(index)
     }
 
     override fun remove(element: T): Boolean {
@@ -242,4 +299,5 @@ class ObservableList<T> : MutableList<T> {
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
         return internalList.subList(fromIndex, toIndex)
     }
+
 }

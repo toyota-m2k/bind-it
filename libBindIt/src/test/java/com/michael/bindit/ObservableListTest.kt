@@ -360,7 +360,7 @@ class ObservableListTest {
         assertTrue(owner.onCreated {})
         list.addListener(owner,this::onListChanged)
 
-        val reference = (0..20).toMutableList()
+        var reference = (0..20).toMutableList()
         list.addAll(reference)
 
         var itrRef = reference.listIterator()
@@ -378,11 +378,17 @@ class ObservableListTest {
 
         itrRef = reference.listIterator(6)
         itrEx  = list.listIterator(6)
+        assertEquals(itrRef.previous(),itrRef.next())
+        assertEquals(itrEx.previous(),itrEx.next())
+
+        itrRef = reference.listIterator(6)
+        itrEx  = list.listIterator(6)
         assertEquals(itrRef.next(), itrEx.next())
         itrRef.remove()
         itrEx.remove()
         assertEqualsList(reference,list)
         assertEqualsList()
+        assertEquals(itrRef.previous(), itrEx.previous())
 
         itrRef = reference.listIterator(6)
         itrEx  = list.listIterator(6)
@@ -393,6 +399,7 @@ class ObservableListTest {
         itrEx.remove()
         assertEqualsList(reference,list)
         assertEqualsList()
+        assertEquals(itrRef.next(), itrEx.next())
 
         itrRef = reference.listIterator(3)
         itrEx  = list.listIterator(3)
@@ -419,5 +426,35 @@ class ObservableListTest {
         itrEx.remove()
         assertEqualsList(reference,list)
         assertEqualsList()
+
+        reference = (0..20).toMutableList()
+        list.replace(reference)
+        assertEqualsList(reference,list)
+
+        itrRef = reference.listIterator(10)
+        itrEx  = list.listIterator(10)
+        itrRef.add(123)
+        itrEx.add(123)
+        assertEqualsList(reference,list)
+        assertEquals(itrRef.next(), itrEx.next())
+        assertEquals(itrRef.next(), itrEx.next())
+        assertEquals(itrRef.previous(), itrEx.previous())
+        assertEquals(itrRef.previous(), itrEx.previous())
+        assertEquals(itrRef.previous(), itrEx.previous())
+        assertEquals(itrRef.previous(), itrEx.previous())
+
+        itrRef.remove()
+        itrEx.remove()
+        assertEqualsList(reference,list)
+        assertEquals(itrRef.previous(), itrEx.previous())
+//        itrRef.remove()
+//        itrEx.remove()
+//        assertEqualsList(reference,list)
+//        itrRef.remove()
+//        itrEx.remove()
+//        assertEqualsList(reference,list)
+//        itrRef.remove()
+//        itrEx.remove()
+//        assertEqualsList(reference,list)
     }
 }
