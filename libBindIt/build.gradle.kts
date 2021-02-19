@@ -64,7 +64,14 @@ dependencies {
     implementation("io.reactivex.rxjava3:rxandroid:$rx_android_version")
     implementation("io.reactivex.rxjava3:rxkotlin:$rx_kotlin_version")
 
-    testImplementation("junit:$junit_version")
+    testImplementation("junit:junit:$junit_version")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.1.0")
+    testImplementation("androidx.test:core:1.3.0")
+    testImplementation("org.mockito:mockito-core:2.25.0")
     androidTestImplementation("androidx.test.ext:junit:$android_junit_version")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espresso_version")
+}
+
+repositories {
+    mavenCentral()
 }

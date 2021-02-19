@@ -10,6 +10,10 @@ interface ListenerKey:Disposable
 
 @Suppress("unused")
 class Listeners<T> {
+    interface IListener<T> {
+        fun onChanged(value:T)
+    }
+
     private val functions = mutableListOf<(OwnerWrapper)>()
 
     inner class OwnerWrapper(owner:LifecycleOwner, val fn:(T)->Unit) : LifecycleEventObserver, ListenerKey {
@@ -59,8 +63,20 @@ class Listeners<T> {
     }
 
     @MainThread
+    fun add(owner: LifecycleOwner, listener:IListener<T>):ListenerKey {
+        return add(owner, listener::onChanged)
+    }
+
+    @MainThread
     fun remove(key:ListenerKey) {
         key.dispose()
+    }
+
+    @MainThread
+    fun clear() {
+        while(functions.isNotEmpty()) {
+            functions.last().dispose()
+        }
     }
 
     @MainThread

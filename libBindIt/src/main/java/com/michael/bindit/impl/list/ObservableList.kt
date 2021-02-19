@@ -2,6 +2,8 @@
 
 package com.michael.bindit.impl.list
 
+import androidx.lifecycle.LifecycleOwner
+import com.michael.bindit.util.ListenerKey
 import com.michael.bindit.util.Listeners
 
 class ObservableList<T> : MutableList<T> {
@@ -35,11 +37,16 @@ class ObservableList<T> : MutableList<T> {
         MutationEventData(MutationKind.CHANGED)
     data class MoveEventData(val from:Int, val to:Int) : MutationEventData(MutationKind.MOVE)
 
-//    private val mMutationEvent = SingleLiveEvent<MutationEventData>()
-//    val mutationEvent: ISingleLiveEvent<MutationEventData>
-//        get() = mMutationEvent
-    var mutationEvent = Listeners<MutationEventData>()
+    private var mutationEvent = Listeners<MutationEventData>()
 
+    fun addListener(owner:LifecycleOwner, fn:(MutationEventData)->Unit):ListenerKey {
+        fn(RefreshEventData())
+        return mutationEvent.add(owner,fn)
+    }
+    fun addListener(owner:LifecycleOwner, listener: Listeners.IListener<MutationEventData>): ListenerKey {
+        listener.onChanged(RefreshEventData())
+        return mutationEvent.add(owner,listener)
+    }
 
     private var internalList: MutableList<T> = mutableListOf()
 
@@ -64,21 +71,6 @@ class ObservableList<T> : MutableList<T> {
 
     override fun isEmpty(): Boolean {
         return internalList.isEmpty()
-    }
-
-    private open inner class MIterator:MutableIterator<T> {
-        protected var current = 0
-        override fun hasNext(): Boolean {
-            return internalList.size>current
-        }
-
-        override fun next(): T {
-            return internalList[current++]
-        }
-
-        override fun remove() {
-            removeAt(current-1)
-        }
     }
 
     override fun iterator(): MutableIterator<T> {
@@ -126,13 +118,29 @@ class ObservableList<T> : MutableList<T> {
         mutationEvent.invoke(RefreshEventData())
     }
 
-    private open inner class MLIterator(val head:Int=0): MIterator(), MutableListIterator<T> {
+    private open inner class MIterator:MutableIterator<T> {
+        protected var current = 0
+        override fun hasNext(): Boolean {
+            return internalList.size>current
+        }
+
+        override fun next(): T {
+            return internalList[current++]
+        }
+
+        override fun remove() {
+            current--
+            removeAt(current)
+        }
+    }
+
+    private open inner class MLIterator(initial:Int=0): MIterator(), MutableListIterator<T> {
         init {
-            current = head
+            current = initial
         }
 
         override fun hasPrevious(): Boolean {
-            return current>head
+            return current>0
         }
 
         override fun nextIndex(): Int {
@@ -165,21 +173,20 @@ class ObservableList<T> : MutableList<T> {
     }
 
     override fun remove(element: T): Boolean {
-        var r = false
-        do {
-            val index = indexOf(element)
-            if(index>=0) {
-                removeAt(index)
-                r = true
-            }
-        } while(index>=0)
-        return r
+        val index = indexOf(element)
+        if(index>=0) {
+            removeAt(index)
+            return true
+        }
+        return false
     }
 
     override fun removeAll(elements: Collection<T>): Boolean {
         var r = false
-        for(e in elements) {
-            if(remove(e)) {
+        val itr = iterator()
+        while(itr.hasNext()) {
+            if(elements.contains(itr.next())) {
+                itr.remove()
                 r = true
             }
         }
@@ -193,8 +200,11 @@ class ObservableList<T> : MutableList<T> {
     }
 
     fun removeAt(index: Int, count:Int) {
-        for(i in 0.until(count)) {
-            internalList.removeAt(index+i)
+        val itr = internalList.listIterator(index)
+        for(i in 0 until count) {
+            if(!itr.hasNext()) break
+            itr.next()
+            itr.remove()
         }
         mutationEvent.invoke(RemoveEventData(index,count))
     }
@@ -224,22 +234,8 @@ class ObservableList<T> : MutableList<T> {
     }
 
     fun move(from:Int, to:Int) {
-        when {
-            to<from -> {
-                val f = internalList.removeAt(from)
-                internalList.add(to, f)
-            }
-            to>from -> {
-                // a,b,c,d,e
-                // move(1,2)    a,c,b,d,e
-                val f = internalList[from]
-                internalList.add(to, f)
-                internalList.removeAt(from)
-            }
-            else -> {
-                return
-            }
-        }
+        val f = internalList.removeAt(from)
+        internalList.add(to, f)
         mutationEvent.invoke(MoveEventData(from,to))
     }
 
