@@ -30,7 +30,7 @@ class LongClickBinding<V>(
     fn: (V)->Boolean
 ) : View.OnLongClickListener where V:View {
     @Suppress("MemberVisibilityCanBePrivate")
-    val callback = Callback<V,Boolean>(owner,fn)
+    val callback = Callback(owner,fn)
     init {
         view.setOnLongClickListener(this)
     }

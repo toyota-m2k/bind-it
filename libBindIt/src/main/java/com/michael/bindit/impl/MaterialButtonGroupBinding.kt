@@ -8,32 +8,31 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.michael.bindit.BindingMode
-import java.lang.ref.WeakReference
 
 abstract class MaterialButtonGroupBindingBase<T,DataType> (
-    owner:LifecycleOwner,
-    val view:MaterialButtonToggleGroup,
-    val mutableData:MutableLiveData<DataType>,
-    val idResolver: IDValueResolver<T>,
+    override val data:MutableLiveData<DataType>,
     mode:BindingMode = BindingMode.TwoWay
-)  : BaseBinding<DataType>(owner, mutableData, mode) {
+)  : BaseBinding<DataType>(mode), MaterialButtonToggleGroup.OnButtonCheckedListener {
     private var btnListener: MaterialButtonToggleGroup.OnButtonCheckedListener? = null
-    init {
+
+     lateinit var idResolver: IDValueResolver<T>
+
+     val toggleGroup:MaterialButtonToggleGroup?
+        get() = view as? MaterialButtonToggleGroup
+
+    open fun connect(owner:LifecycleOwner, view:MaterialButtonToggleGroup, idResolver: IDValueResolver<T>) {
+        this.idResolver = idResolver
+        super.connect(owner,view)
         if(mode!=BindingMode.OneWay) {
-            btnListener = MaterialButtonToggleGroup.OnButtonCheckedListener { group, id, isChecked->
-                onButtonChecked(group,id,isChecked)
-            }.apply {
-                view.addOnButtonCheckedListener(this)
-            }
+            view.addOnButtonCheckedListener(this)
         }
     }
 
-    abstract fun onButtonChecked(group: MaterialButtonToggleGroup?, checkedId: Int,isChecked: Boolean)
-
     override fun cleanup() {
+        if(mode!=BindingMode.OneWay) {
+            toggleGroup?.removeOnButtonCheckedListener(this)
+        }
         super.cleanup()
-        val bl = btnListener?:return
-        view.removeOnButtonCheckedListener(bl)
     }
 }
 
@@ -42,32 +41,28 @@ abstract class MaterialButtonGroupBindingBase<T,DataType> (
  * 考え方は RadioGroup と同じだが、i/fが異なるので、クラスは別になる。
  */
 class MaterialRadioButtonGroupBinding<T>(
-    owner:LifecycleOwner,
-    view:MaterialButtonToggleGroup,
-    mutableData:MutableLiveData<T>,
-    idResolver: IDValueResolver<T>,
+    data:MutableLiveData<T>,
     mode:BindingMode = BindingMode.TwoWay
-) : MaterialButtonGroupBindingBase<T,T>(owner,view,mutableData,idResolver,mode) {
-    init {
+) : MaterialButtonGroupBindingBase<T,T>(data,mode) {
+
+    override fun connect(owner: LifecycleOwner, view: MaterialButtonToggleGroup, idResolver: IDValueResolver<T>) {
         view.isSingleSelection = true
+        super.connect(owner, view, idResolver)
     }
 
     // View --> Source
-    override fun onButtonChecked(
-        group: MaterialButtonToggleGroup?,
-        checkedId: Int,
-        isChecked: Boolean
-    ) {
+    override fun onButtonChecked(group: MaterialButtonToggleGroup?, checkedId: Int, isChecked: Boolean) {
         if(isChecked) {
             val v = idResolver.id2value(checkedId)
             if(data.value!=v) {
-                mutableData.value = v
+                data.value = v
             }
         }
     }
 
     // Source --> View
     override fun onDataChanged(v: T?) {
+        val view = toggleGroup?:return
         if(v!=null) {
             val id = idResolver.value2id(v)
             if(view.checkedButtonId != id) {
@@ -84,12 +79,9 @@ class MaterialRadioButtonGroupBinding<T>(
  * MaterialButtonToggleGroupを使う場合、トグルボタンとしてButtonを使うため、個々のボタンの選択状態の指定や選択イベントは使えないので。
  */
 class MaterialToggleButtonGroupBinding<T>(
-    owner:LifecycleOwner,
-    view:MaterialButtonToggleGroup,
-    mutableData:MutableLiveData<List<T>>,
-    idResolver: IDValueResolver<T>,
+    data:MutableLiveData<List<T>>,
     mode:BindingMode = BindingMode.TwoWay
-) : MaterialButtonGroupBindingBase<T,List<T>>(owner,view,mutableData,idResolver,mode) {
+) : MaterialButtonGroupBindingBase<T,List<T>>(data,mode) {
 
     private val selected = mutableSetOf<T>()
     private var busy = false
@@ -105,6 +97,7 @@ class MaterialToggleButtonGroupBinding<T>(
     }
 
     override fun onDataChanged(v: List<T>?) {
+        val view = toggleGroup ?: return
         inBusy {
             view.clearChecked()
             selected.clear()
@@ -129,7 +122,7 @@ class MaterialToggleButtonGroupBinding<T>(
             } else {
                 selected.remove(v)
             }
-            mutableData.value = selected.toList()
+            data.value = selected.toList()
         }
     }
 }
@@ -146,17 +139,16 @@ class MaterialToggleButtonGroupBinding<T>(
  *            }
  */
 class MaterialToggleButtonsBinding (
-    owner:LifecycleOwner,
-    val view:MaterialButtonToggleGroup,
-    val mode:BindingMode = BindingMode.TwoWay
+    override val mode:BindingMode = BindingMode.TwoWay
 ) : DisposableImpl(),  MaterialButtonToggleGroup.OnButtonCheckedListener {
 
-    private inner class DataObserver(val button: View, val data:MutableLiveData<Boolean>) : Observer<Boolean> {
+    var toggleGroup:MaterialButtonToggleGroup? = null
+
+
+    private inner class DataObserver(owner:LifecycleOwner, val button: View, val data:MutableLiveData<Boolean>) : Observer<Boolean> {
         init {
             if (mode != BindingMode.OneWayToSource) {
-                owner?.also {
-                    data.observe(it,this)
-                }
+                data.observe(owner,this)
             }
         }
 
@@ -165,6 +157,7 @@ class MaterialToggleButtonsBinding (
         }
 
         override fun onChanged(t: Boolean?) {
+            val view = toggleGroup ?: return
             val cur = view.checkedButtonIds.contains(button.id)
             if(t==true) {
                 if(!cur) {
@@ -178,19 +171,22 @@ class MaterialToggleButtonsBinding (
         }
     }
 
-    private val weakOwner = WeakReference(owner)
-    private val owner:LifecycleOwner?
-        get() = weakOwner.get()
+//    private val weakOwner = WeakReference(owner)
+//    private val owner:LifecycleOwner?
+//        get() = weakOwner.get()
     private val buttons = mutableMapOf<Int,DataObserver>()
 
-    init {
+    fun connect(view: MaterialButtonToggleGroup) {
+        toggleGroup = view
         if(mode!=BindingMode.OneWay) {
             view.addOnButtonCheckedListener(this)
         }
     }
 
-    fun add(button:View, data:MutableLiveData<Boolean>):MaterialToggleButtonsBinding {
-        buttons[button.id] = DataObserver(button,data)
+    data class ButtonAndData(val button:View, val data:MutableLiveData<Boolean>)
+
+    fun add(owner:LifecycleOwner, button:View, data:MutableLiveData<Boolean>):MaterialToggleButtonsBinding {
+        buttons[button.id] = DataObserver(owner,button,data)
         return this
     }
 
@@ -202,7 +198,7 @@ class MaterialToggleButtonsBinding (
         }
         buttons.clear()
         if(mode!=BindingMode.OneWay) {
-            view.removeOnButtonCheckedListener(this)
+            toggleGroup?.removeOnButtonCheckedListener(this)
         }
     }
 

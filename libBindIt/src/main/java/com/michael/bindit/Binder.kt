@@ -5,6 +5,7 @@ package com.michael.bindit
 import android.view.View
 import io.reactivex.rxjava3.disposables.Disposable
 
+@Suppress("MemberVisibilityCanBePrivate")
 open class Binder : Disposable {
     protected var disposed: Boolean = false
     protected val bindings = mutableListOf<Disposable>()

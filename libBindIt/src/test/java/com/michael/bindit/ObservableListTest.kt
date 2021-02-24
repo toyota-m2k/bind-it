@@ -5,15 +5,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.michael.bindit.impl.list.ObservableList
-import org.junit.After
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import java.lang.IllegalStateException
 
 class ObservableListTest {
-    class DummyLifecycle(val owner:LifecycleOwner) : Lifecycle() {
+    class DummyLifecycle(private val owner:LifecycleOwner) : Lifecycle() {
         private var state:State = State.INITIALIZED
             set(s) {
                 if(s!=field) {
@@ -62,7 +59,7 @@ class ObservableListTest {
         }
     }
     class DummyLifecycleOwner : LifecycleOwner {
-        val lifecycle = DummyLifecycle(this)
+        private val lifecycle = DummyLifecycle(this)
         override fun getLifecycle(): Lifecycle {
             return lifecycle
         }
@@ -88,10 +85,10 @@ class ObservableListTest {
         }
     }
 
-    lateinit var list:ObservableList<Int>
-    lateinit var listMirror:MutableList<Int>
+    private lateinit var list:ObservableList<Int>
+    private lateinit var listMirror:MutableList<Int>
 
-    fun onListChanged(m: ObservableList.MutationEventData) {
+    private fun onListChanged(m: ObservableList.MutationEventData) {
         when(m) {
             is ObservableList.RefreshEventData -> listMirror = list.toMutableList()
             is ObservableList.InsertEventData -> {
@@ -115,13 +112,13 @@ class ObservableListTest {
         }
     }
 
-    fun assertEqualsList(list1:List<Int>, list2:List<Int>) {
+    private fun assertEqualsList(list1:List<Int>, list2:List<Int>) {
         assertEquals(list1.size, list2.size)
-        for (i in 0 until list1.size) {
+        for (i in list1.indices) {
             assertEquals(list1[i],list2[i])
         }
     }
-    fun assertEqualsList() {
+    private fun assertEqualsList() {
         assertEqualsList(list,listMirror)
     }
 

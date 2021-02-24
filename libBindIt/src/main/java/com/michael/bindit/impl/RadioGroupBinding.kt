@@ -2,6 +2,7 @@ package com.michael.bindit.impl
 
 import android.widget.RadioGroup
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.michael.bindit.BindingMode
 
@@ -10,36 +11,23 @@ interface IDValueResolver<T> {
     fun value2id(v:T): Int
 }
 
-@Suppress("unused")
-open class RadioGroupBinding<T>(
-    owner:LifecycleOwner,
-    val view:RadioGroup,
-    val mutableData:MutableLiveData<T>,
-    val idResolver: IDValueResolver<T>,
-    mode:BindingMode = BindingMode.TwoWay
-) : BaseBinding<T>(owner,mutableData,mode) {
-    private var radioListener:RadioGroup.OnCheckedChangeListener? = null
+open class RadioGroupBinding<T> protected constructor(
+    override val data: LiveData<T>,
+    mode:BindingMode
+) : BaseBinding<T>(mode) {
+    constructor(data:LiveData<T>):this(data,BindingMode.OneWay)
 
-    init {
-        if(mode!=BindingMode.OneWay) {
-            radioListener = RadioGroup.OnCheckedChangeListener {group, checkedId ->
-                onCheckedChanged(group, checkedId)
-            }.apply {
-                view.setOnCheckedChangeListener(this)
-            }
-        }
-    }
+    lateinit var idResolver: IDValueResolver<T>
+    val radioGroup:RadioGroup?
+        get() = view as? RadioGroup
 
-
-    override fun cleanup() {
-        super.cleanup()
-        if(radioListener!=null) {
-            radioListener = null
-            view.setOnCheckedChangeListener(null)
-        }
+    open fun connect(owner: LifecycleOwner, view:RadioGroup, idResolver:IDValueResolver<T>) {
+        this.idResolver = idResolver
+        super.connect(owner,view)
     }
 
     override fun onDataChanged(v: T?) {
+        val view = radioGroup ?: return
         if(v!=null) {
             val id = idResolver.value2id(v)
             if(view.checkedRadioButtonId!=id) {
@@ -47,11 +35,43 @@ open class RadioGroupBinding<T>(
             }
         }
     }
+    companion object {
+        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: LiveData<T>, idResolver: IDValueResolver<T>):RadioGroupBinding<T> {
+            return RadioGroupBinding(data).apply { connect(owner, view, idResolver) }
+        }
+        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: MutableLiveData<T>, idResolver: IDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):RadioGroupBinding<T> {
+            return MutableRadioGroupBinding(data, mode).apply { connect(owner, view, idResolver) }
+        }
+    }
+}
 
-    fun onCheckedChanged(@Suppress("UNUSED_PARAMETER") group: RadioGroup?, checkedId: Int) {
+open class MutableRadioGroupBinding<T>(
+    override val data:MutableLiveData<T>,
+    mode:BindingMode = BindingMode.TwoWay
+) : RadioGroupBinding<T>(data,mode), RadioGroup.OnCheckedChangeListener {
+
+    override fun connect(owner: LifecycleOwner, view:RadioGroup, idResolver:IDValueResolver<T>) {
+        super.connect(owner,view,idResolver)
+        if(mode!=BindingMode.OneWay) {
+            view.setOnCheckedChangeListener(this)
+        }
+    }
+
+    override fun cleanup() {
+        radioGroup?.setOnCheckedChangeListener(null)
+        super.cleanup()
+    }
+
+    override fun onCheckedChanged(@Suppress("UNUSED_PARAMETER") group: RadioGroup?, checkedId: Int) {
         val v = idResolver.id2value(checkedId)
         if(data.value!=v) {
-            mutableData.value = v
+            data.value = v
+        }
+    }
+
+    companion object {
+        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: MutableLiveData<T>, idResolver: IDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):MutableRadioGroupBinding<T> {
+            return MutableRadioGroupBinding(data, mode).apply { connect(owner, view, idResolver) }
         }
     }
 }

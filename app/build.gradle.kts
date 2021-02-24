@@ -51,6 +51,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:$constraint_layout_version")
 
     testImplementation("junit:junit:$junit_version")
+    androidTestImplementation("org.robolectric:robolectric:4.3")
     androidTestImplementation("androidx.test.ext:junit:$android_junit_version")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espresso_version")
 }

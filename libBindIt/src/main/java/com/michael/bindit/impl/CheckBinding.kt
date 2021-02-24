@@ -6,47 +6,83 @@ import android.widget.CompoundButton
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
 import com.michael.bindit.BindingMode
+import com.michael.bindit.BoolConvert
 
-open class CheckBinding(
-    owner: LifecycleOwner,
-    val view: CompoundButton,
-    data: LiveData<Boolean>,
-    mode: BindingMode = BindingMode.OneWay
-) : BaseBinding<Boolean>(owner,data,mode) {
+open class CheckBinding protected constructor(
+    rawData: LiveData<Boolean>,
+    boolConvert:BoolConvert,
+    mode: BindingMode
+) : BaseBinding<Boolean>(mode) {
+    constructor(data:LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Staright) : this(data,boolConvert,BindingMode.OneWay)
+
+    override val data: LiveData<Boolean> = if(boolConvert==BoolConvert.Inverse) rawData.map { !it } else rawData
+
+    val compoundButton:CompoundButton?
+        get() = view as? CompoundButton
+
+    open fun connect(owner: LifecycleOwner, view:CompoundButton) {
+        super.connect(owner,view)
+    }
 
     override fun onDataChanged(v: Boolean?) {
-        view.isChecked = v == true
+        val view = compoundButton ?: return
+        val chk = (v==true)
+        if(view.isChecked != chk) {
+            view.isChecked = chk
+        }
+    }
+
+    companion object {
+        fun create(owner: LifecycleOwner, view: CompoundButton, data: LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Staright):CheckBinding {
+            return CheckBinding(data, boolConvert, BindingMode.OneWay).apply { connect(owner, view) }
+        }
+        fun create(owner: LifecycleOwner, view:CompoundButton, data: MutableLiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Staright, mode: BindingMode=BindingMode.TwoWay):CheckBinding {
+            return if(mode==BindingMode.OneWay) {
+                CheckBinding(data, boolConvert, BindingMode.OneWay).apply { connect(owner, view) }
+            } else {
+                MutableCheckBinding.create(owner, view, data, boolConvert, mode)
+            }
+        }
     }
 }
 
-class MutableCheckBinding(
-    owner:LifecycleOwner,
-    view: CompoundButton,
-    private val mutableData: MutableLiveData<Boolean>,
-    mode: BindingMode = BindingMode.TwoWay
-): CheckBinding(owner,view,mutableData,mode), CompoundButton.OnCheckedChangeListener {
+@Suppress("MemberVisibilityCanBePrivate")
+open class MutableCheckBinding(
+        protected val mutableData: MutableLiveData<Boolean>,
+        protected val boolConvert: BoolConvert = BoolConvert.Staright,
+        mode: BindingMode = BindingMode.TwoWay
+): CheckBinding(mutableData,boolConvert,mode), CompoundButton.OnCheckedChangeListener {
 
-    init {
+    override fun connect(owner: LifecycleOwner, view: CompoundButton) {
+        super.connect(owner, view)
         if(mode!=BindingMode.OneWay) {
             view.setOnCheckedChangeListener(this)
+            onCheckedChanged(view, view.isChecked)
         }
     }
 
     override fun cleanup() {
-        super.dispose()
         if(mode!=BindingMode.OneWay) {
-            view.setOnCheckedChangeListener(null)
+            compoundButton?.setOnCheckedChangeListener(null)
         }
+        super.cleanup()
     }
 
     // region OnCheckedChangeListener
 
     override fun onCheckedChanged(buttonView: CompoundButton?, isChecked: Boolean) {
-        if(data.value!=isChecked) {
-            mutableData.value = isChecked
+        val chk = if(boolConvert==BoolConvert.Inverse) !isChecked else isChecked
+        if(mutableData.value!=chk) {
+            mutableData.value = chk
         }
     }
 
+    companion object {
+        fun create(owner: LifecycleOwner, view: CompoundButton, data: MutableLiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Staright, mode: BindingMode=BindingMode.TwoWay):MutableCheckBinding {
+            return MutableCheckBinding(data, boolConvert, mode).apply { connect(owner, view) }
+        }
+    }
     // endregion
 }

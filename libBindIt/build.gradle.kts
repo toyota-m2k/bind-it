@@ -35,6 +35,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -67,7 +70,12 @@ dependencies {
     testImplementation("junit:junit:$junit_version")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.1.0")
     testImplementation("androidx.test:core:1.3.0")
-    testImplementation("org.mockito:mockito-core:2.25.0")
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation("org.mockito:mockito-inline:3.7.7")
+    testImplementation("org.robolectric:robolectric:4.3")
+    testImplementation ("androidx.arch.core:core-testing:2.1.0")
+
+    androidTestImplementation ("androidx.arch.core:core-testing:2.1.0")
     androidTestImplementation("androidx.test.ext:junit:$android_junit_version")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espresso_version")
 }

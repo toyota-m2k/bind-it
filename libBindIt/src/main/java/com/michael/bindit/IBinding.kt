@@ -8,6 +8,12 @@ enum class BindingMode {
     TwoWay,
 }
 
+enum class BoolConvert {
+    Staright,   // true --> true
+    Inverse,    // true --> false
+}
 
-interface IBinding : Disposable
+interface IBinding : Disposable {
+    val mode:BindingMode
+}
 
