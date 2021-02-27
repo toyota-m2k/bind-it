@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.michael.bindit.BindingMode
 
-interface IDValueResolver<T> {
+interface IIDValueResolver<T> {
     fun id2value(id:Int) : T?
     fun value2id(v:T): Int
 }
@@ -17,11 +17,11 @@ open class RadioGroupBinding<T> protected constructor(
 ) : BaseBinding<T>(mode) {
     constructor(data:LiveData<T>):this(data,BindingMode.OneWay)
 
-    lateinit var idResolver: IDValueResolver<T>
+    lateinit var idResolver: IIDValueResolver<T>
     val radioGroup:RadioGroup?
         get() = view as? RadioGroup
 
-    open fun connect(owner: LifecycleOwner, view:RadioGroup, idResolver:IDValueResolver<T>) {
+    open fun connect(owner: LifecycleOwner, view:RadioGroup, idResolver:IIDValueResolver<T>) {
         this.idResolver = idResolver
         super.connect(owner,view)
     }
@@ -36,10 +36,10 @@ open class RadioGroupBinding<T> protected constructor(
         }
     }
     companion object {
-        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: LiveData<T>, idResolver: IDValueResolver<T>):RadioGroupBinding<T> {
+        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: LiveData<T>, idResolver: IIDValueResolver<T>):RadioGroupBinding<T> {
             return RadioGroupBinding(data).apply { connect(owner, view, idResolver) }
         }
-        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: MutableLiveData<T>, idResolver: IDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):RadioGroupBinding<T> {
+        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):RadioGroupBinding<T> {
             return MutableRadioGroupBinding(data, mode).apply { connect(owner, view, idResolver) }
         }
     }
@@ -50,7 +50,7 @@ open class MutableRadioGroupBinding<T>(
     mode:BindingMode = BindingMode.TwoWay
 ) : RadioGroupBinding<T>(data,mode), RadioGroup.OnCheckedChangeListener {
 
-    override fun connect(owner: LifecycleOwner, view:RadioGroup, idResolver:IDValueResolver<T>) {
+    override fun connect(owner: LifecycleOwner, view:RadioGroup, idResolver:IIDValueResolver<T>) {
         super.connect(owner,view,idResolver)
         if(mode!=BindingMode.OneWay) {
             view.setOnCheckedChangeListener(this)
@@ -70,7 +70,7 @@ open class MutableRadioGroupBinding<T>(
     }
 
     companion object {
-        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: MutableLiveData<T>, idResolver: IDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):MutableRadioGroupBinding<T> {
+        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):MutableRadioGroupBinding<T> {
             return MutableRadioGroupBinding(data, mode).apply { connect(owner, view, idResolver) }
         }
     }

@@ -67,6 +67,7 @@ fun <T,T1,T2, R> LiveData<T>.combineLatest(src2: LiveData<T1>, src3:LiveData<T2>
     }
 }
 
+
 //fun <T,R> LiveData<T>.map(fn:(T?)->R?):LiveData<R> {
 //    return MediatorLiveData<R>().also { med->
 //        med.addSource(this) { med.value = fn(value) }

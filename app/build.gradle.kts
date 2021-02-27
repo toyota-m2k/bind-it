@@ -39,6 +39,7 @@ dependencies {
     val material_version:String by project
     val lifecycle_ktx_version:String by project
     val constraint_layout_version:String by project
+    val rx_kotlin_version:String by project
 
     val junit_version:String by project
     val android_junit_version:String by project
@@ -49,9 +50,14 @@ dependencies {
     implementation("androidx.appcompat:appcompat:$appcompat_version")
     implementation("com.google.android.material:material:$material_version")
     implementation("androidx.constraintlayout:constraintlayout:$constraint_layout_version")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_ktx_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_ktx_version")
+    implementation("io.reactivex.rxjava3:rxkotlin:$rx_kotlin_version")
 
     testImplementation("junit:junit:$junit_version")
     androidTestImplementation("org.robolectric:robolectric:4.3")
     androidTestImplementation("androidx.test.ext:junit:$android_junit_version")
     androidTestImplementation("androidx.test.espresso:espresso-core:$espresso_version")
+
+    implementation(project(path=":libBindIt"))
 }

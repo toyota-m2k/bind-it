@@ -9,6 +9,13 @@ import androidx.lifecycle.Observer
 import com.google.android.material.slider.Slider
 import com.michael.bindit.BindingMode
 
+/**
+ * SeekBarより高機能だが、
+ * 不正な値（範囲外とかStep位置からずれた値とか）を与えると死ぬので、それを回避するための補正を仕込んである。
+ * そのため、EditTextと組み合わせたTwoWayバインドだと、なんか不自然な動きになる。
+ *
+ * min/max を変更するときに、valueが範囲外になると死ぬし、min==max になっても死ぬし、とにかく、そっと使うように。
+ */
 open class SliderBinding protected constructor(
     override val data: LiveData<Float>,
     private val min:LiveData<Float>? = null,
@@ -25,15 +32,6 @@ open class SliderBinding protected constructor(
 
     open fun connect(owner: LifecycleOwner, view:Slider) {
         super.connect(owner, view)
-        if(min!=null) {
-            minObserver = Observer<Float?> {
-                if(it!=null) {
-                    view.valueFrom = it
-                }
-            }.apply {
-                min.observe(owner,this)
-            }
-        }
         if(max!=null) {
             maxObserver = Observer<Float?> {
                 if(it!=null) {
@@ -41,6 +39,15 @@ open class SliderBinding protected constructor(
                 }
             }.apply {
                 max.observe(owner,this)
+            }
+        }
+        if(min!=null) {
+            minObserver = Observer<Float?> {
+                if(it!=null) {
+                    view.valueFrom = it
+                }
+            }.apply {
+                min.observe(owner,this)
             }
         }
     }
@@ -57,9 +64,25 @@ open class SliderBinding protected constructor(
         super.cleanup()
     }
 
+    fun clipByRange(a:Float, b:Float, v:Float):Float {
+        val min = Math.min(a,b)
+        val max = Math.max(a,b)
+        return Math.min(Math.max(min,v), max)
+    }
+
+    fun fitToStep(v:Float, s:Float):Float {
+        return if(s==0f) {
+            v
+        } else {
+            s*Math.round(v/s)
+        }
+    }
+
     override fun onDataChanged(v: Float?) {
         val view = slider ?: return
-        val t = v ?: 0f
+        // SeekBar と違って、範囲外のValueを与えると描画時に例外が出て死ぬ。
+        // stetSize!=0 の場合は、step位置からずれた値を入れるとやっぱり死ぬ。
+        val t = fitToStep(clipByRange(view.valueFrom,view.valueTo, v ?: 0f),view.stepSize)
         if(view.value != t) {
             view.value = t
         }

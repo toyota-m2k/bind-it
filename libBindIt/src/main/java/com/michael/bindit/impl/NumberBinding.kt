@@ -108,4 +108,4 @@ class DoubleBinding(data: LiveData<Double>) : NumberBinding<Double>(data)
 class MutableDoubleBinding(data: MutableLiveData<Double>,mode:BindingMode=BindingMode.TwoWay) : MutableNumberBinding<Double>(data, {it.toDouble()}, mode)
 
 class FloatBinding(data: LiveData<Float>) : NumberBinding<Float>(data)
-class MutableFloatBinding(data: MutableLiveData<Float>,mode:BindingMode=BindingMode.TwoWay) : MutableNumberBinding<Float>(data, {it.toFloat()}, mode)
+class MutableFloatBinding(data: MutableLiveData<Float>,mode:BindingMode=BindingMode.TwoWay) : MutableNumberBinding<Float>(data, { try{it.toFloat()} catch(_:Throwable){0f} }, mode)

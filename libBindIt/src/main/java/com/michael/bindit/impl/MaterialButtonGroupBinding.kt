@@ -15,12 +15,12 @@ abstract class MaterialButtonGroupBindingBase<T,DataType> (
 )  : BaseBinding<DataType>(mode), MaterialButtonToggleGroup.OnButtonCheckedListener {
     private var btnListener: MaterialButtonToggleGroup.OnButtonCheckedListener? = null
 
-     lateinit var idResolver: IDValueResolver<T>
+     lateinit var idResolver: IIDValueResolver<T>
 
      val toggleGroup:MaterialButtonToggleGroup?
         get() = view as? MaterialButtonToggleGroup
 
-    open fun connect(owner:LifecycleOwner, view:MaterialButtonToggleGroup, idResolver: IDValueResolver<T>) {
+    open fun connect(owner:LifecycleOwner, view:MaterialButtonToggleGroup, idResolver: IIDValueResolver<T>) {
         this.idResolver = idResolver
         super.connect(owner,view)
         if(mode!=BindingMode.OneWay) {
@@ -45,7 +45,7 @@ class MaterialRadioButtonGroupBinding<T>(
     mode:BindingMode = BindingMode.TwoWay
 ) : MaterialButtonGroupBindingBase<T,T>(data,mode) {
 
-    override fun connect(owner: LifecycleOwner, view: MaterialButtonToggleGroup, idResolver: IDValueResolver<T>) {
+    override fun connect(owner: LifecycleOwner, view: MaterialButtonToggleGroup, idResolver: IIDValueResolver<T>) {
         view.isSingleSelection = true
         super.connect(owner, view, idResolver)
     }
@@ -69,6 +69,12 @@ class MaterialRadioButtonGroupBinding<T>(
                 view.clearChecked()
                 view.check(id)
             }
+        }
+    }
+
+    companion object {
+        fun <T> create(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay) : MaterialRadioButtonGroupBinding<T> {
+            return MaterialRadioButtonGroupBinding(data, mode).apply { connect(owner,view,idResolver) }
         }
     }
 }
@@ -123,6 +129,12 @@ class MaterialToggleButtonGroupBinding<T>(
                 selected.remove(v)
             }
             data.value = selected.toList()
+        }
+    }
+
+    companion object {
+        fun <T> create(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableLiveData<List<T>>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay) : MaterialToggleButtonGroupBinding<T> {
+            return MaterialToggleButtonGroupBinding(data, mode).apply { connect(owner,view,idResolver) }
         }
     }
 }
@@ -190,6 +202,13 @@ class MaterialToggleButtonsBinding (
         return this
     }
 
+    fun add(owner:LifecycleOwner, vararg buttons:ButtonAndData):MaterialToggleButtonsBinding {
+        for(b in buttons) {
+            add(owner, b.button, b.data)
+        }
+        return this
+    }
+
     override fun cleanup() {
         if (mode != BindingMode.OneWayToSource) {
             buttons.forEach { (_, data) ->
@@ -210,6 +229,17 @@ class MaterialToggleButtonsBinding (
         val v = buttons[checkedId] ?: return
         if(v.data.value != isChecked) {
             v.data.value = isChecked
+        }
+    }
+    companion object {
+        fun create(view:MaterialButtonToggleGroup, mode:BindingMode = BindingMode.TwoWay) : MaterialToggleButtonsBinding {
+            return MaterialToggleButtonsBinding(mode).apply { connect(view) }
+        }
+        fun create(owner: LifecycleOwner, view:MaterialButtonToggleGroup, mode:BindingMode, vararg buttons:ButtonAndData) : MaterialToggleButtonsBinding {
+            return MaterialToggleButtonsBinding(mode).apply {
+                connect(view)
+                add(owner, *buttons)
+            }
         }
     }
 }

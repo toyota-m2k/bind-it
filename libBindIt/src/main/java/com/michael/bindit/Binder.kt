@@ -20,8 +20,10 @@ open class Binder : Disposable {
         return disposed
     }
 
-    fun <V> register(binding:IBinding):Binder where V:View {
-        bindings.add(binding)
+    fun register(vararg bindings:IBinding):Binder {
+        for(b in bindings) {
+            this.bindings.add(b)
+        }
         return this
     }
 
