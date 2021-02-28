@@ -2,6 +2,7 @@ package com.michael.bindit
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -130,5 +131,10 @@ class MainActivity : AppCompatActivity() {
 
         model = MainViewModel.instance(this)
         binding = Binding(this, model)
+
+        val v = View(this)
+        v.setBackgroundColor()
+
+
     }
 }
