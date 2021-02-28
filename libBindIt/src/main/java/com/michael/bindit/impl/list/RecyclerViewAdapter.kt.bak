@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
-import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.michael.bindit.Binder
@@ -17,7 +16,7 @@ class RecyclerViewAdapter {
      */
     abstract class Base<T, VH>(
         owner: LifecycleOwner,
-        val list: ObservableList<T>
+        val list:ObservableList<T>
     ) : Disposable, RecyclerView.Adapter<VH>() where VH : RecyclerView.ViewHolder
     {
 
@@ -103,23 +102,4 @@ class RecyclerViewAdapter {
             bindView(holder.binder, holder.itemView, list[position])
         }
     }
-
-    class SimpleWithDataBinding<T,B>(
-        owner:LifecycleOwner,
-        list: ObservableList<T>,
-        val createView:(parent:ViewGroup, viewType:Int)->B,
-        val bind: (binding: B, item:T)->Unit
-    ) : Base<T, SimpleWithDataBinding.SimpleViewHolder<B>>(owner,list) where B:ViewDataBinding {
-
-        class SimpleViewHolder<B>(val binding: B): RecyclerView.ViewHolder(binding.root) where B:ViewDataBinding
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleViewHolder<B> {
-            return SimpleViewHolder(createView(parent,viewType))
-        }
-
-        override fun onBindViewHolder(holder: SimpleViewHolder<B>, position: Int) {
-            bind(holder.binding, list[position])
-        }
-    }
-
 }
