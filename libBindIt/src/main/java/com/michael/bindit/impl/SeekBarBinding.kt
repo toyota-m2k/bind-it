@@ -7,10 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import com.michael.bindit.BindingMode
 
 open class SeekBarBinding(
-    override val data: MutableLiveData<Int>,
+    data: LiveData<Int>,
     min: LiveData<Int>? = null,
     max: LiveData<Int>? = null,
-    mode:BindingMode = BindingMode.TwoWay
+    mode:BindingMode
 ) : ProgressBarBinding(data,min,max,mode), SeekBar.OnSeekBarChangeListener {
     private val seekBar:SeekBar?
         get() = view as? SeekBar
@@ -31,8 +31,10 @@ open class SeekBarBinding(
     }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        if(data.value!=progress) {
-            data.value = progress
+        mutableData?.apply {
+            if(value != progress) {
+                value = progress
+            }
         }
     }
 

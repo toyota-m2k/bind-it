@@ -3,6 +3,7 @@ package com.michael.bindit.impl
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.michael.bindit.BindingMode
 import com.michael.bindit.IBinding
@@ -27,10 +28,13 @@ abstract class DisposableImpl : IBinding {
 
 abstract class BaseBinding<T>(override val mode: BindingMode) : DisposableImpl() {
     abstract val data: LiveData<T>
+    open val mutableData : MutableLiveData<T>?
+        get() = data as? MutableLiveData<T>
+
     open var view: View? = null
     private var dataObserver:Observer<T?>? = null
 
-    fun connect(owner:LifecycleOwner, view:View) {
+    protected fun connect(owner:LifecycleOwner, view:View) {
         this.view = view
         if(mode!=BindingMode.OneWayToSource) {
             dataObserver = Observer<T?> {

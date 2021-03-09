@@ -1,11 +1,9 @@
 package com.michael.bindit.impl
 
-import android.renderscript.ScriptGroup
 import android.widget.ProgressBar
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.google.android.material.slider.Slider
 import com.michael.bindit.BindingMode
 
 /**
@@ -25,7 +23,7 @@ open class ProgressBarBinding protected constructor(
 ) : BaseBinding<Int>(mode) {
     constructor(data:LiveData<Int>, min:LiveData<Int>?=null,max:LiveData<Int>?=null) :this(data,min,max,BindingMode.OneWay)
 
-    val progressBar:ProgressBar?
+    private val progressBar:ProgressBar?
         get() = view as? ProgressBar
 
     private var minObserver: Observer<Int>? = null

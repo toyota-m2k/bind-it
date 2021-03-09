@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
-import androidx.databinding.ViewDataBinding
+//import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.michael.bindit.Binder
@@ -103,7 +103,7 @@ class RecyclerViewAdapter {
             bindView(holder.binder, holder.itemView, list[position])
         }
     }
-
+/**
     class SimpleWithDataBinding<T,B>(
         owner:LifecycleOwner,
         list: ObservableList<T>,
@@ -121,5 +121,5 @@ class RecyclerViewAdapter {
             bind(holder.binding, list[position])
         }
     }
-
+**/
 }

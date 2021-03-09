@@ -9,16 +9,14 @@ import com.michael.bindit.BoolConvert
 
 @Suppress("unused")
 open class VisibilityBinding(
-        rawData: LiveData<Boolean>,
+        data: LiveData<Boolean>,
         boolConvert: BoolConvert = BoolConvert.Staright,
         private val hiddenMode:HiddenMode = HiddenMode.HideByGone
-) : BaseBinding<Boolean>(BindingMode.OneWay) {
+) : BoolBinding(data,BindingMode.OneWay, boolConvert) {
     enum class HiddenMode {
         HideByGone,
         HideByInvisible,
     }
-
-    override val data: LiveData<Boolean> = if(boolConvert==BoolConvert.Inverse) rawData.map { !it } else rawData
 
     override fun onDataChanged(v: Boolean?) {
         val view = this.view ?: return

@@ -103,8 +103,8 @@ class MainActivity : AppCompatActivity() {
 
         init {
             register(
-                SliderBinding.create(owner,slider,model.sliderValue,model.sliderMin,model.sliderMax, BindingMode.TwoWay),
-                NumberBinding.create(owner,numberText,model.sliderValue,BindingMode.TwoWay),
+                SliderBinding.create(owner,slider,model.sliderValue, BindingMode.TwoWay, model.sliderMin,model.sliderMax),
+                EditNumberBinding.create(owner,numberText,model.sliderValue,BindingMode.TwoWay),
 
                 RadioGroupBinding.create(owner,radioGroup, model.radioValue, RadioValue.idResolver, BindingMode.TwoWay),
                 TextBinding.create(owner, radioValue, model.radioValue.map {it.toString()}),
@@ -131,10 +131,6 @@ class MainActivity : AppCompatActivity() {
 
         model = MainViewModel.instance(this)
         binding = Binding(this, model)
-
-        val v = View(this)
-        v.setBackgroundColor()
-
 
     }
 }

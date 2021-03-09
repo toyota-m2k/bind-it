@@ -10,12 +10,9 @@ import com.michael.bindit.BindingMode
 import com.michael.bindit.BoolConvert
 
 open class EnableBinding(
-        rawData: LiveData<Boolean>,
-        boolConvert: BoolConvert = BoolConvert.Staright
-) : BaseBinding<Boolean>(BindingMode.OneWay) {
-
-    override val data: LiveData<Boolean> = if(boolConvert==BoolConvert.Inverse) rawData.map { !it } else rawData
-
+    rawData: LiveData<Boolean>,
+    boolConvert: BoolConvert = BoolConvert.Staright
+) : BoolBinding(rawData, BindingMode.OneWay, boolConvert) {
     override fun onDataChanged(v: Boolean?) {
         val view = this.view ?: return
         val enabled = v==true

@@ -10,19 +10,20 @@ import com.google.android.material.slider.Slider
 import com.michael.bindit.BindingMode
 
 /**
+ * Material Componentのスライダー
  * SeekBarより高機能だが、
  * 不正な値（範囲外とかStep位置からずれた値とか）を与えると死ぬので、それを回避するための補正を仕込んである。
  * そのため、EditTextと組み合わせたTwoWayバインドだと、なんか不自然な動きになる。
  *
  * min/max を変更するときに、valueが範囲外になると死ぬし、min==max になっても死ぬし、とにかく、そっと使うように。
  */
-open class SliderBinding protected constructor(
+open class SliderBinding (
     override val data: LiveData<Float>,
+    mode:BindingMode,
     private val min:LiveData<Float>? = null,
     private val max:LiveData<Float>? = null,
-    mode:BindingMode
-) : BaseBinding<Float>(mode) {
-    constructor(data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null) : this(data, min,max, BindingMode.OneWay)
+) : BaseBinding<Float>(mode), Slider.OnChangeListener {
+    constructor(data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null) : this(data, BindingMode.OneWay, min,max)
 
     val slider: Slider?
         get() = view as? Slider
@@ -50,6 +51,10 @@ open class SliderBinding protected constructor(
                 min.observe(owner,this)
             }
         }
+        if(mode!=BindingMode.OneWay) {
+            view.addOnChangeListener(this)
+            onValueChange(view, view.value, false)
+        }
     }
 
     override fun cleanup() {
@@ -60,6 +65,9 @@ open class SliderBinding protected constructor(
         maxObserver?.let {
             max?.removeObserver(it)
             maxObserver = null
+        }
+        if(mode!=BindingMode.OneWay) {
+            slider?.removeOnChangeListener(this)
         }
         super.cleanup()
     }
@@ -87,49 +95,19 @@ open class SliderBinding protected constructor(
             view.value = t
         }
     }
-
-    companion object {
-        fun create(owner: LifecycleOwner, view: Slider, data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null) : SliderBinding {
-            return SliderBinding(data,min,max,BindingMode.OneWay).apply { connect(owner,view) }
-        }
-        fun create(owner: LifecycleOwner, view: Slider, data:MutableLiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null, mode: BindingMode=BindingMode.TwoWay) : SliderBinding {
-            return MutableSliderBinding.create(owner,view,data,min,max,mode)
-        }
-    }
-}
-
-open class MutableSliderBinding(
-    override val data: MutableLiveData<Float>,
-    min:LiveData<Float>? = null,
-    max:LiveData<Float>? = null,
-    mode:BindingMode = BindingMode.TwoWay
-    ) : SliderBinding(data,min, max, mode), Slider.OnChangeListener
-{
-
-    override fun connect(owner: LifecycleOwner, view:Slider) {
-        super.connect(owner, view)
-        if(mode!=BindingMode.OneWay) {
-            view.addOnChangeListener(this)
-            onValueChange(view, view.value, false)
-        }
-    }
-
-    override fun cleanup() {
-        slider?.removeOnChangeListener(this)
-        super.cleanup()
-    }
-
-
     // Slider.OnChangeListener
     override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
         if(data.value!=value) {
-            data.value = value
+            mutableData?.value = value
         }
     }
 
     companion object {
-        fun create(owner: LifecycleOwner, view: Slider, data:MutableLiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null, mode: BindingMode=BindingMode.TwoWay) : MutableSliderBinding {
-            return MutableSliderBinding(data,min,max,mode).apply { connect(owner,view) }
+        fun create(owner: LifecycleOwner, view: Slider, data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null) : SliderBinding {
+            return SliderBinding(data, BindingMode.OneWay, min, max).apply { connect(owner, view) }
+        }
+        fun create(owner: LifecycleOwner, view: Slider, data:MutableLiveData<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null) : SliderBinding {
+            return SliderBinding(data, mode, min, max).apply { connect(owner, view) }
         }
     }
 }

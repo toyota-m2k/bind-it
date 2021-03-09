@@ -5,6 +5,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import com.michael.bindit.impl.EditTextBinding
 import com.michael.bindit.impl.TextBinding
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -66,7 +67,7 @@ class TextBindingTest {
         val view = EditText(activity)
         val data = MutableLiveData<String>()
         view.setText("123")
-        val textBinding = TextBinding.create(activity, view, data, mode = BindingMode.OneWayToSource)
+        val textBinding = EditTextBinding.create(activity, view, data, mode = BindingMode.OneWayToSource)
 
         assertEquals("123", view.text.toString())
         assertEquals(view.text.toString(), data.value)
@@ -85,7 +86,7 @@ class TextBindingTest {
         val view = EditText(activity)
         val data = MutableLiveData<String>("data")
         view.setText("view")
-        val textBinding = TextBinding.create(activity, view, data, mode = BindingMode.TwoWay)
+        val textBinding = EditTextBinding.create(activity, view, data, mode = BindingMode.TwoWay)
 
         assertEquals("data", data.value)
         assertEquals("data", view.text.toString())

@@ -5,6 +5,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import com.michael.bindit.impl.EditNumberBinding
 import com.michael.bindit.impl.NumberBinding
 import org.junit.Assert.*
 import org.junit.Rule
@@ -58,7 +59,7 @@ class NumberBindingTest {
         val data = MutableLiveData<Int>(111)
         view.setText("222")
 
-        val binding = NumberBinding.create(activity, view, data, BindingMode.OneWayToSource)
+        val binding = EditNumberBinding.create(activity, view, data, BindingMode.OneWayToSource)
         assertEquals("222", view.text.toString())
         assertEquals(222, data.value)
 
@@ -79,7 +80,7 @@ class NumberBindingTest {
         val data = MutableLiveData<Int>(111)
         view.setText("222")
 
-        val binding = NumberBinding.create(activity, view, data, BindingMode.TwoWay)
+        val binding = EditNumberBinding.create(activity, view, data, BindingMode.TwoWay)
         assertEquals("111", view.text.toString())
         assertEquals(111, data.value)
 

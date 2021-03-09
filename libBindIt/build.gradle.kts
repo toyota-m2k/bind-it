@@ -63,6 +63,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_ktx_version")
     implementation("androidx.constraintlayout:constraintlayout:$constraint_layout_version")
     implementation("androidx.recyclerview:recyclerview:$recycle_view_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_ktx_version")
     implementation("io.reactivex.rxjava3:rxjava:$rx_java_version")
     implementation("io.reactivex.rxjava3:rxandroid:$rx_android_version")
     implementation("io.reactivex.rxjava3:rxkotlin:$rx_kotlin_version")

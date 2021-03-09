@@ -27,7 +27,7 @@ open class TextBinding protected constructor(
 
     override fun onDataChanged(v: String?) {
         val view = textView?:return
-        if(v!=view.text) {
+        if(v!=view.text.toString()) {
             view.text = v
         }
     }
@@ -38,19 +38,17 @@ open class TextBinding protected constructor(
         fun create(owner:LifecycleOwner, view:TextView, data:LiveData<String>) : TextBinding {
             return TextBinding(data, BindingMode.OneWay).apply { connect(owner,view) }
         }
-        fun create(owner:LifecycleOwner, view:EditText, data:MutableLiveData<String>, mode:BindingMode):TextBinding {
-            if(mode==BindingMode.OneWay) {
-                return TextBinding(data, BindingMode.OneWay).apply { connect(owner,view) }
-            }
-            return MutableTextBinding.create(owner,view,data,mode)
-        }
     }
 }
 
-open class MutableTextBinding(
-    override val data: MutableLiveData<String>,
-    mode: BindingMode = BindingMode.TwoWay
+open class EditTextBinding(
+    data: MutableLiveData<String>,
+    mode: BindingMode
 ) : TextBinding(data,mode), TextWatcher {
+
+    private val editText:EditText?
+        get() = view as EditText?
+
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
     }
@@ -59,14 +57,16 @@ open class MutableTextBinding(
     }
 
     override fun afterTextChanged(s: Editable?) {
-        val tx = s?.toString()
-        if(tx!=data.value) {
-            data.value = tx
-        }
+        onViewValueChanged(s?.toString())
     }
 
-    private val editText:EditText?
-        get() = view as EditText?
+    open fun onViewValueChanged(tx:String?) {
+        mutableData?.apply {
+            if(tx!=value) {
+                value = tx
+            }
+        }
+    }
 
     fun connect(owner: LifecycleOwner, view:EditText) {
         super.connect(owner,view)
@@ -83,8 +83,8 @@ open class MutableTextBinding(
 
     // endregion
     companion object {
-        fun create(owner:LifecycleOwner, view:EditText, data:MutableLiveData<String>, mode:BindingMode=BindingMode.TwoWay):MutableTextBinding {
-            return MutableTextBinding(data,mode).apply { connect(owner,view) }
+        fun create(owner:LifecycleOwner, view:EditText, data:MutableLiveData<String>, mode:BindingMode=BindingMode.TwoWay):EditTextBinding {
+            return EditTextBinding(data,mode).apply { connect(owner,view) }
         }
     }
 }
