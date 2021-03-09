@@ -34,7 +34,7 @@ abstract class BaseBinding<T>(override val mode: BindingMode) : DisposableImpl()
     open var view: View? = null
     private var dataObserver:Observer<T?>? = null
 
-    protected fun connect(owner:LifecycleOwner, view:View) {
+    fun connect(owner:LifecycleOwner, view:View) {
         this.view = view
         if(mode!=BindingMode.OneWayToSource) {
             dataObserver = Observer<T?> {
