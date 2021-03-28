@@ -9,11 +9,11 @@ import com.michael.bindit.Binder
 import com.michael.bindit.BindingMode
 import com.michael.bindit.impl.list.ObservableList
 import com.michael.bindit.impl.list.RecyclerViewAdapter
-import io.reactivex.rxjava3.disposables.Disposable
+import com.michael.bindit.util.IDisposable
 
 class RecycleViewBinding<T>(
-    val list: ObservableList<T>,
-    val view: RecyclerView
+        val list: ObservableList<T>,
+        val view: RecyclerView
 //        private val itemViewLayoutId:Int,
 //        private val bindView:(Binder, View, T)->Unit
 ) : DisposableImpl() {
@@ -27,7 +27,7 @@ class RecycleViewBinding<T>(
 //    }
 
     override fun cleanup() {
-        val adapter = view.adapter as? Disposable ?: return
+        val adapter = view.adapter as? IDisposable ?: return
         adapter.dispose()
     }
 

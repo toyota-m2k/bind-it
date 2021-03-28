@@ -20,6 +20,7 @@ open class DrawableBinding<V>(
     }
 }
 
+@Suppress("unused")
 class BackgroundBinding(data:LiveData<Drawable>) : DrawableBinding<View>(data, { view, dr->view.background = dr}) {
     companion object {
         fun create(owner: LifecycleOwner, view:View, data:LiveData<Drawable>) : BackgroundBinding {

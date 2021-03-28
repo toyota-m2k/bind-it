@@ -29,9 +29,9 @@ open class NumberBinding<N> (
 }
 
 open class EditNumberBinding<N> (
-    data: MutableLiveData<N>,
-    mode: BindingMode,
-    val revert: ((String?)->N?)?
+        data: MutableLiveData<N>,
+        mode: BindingMode,
+        private val revert: ((String?)->N?)?
 ) : EditTextBinding(ConvertLiveData<N,String>(data, {it.toString()}, {revert?.invoke(it)}),mode) where N : Number {
 
     override fun onDataChanged(v: String?) {

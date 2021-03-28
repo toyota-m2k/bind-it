@@ -102,7 +102,7 @@ class VisibilityBindingTest {
         val data = MutableLiveData<Boolean>(false)
         val view = View(activity)
         view.visibility = View.VISIBLE
-        var binding = VisibilityBinding.create(activity,view,data,BoolConvert.Staright,VisibilityBinding.HiddenMode.HideByInvisible)
+        var binding = VisibilityBinding.create(activity,view,data,BoolConvert.Straight,VisibilityBinding.HiddenMode.HideByInvisible)
 
         assertEquals(View.INVISIBLE, view.visibility)
         data.value = true
@@ -114,7 +114,7 @@ class VisibilityBindingTest {
         data.value = true
         assertEquals(View.INVISIBLE, view.visibility)
 
-        binding = VisibilityBinding.create(activity,view,data,BoolConvert.Staright,VisibilityBinding.HiddenMode.HideByInvisible)
+        binding = VisibilityBinding.create(activity,view,data,BoolConvert.Straight,VisibilityBinding.HiddenMode.HideByInvisible)
         assertEquals(View.VISIBLE, view.visibility)
         data.value = false
         assertEquals(View.INVISIBLE, view.visibility)

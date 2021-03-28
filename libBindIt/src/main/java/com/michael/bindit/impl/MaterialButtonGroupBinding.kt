@@ -11,7 +11,7 @@ import com.michael.bindit.BindingMode
 
 abstract class MaterialButtonGroupBindingBase<T,DataType> (
     override val data:MutableLiveData<DataType>,
-    mode:BindingMode = BindingMode.TwoWay
+    mode: BindingMode = BindingMode.TwoWay
 )  : BaseBinding<DataType>(mode), MaterialButtonToggleGroup.OnButtonCheckedListener {
     private var btnListener: MaterialButtonToggleGroup.OnButtonCheckedListener? = null
 

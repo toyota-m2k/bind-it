@@ -5,6 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import com.michael.bindit.BindingMode
 
+@Suppress("unused")
 class AlphaBinding(
     override val data:LiveData<Float>
 ) : BaseBinding<Float>(BindingMode.OneWay) {

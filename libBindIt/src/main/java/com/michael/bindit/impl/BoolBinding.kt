@@ -10,5 +10,5 @@ abstract class BoolBinding(
     mode:BindingMode,
     boolConvert: BoolConvert
 ) : BaseBinding<Boolean>(mode) {
-    override val data:LiveData<Boolean> = if(boolConvert==BoolConvert.Staright) rawData else ConvertLiveData<Boolean,Boolean>(rawData as MutableLiveData<Boolean>, { it!=true }, {it!=true})
+    override val data:LiveData<Boolean> = if(boolConvert==BoolConvert.Straight) rawData else ConvertLiveData<Boolean,Boolean>(rawData as MutableLiveData<Boolean>, { it!=true }, {it!=true})
 }

@@ -41,7 +41,7 @@ fun Context.viewModelStorageOwner(): ViewModelStoreOwner? {
     return findSpecialContext()
 }
 
-fun View.activity(): FragmentActivity? {
+fun View.activity(): Activity? {
     return context?.findSpecialContext()
 }
 fun View.fragment(): Fragment? {

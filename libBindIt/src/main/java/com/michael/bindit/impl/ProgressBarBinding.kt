@@ -19,7 +19,7 @@ open class ProgressBarBinding protected constructor(
     override val data: LiveData<Int>,
     private val min:LiveData<Int>?,
     private val max:LiveData<Int>?,
-    mode:BindingMode
+    mode: BindingMode
 ) : BaseBinding<Int>(mode) {
     constructor(data:LiveData<Int>, min:LiveData<Int>?=null,max:LiveData<Int>?=null) :this(data,min,max,BindingMode.OneWay)
 
@@ -37,7 +37,9 @@ open class ProgressBarBinding protected constructor(
                     if(view.max < it) {
                         view.max = it
                     }
-                    view.min = it
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        view.min = it
+                    }
                 }
             }.apply {
                 min.observe(owner,this)
@@ -46,8 +48,10 @@ open class ProgressBarBinding protected constructor(
         if(max!=null) {
             maxObserver = Observer<Int> {
                 if(it!=null) {
-                    if(view.min>it) {
-                        view.min = it
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        if (view.min > it) {
+                            view.min = it
+                        }
                     }
                     view.max = it
                 }

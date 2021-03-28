@@ -11,14 +11,15 @@ interface IIDValueResolver<T> {
     fun value2id(v:T): Int
 }
 
+@Suppress("unused")
 open class RadioGroupBinding<T> (
     override val data: LiveData<T>,
-    mode:BindingMode
+    mode: BindingMode
 ) : BaseBinding<T>(mode), RadioGroup.OnCheckedChangeListener {
     constructor(data:LiveData<T>):this(data,BindingMode.OneWay)
 
-    lateinit var idResolver: IIDValueResolver<T>
-    val radioGroup:RadioGroup?
+    private lateinit var idResolver: IIDValueResolver<T>
+    private val radioGroup:RadioGroup?
         get() = view as? RadioGroup
 
     fun connect(owner: LifecycleOwner, view:RadioGroup, idResolver:IIDValueResolver<T>) {

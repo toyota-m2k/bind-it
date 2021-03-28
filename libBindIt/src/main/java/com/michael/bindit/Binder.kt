@@ -2,13 +2,12 @@
 
 package com.michael.bindit
 
-import android.view.View
-import io.reactivex.rxjava3.disposables.Disposable
+import com.michael.bindit.util.IDisposable
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class Binder : Disposable {
+open class Binder : IDisposable {
     protected var disposed: Boolean = false
-    protected val bindings = mutableListOf<Disposable>()
+    protected val bindings = mutableListOf<IDisposable>()
     override fun dispose() {
         if(!disposed) {
             disposed = true
@@ -20,7 +19,7 @@ open class Binder : Disposable {
         return disposed
     }
 
-    fun register(vararg bindings:IBinding):Binder {
+    fun register(vararg bindings:IDisposable):Binder {
         for(b in bindings) {
             this.bindings.add(b)
         }

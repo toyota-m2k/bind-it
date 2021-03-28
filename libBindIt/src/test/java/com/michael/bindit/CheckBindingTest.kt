@@ -35,7 +35,7 @@ class CheckBindingTest {
         val view = ToggleButton(activity)
         val data = MutableLiveData<Boolean>(false)
 
-        val binding = CheckBinding.create(activity, view, data, BoolConvert.Staright, BindingMode.OneWay)
+        val binding = CheckBinding.create(activity, view, data, BoolConvert.Straight, BindingMode.OneWay)
         assertEquals(data.value, view.isChecked)
         assertFalse(view.isChecked)
         data.value = true
@@ -53,7 +53,7 @@ class CheckBindingTest {
         val data = MutableLiveData<Boolean>(false)
 
         view.isChecked = true
-        val binding = CheckBinding.create(activity, view, data, BoolConvert.Staright, BindingMode.OneWayToSource)
+        val binding = CheckBinding.create(activity, view, data, BoolConvert.Straight, BindingMode.OneWayToSource)
         assertEquals(data.value, view.isChecked)
         assertTrue(data.value!!)
 
@@ -73,7 +73,7 @@ class CheckBindingTest {
         val data = MutableLiveData<Boolean>(false)
 
         view.isChecked = true
-        val binding = CheckBinding.create(activity, view, data, BoolConvert.Staright, BindingMode.TwoWay)
+        val binding = CheckBinding.create(activity, view, data, BoolConvert.Straight, BindingMode.TwoWay)
         assertEquals(data.value, view.isChecked)
         assertFalse(view.isChecked)
 

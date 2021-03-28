@@ -10,9 +10,9 @@ import com.michael.bindit.BoolConvert
 @Suppress("unused")
 open class VisibilityBinding(
         data: LiveData<Boolean>,
-        boolConvert: BoolConvert = BoolConvert.Staright,
+        boolConvert: BoolConvert = BoolConvert.Straight,
         private val hiddenMode:HiddenMode = HiddenMode.HideByGone
-) : BoolBinding(data,BindingMode.OneWay, boolConvert) {
+) : BoolBinding(data, BindingMode.OneWay, boolConvert) {
     enum class HiddenMode {
         HideByGone,
         HideByInvisible,
@@ -28,7 +28,7 @@ open class VisibilityBinding(
     }
 
     companion object {
-        fun create(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Staright, hiddenMode:HiddenMode = HiddenMode.HideByGone) : VisibilityBinding {
+        fun create(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode:HiddenMode = HiddenMode.HideByGone) : VisibilityBinding {
             return VisibilityBinding(data, boolConvert, hiddenMode).apply { connect(owner, view) }
         }
     }

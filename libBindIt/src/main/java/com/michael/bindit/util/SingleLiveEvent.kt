@@ -24,7 +24,7 @@ interface ISingleLiveEvent<T> {
  *
  */
 @Suppress("unused")
-class SingleLiveEvent<T> : ISingleLiveEvent<T> {
+class SingleLiveEvent<T:Any> : ISingleLiveEvent<T> {
     private val subject = SingleLiveData<T>()
 
     val liveData:LiveData<T>

@@ -1,6 +1,6 @@
 package com.michael.bindit
 
-import io.reactivex.rxjava3.disposables.Disposable
+import com.michael.bindit.util.IDisposable
 
 enum class BindingMode {
     OneWay,
@@ -8,12 +8,13 @@ enum class BindingMode {
     TwoWay,
 }
 
+@Suppress("unused")
 enum class BoolConvert {
-    Staright,   // true --> true
+    Straight,   // true --> true
     Inverse,    // true --> false
 }
 
-interface IBinding : Disposable {
+interface IBinding : IDisposable {
     val mode:BindingMode
 }
 

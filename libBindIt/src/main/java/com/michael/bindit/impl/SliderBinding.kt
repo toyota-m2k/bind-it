@@ -8,6 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.material.slider.Slider
 import com.michael.bindit.BindingMode
+import java.lang.Float.max
+import java.lang.Float.min
 
 /**
  * Material Componentのスライダー
@@ -18,14 +20,14 @@ import com.michael.bindit.BindingMode
  * min/max を変更するときに、valueが範囲外になると死ぬし、min==max になっても死ぬし、とにかく、そっと使うように。
  */
 open class SliderBinding (
-    override val data: LiveData<Float>,
-    mode:BindingMode,
-    private val min:LiveData<Float>? = null,
-    private val max:LiveData<Float>? = null,
+        override val data: LiveData<Float>,
+        mode: BindingMode,
+        private val min:LiveData<Float>? = null,
+        private val max:LiveData<Float>? = null,
 ) : BaseBinding<Float>(mode), Slider.OnChangeListener {
     constructor(data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null) : this(data, BindingMode.OneWay, min,max)
 
-    val slider: Slider?
+    private val slider: Slider?
         get() = view as? Slider
 
     private var minObserver: Observer<Float?>? = null
@@ -72,16 +74,17 @@ open class SliderBinding (
         super.cleanup()
     }
 
-    fun clipByRange(a:Float, b:Float, v:Float):Float {
-        val min = Math.min(a,b)
-        val max = Math.max(a,b)
-        return Math.min(Math.max(min,v), max)
+    private fun clipByRange(a:Float, b:Float, v:Float):Float {
+        val min = min(a,b)
+        val max = max(a,b)
+        return min(max(min,v), max)
     }
 
-    fun fitToStep(v:Float, s:Float):Float {
+    private fun fitToStep(v:Float, s:Float):Float {
         return if(s==0f) {
             v
         } else {
+            @Suppress("ReplaceJavaStaticMethodWithKotlinAnalog")
             s*Math.round(v/s)
         }
     }

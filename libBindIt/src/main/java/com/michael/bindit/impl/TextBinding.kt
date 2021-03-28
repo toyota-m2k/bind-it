@@ -13,7 +13,7 @@ import com.michael.bindit.BindingMode
 
 open class TextBinding protected constructor(
     override val data:LiveData<String>,
-    mode:BindingMode
+    mode: BindingMode
 ) : BaseBinding<String>(mode) {
     constructor(data:LiveData<String>):this(data,BindingMode.OneWay)
     // region Observer (LiveData-->View)
@@ -72,7 +72,9 @@ open class EditTextBinding(
         super.connect(owner,view)
         if(mode!=BindingMode.OneWay) {
             view.addTextChangedListener(this)
-            afterTextChanged(view.text)
+            if(mode==BindingMode.OneWayToSource) {
+                afterTextChanged(view.text)
+            }
         }
     }
 

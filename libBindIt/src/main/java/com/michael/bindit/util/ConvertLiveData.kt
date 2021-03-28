@@ -3,6 +3,10 @@ package com.michael.bindit.util
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 
+/**
+ * 型・値変換をサポートするMutableLiveData
+ * Mutableでないなら、Filterで十分なのだけど、双方向リンクに使うために実装した。
+ */
 class ConvertLiveData<R,C>(
     val source: MutableLiveData<R>,
     val convert:(R?)->C?,
@@ -19,12 +23,12 @@ class ConvertLiveData<R,C>(
         }
     }
 
-    private fun rawValueChanged(value:R?):C? {
-        val c = convert(value)
-        super.setValue(c)
-        source.value = value
-        return c
-    }
+//    private fun rawValueChanged(value:R?):C? {
+//        val c = convert(value)
+//        super.setValue(c)
+//        source.value = value
+//        return c
+//    }
 
     override fun setValue(value: C?) {
         super.setValue(value)

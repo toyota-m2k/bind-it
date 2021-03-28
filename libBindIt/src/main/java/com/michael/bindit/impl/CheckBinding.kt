@@ -10,12 +10,12 @@ import com.michael.bindit.BindingMode
 import com.michael.bindit.BoolConvert
 
 open class CheckBinding protected constructor(
-    rawData: LiveData<Boolean>,
-    mode: BindingMode,
-    boolConvert:BoolConvert = BoolConvert.Staright
+        rawData: LiveData<Boolean>,
+        mode: BindingMode,
+        boolConvert: BoolConvert = BoolConvert.Straight
 ) : BoolBinding(rawData,mode,boolConvert), CompoundButton.OnCheckedChangeListener {
-    constructor(data:LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Staright) : this(data,BindingMode.OneWay,boolConvert)
-    val compoundButton:CompoundButton?
+    constructor(data:LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight) : this(data,BindingMode.OneWay,boolConvert)
+    private val compoundButton:CompoundButton?
         get() = view as? CompoundButton
 
     fun connect(owner: LifecycleOwner, view: CompoundButton) {
@@ -53,10 +53,10 @@ open class CheckBinding protected constructor(
     }
 
     companion object {
-        fun create(owner: LifecycleOwner, view: CompoundButton, data: LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Staright):CheckBinding {
+        fun create(owner: LifecycleOwner, view: CompoundButton, data: LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):CheckBinding {
             return CheckBinding(data, BindingMode.OneWay, boolConvert).apply { connect(owner, view) }
         }
-        fun create(owner: LifecycleOwner, view:CompoundButton, data: MutableLiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Staright, mode: BindingMode=BindingMode.TwoWay):CheckBinding {
+        fun create(owner: LifecycleOwner, view:CompoundButton, data: MutableLiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):CheckBinding {
             return CheckBinding(data, mode, boolConvert).apply { connect(owner, view) }
         }
     }

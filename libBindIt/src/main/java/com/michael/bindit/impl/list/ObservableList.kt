@@ -39,7 +39,7 @@ class ObservableList<T> : MutableList<T> {
 
     private var mutationEvent = Listeners<MutationEventData>()
 
-    fun addListener(owner:LifecycleOwner, fn:(MutationEventData)->Unit):ListenerKey {
+    fun addListener(owner:LifecycleOwner, fn:(MutationEventData)->Unit): ListenerKey {
         fn(RefreshEventData())
         return mutationEvent.add(owner,fn)
     }

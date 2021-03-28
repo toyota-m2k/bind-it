@@ -4,12 +4,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.MainThread
-//import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.michael.bindit.Binder
+import com.michael.bindit.util.IDisposable
 import com.michael.bindit.util.ListenerKey
-import io.reactivex.rxjava3.disposables.Disposable
 
 class RecyclerViewAdapter {
     /**
@@ -18,7 +17,7 @@ class RecyclerViewAdapter {
     abstract class Base<T, VH>(
         owner: LifecycleOwner,
         val list: ObservableList<T>
-    ) : Disposable, RecyclerView.Adapter<VH>() where VH : RecyclerView.ViewHolder
+    ) : IDisposable, RecyclerView.Adapter<VH>() where VH : RecyclerView.ViewHolder
     {
 
 //            set(v) {
@@ -38,7 +37,7 @@ class RecyclerViewAdapter {
             }
         }
         private val listMutationListener = ListMutationListener()
-        private var listenerKey:ListenerKey? = list.addListener(owner, listMutationListener::onListChanged)
+        private var listenerKey: ListenerKey? = list.addListener(owner, listMutationListener::onListChanged)
 
         // region Disposable i/f
         @MainThread
@@ -103,23 +102,21 @@ class RecyclerViewAdapter {
             bindView(holder.binder, holder.itemView, list[position])
         }
     }
-/**
-    class SimpleWithDataBinding<T,B>(
-        owner:LifecycleOwner,
-        list: ObservableList<T>,
-        val createView:(parent:ViewGroup, viewType:Int)->B,
-        val bind: (binding: B, item:T)->Unit
-    ) : Base<T, SimpleWithDataBinding.SimpleViewHolder<B>>(owner,list) where B:ViewDataBinding {
-
-        class SimpleViewHolder<B>(val binding: B): RecyclerView.ViewHolder(binding.root) where B:ViewDataBinding
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleViewHolder<B> {
-            return SimpleViewHolder(createView(parent,viewType))
-        }
-
-        override fun onBindViewHolder(holder: SimpleViewHolder<B>, position: Int) {
-            bind(holder.binding, list[position])
-        }
-    }
-**/
+//    class SimpleWithDataBinding<T,B>(
+//        owner:LifecycleOwner,
+//        list: ObservableList<T>,
+//        val createView:(parent:ViewGroup, viewType:Int)->B,
+//        val bind: (binding: B, item:T)->Unit
+//    ) : Base<T, SimpleWithDataBinding.SimpleViewHolder<B>>(owner,list) where B:ViewDataBinding {
+//
+//        class SimpleViewHolder<B>(val binding: B): RecyclerView.ViewHolder(binding.root) where B:ViewDataBinding
+//
+//        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SimpleViewHolder<B> {
+//            return SimpleViewHolder(createView(parent,viewType))
+//        }
+//
+//        override fun onBindViewHolder(holder: SimpleViewHolder<B>, position: Int) {
+//            bind(holder.binding, list[position])
+//        }
+//    }
 }

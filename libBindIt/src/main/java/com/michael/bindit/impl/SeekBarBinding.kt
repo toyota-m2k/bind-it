@@ -6,11 +6,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.michael.bindit.BindingMode
 
+@Suppress("unused")
 open class SeekBarBinding(
     data: LiveData<Int>,
     min: LiveData<Int>? = null,
     max: LiveData<Int>? = null,
-    mode:BindingMode
+    mode: BindingMode
 ) : ProgressBarBinding(data,min,max,mode), SeekBar.OnSeekBarChangeListener {
     private val seekBar:SeekBar?
         get() = view as? SeekBar

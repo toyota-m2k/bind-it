@@ -4,9 +4,8 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import io.reactivex.rxjava3.disposables.Disposable
 
-interface ListenerKey:Disposable
+interface ListenerKey:IDisposable
 
 @Suppress("unused")
 class Listeners<T> {
