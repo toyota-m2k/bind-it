@@ -16,10 +16,11 @@ buildscript {
     val espresso_version by extra("3.3.0")
     repositories {
         google()
+        mavenCentral()
         jcenter()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:4.1.2")
+        classpath("com.android.tools.build:gradle:4.1.3")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
 
         // NOTE: Do not place your application dependencies here; they belong

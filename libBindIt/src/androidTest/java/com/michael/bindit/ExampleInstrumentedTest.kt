@@ -1,4 +1,4 @@
-package com.michael.bindit
+package io.github.toyota32k.bindit
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -20,6 +20,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.michael.bindit.test", appContext.packageName)
+        assertEquals("io.github.toyota32k.bindit.test", appContext.packageName)
     }
 }
