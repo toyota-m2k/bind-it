@@ -111,6 +111,28 @@ fun <T1,T2,T3,T4,T5,R> combineLatest(src1:LiveData<T1>, src2: LiveData<T2>, src3
     }
 }
 
+class DisposableObserver<T>(data: LiveData<T>, owner: LifecycleOwner, private val callback:(v:T?)->Unit): Observer<T?>, IDisposable {
+    private var data:LiveData<T>? = data
+    init {
+        data.observe(owner, this)
+    }
+    override fun onChanged(t: T?) {
+        callback(t)
+    }
+    override fun dispose() {
+        data?.removeObserver(this)
+        data = null
+    }
+
+    override fun isDisposed(): Boolean {
+        return data==null
+    }
+}
+
+fun <T> LiveData<T>.disposableObserve(owner: LifecycleOwner, fn:(v:T?)->Unit) : IDisposable
+        = DisposableObserver(this,owner,fn)
+
+
 ///**
 // * LiveData.observe()で、ラムダ式を使えるようにする拡張メソッド。
 // * （今は、直接ラムダ式を渡せない。そのうち、Kotlinがサポートするようになるかもしれないが。）
@@ -223,3 +245,15 @@ fun <T> LiveData<T>.toFlow(): Flow<T?> = callbackFlow {
 //
 //fun <T> Publisher<T>.toLiveData() =
 //        LiveDataReactiveStreams.fromPublisher(this)
+fun Boolean.onTrue(fn:()->Unit):Boolean {
+    if(this==true) {
+        fn()
+    }
+    return this
+}
+fun Boolean.onFalse(fn:()->Unit):Boolean {
+    if(this!=true) {
+        fn()
+    }
+    return this
+}

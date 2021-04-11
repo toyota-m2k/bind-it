@@ -25,7 +25,7 @@ interface IUtVaLogger {
 class UtLoggerInstance(private val tag:String) : IUtVaLogger {
     companion object {
         @JvmStatic
-        internal var externalLogger:IUtExternalLogger? = null
+        var externalLogger:IUtExternalLogger? = null
     }
 
     override fun debug(s: String, vararg args: Any?) {

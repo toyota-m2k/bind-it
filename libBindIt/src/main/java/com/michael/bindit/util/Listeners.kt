@@ -13,7 +13,9 @@ class Listeners<T> {
         fun onChanged(value:T)
     }
 
-    private val functions = mutableListOf<(OwnerWrapper)>()
+    private val functions = mutableListOf<OwnerWrapper>()
+    private val tobeDelete = mutableListOf<OwnerWrapper>()
+    private var busy:Boolean = false
 
     inner class OwnerWrapper(owner:LifecycleOwner, val fn:(T)->Unit) : LifecycleEventObserver, ListenerKey {
         var lifecycle:Lifecycle?
@@ -34,7 +36,12 @@ class Listeners<T> {
             lifecycle?.let {
                 lifecycle = null
                 it.removeObserver(this)
-                functions.remove(this)
+                if(!busy) {
+                    functions.remove(this)
+                } else {
+                    // invokeíÜÇ…deleteÇ™óvãÅÇ≥ÇÍÇΩèÍçáÇÕÇ±Ç±Ç…ì¸ÇÈ
+                    tobeDelete.add(this)
+                }
             }
         }
 
@@ -49,6 +56,8 @@ class Listeners<T> {
         fun invoke(arg:T) {
             if(alive) {
                 fn(arg)
+            } else {
+                dispose()
             }
         }
     }
@@ -80,8 +89,21 @@ class Listeners<T> {
 
     @MainThread
     fun invoke(v:T) {
-        functions.forEach {
-            it.invoke(v)
+        busy = true
+        try {
+            functions.forEach {
+                it.invoke(v)
+            }
+        } catch(e:Throwable) {
+            UtLogger.stackTrace(e)
+        }
+        busy = false
+
+        if(tobeDelete.size>0) {
+            tobeDelete.forEach {
+                it.dispose()
+            }
+            tobeDelete.clear()
         }
     }
 }

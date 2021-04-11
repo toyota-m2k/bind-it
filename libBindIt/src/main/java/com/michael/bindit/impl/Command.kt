@@ -1,21 +1,29 @@
 package com.michael.bindit.impl
 
+import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.EditText
+import android.widget.TextView
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import com.michael.bindit.util.IDisposable
 import com.michael.bindit.util.Listeners
 import java.lang.ref.WeakReference
 
-class Command : View.OnClickListener {
+class Command : View.OnClickListener, TextView.OnEditorActionListener {
     private val listeners = Listeners<View?>()
-    private class ClickListenerDisposer(v:View, var bind: IDisposable?=null) : IDisposable {
+    private class ClickListenerDisposer(v:View, var bind:IDisposable?=null) : IDisposable {
         var view:WeakReference<View>? = WeakReference<View>(v)
 
         override fun dispose() {
             bind?.dispose()
             view?.get()?.apply {
-                setOnClickListener(null)
+                if(this is EditText) {
+                    setOnEditorActionListener(null)
+                } else {
+                    setOnClickListener(null)
+                }
             }
             view = null
             bind = null
@@ -29,18 +37,17 @@ class Command : View.OnClickListener {
 
     @MainThread
     fun connectView(view:View) {
-        view.setOnClickListener(this)
+        if(view is EditText) {
+            view.setOnEditorActionListener(this)
+        } else {
+            view.setOnClickListener(this)
+        }
     }
 
     @MainThread
     fun connectViewEx(view:View) : IDisposable {
-        view.setOnClickListener(this)
+        connectView(view)
         return ClickListenerDisposer(view)
-    }
-
-
-    override fun onClick(v: View?) {
-        listeners.invoke(v)
     }
 
     @MainThread
@@ -54,9 +61,19 @@ class Command : View.OnClickListener {
         return ClickListenerDisposer(view, bind(owner,fn))
     }
 
-
     @MainThread
     fun reset() {
         listeners.clear()
+    }
+
+    override fun onClick(v: View?) {
+        listeners.invoke(v)
+    }
+
+    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
+        return if (actionId == EditorInfo.IME_ACTION_DONE || event?.action == KeyEvent.ACTION_DOWN && (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)) {
+            listeners.invoke(v)
+            true
+        } else false
     }
 }
