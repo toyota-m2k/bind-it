@@ -8,7 +8,6 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "io.github.toyota32k.bindit.sample"
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
