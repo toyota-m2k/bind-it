@@ -1,14 +1,15 @@
-package io.github.toyota32k.bindit
+package io.github.toyota32k.bindit.sample
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.slider.Slider
+import io.github.toyota32k.bindit.*
 import io.github.toyota32k.utils.combineLatest
 
 class MainActivity : AppCompatActivity() {
@@ -19,17 +20,17 @@ class MainActivity : AppCompatActivity() {
 
         class IDResolver: IIDValueResolver<RadioValue> {
             override fun id2value(id:Int) : RadioValue? {
-                return Companion.valueOf(id)
+                return valueOf(id)
             }
-            override fun value2id(v:RadioValue): Int {
+            override fun value2id(v: RadioValue): Int {
                 return v.resId
             }
         }
         class MtIDResolver: IIDValueResolver<RadioValue> {
             override fun id2value(id:Int) : RadioValue? {
-                return Companion.mtValueOf(id)
+                return mtValueOf(id)
             }
-            override fun value2id(v:RadioValue): Int {
+            override fun value2id(v: RadioValue): Int {
                 return v.mtResId
             }
         }
@@ -41,8 +42,8 @@ class MainActivity : AppCompatActivity() {
             fun mtValueOf(resId: Int, def: RadioValue = Radio1): RadioValue {
                 return values().find { it.mtResId == resId } ?: def
             }
-            val idResolver:IIDValueResolver<RadioValue> by lazy { IDResolver() }
-            val mtIdResolver:IIDValueResolver<RadioValue> by lazy { MtIDResolver() }
+            val idResolver: IIDValueResolver<RadioValue> by lazy { IDResolver() }
+            val mtIdResolver: IIDValueResolver<RadioValue> by lazy { MtIDResolver() }
         }
 
     }
@@ -54,18 +55,18 @@ class MainActivity : AppCompatActivity() {
 
         class IDResolver: IIDValueResolver<ToggleValue> {
             override fun id2value(id:Int) : ToggleValue? {
-                return ToggleValue.valueOf(id)
+                return valueOf(id)
             }
-            override fun value2id(v:ToggleValue): Int {
+            override fun value2id(v: ToggleValue): Int {
                 return v.resId
             }
         }
 
         companion object {
-            fun valueOf(resId: Int, def: ToggleValue = ToggleValue.Toggle1): ToggleValue {
+            fun valueOf(resId: Int, def: ToggleValue = Toggle1): ToggleValue {
                 return ToggleValue.values().find { it.resId == resId } ?: def
             }
-            val idResolver:IIDValueResolver<ToggleValue> by lazy { ToggleValue.IDResolver() }
+            val idResolver: IIDValueResolver<ToggleValue> by lazy { IDResolver() }
         }
     }
 
@@ -83,12 +84,13 @@ class MainActivity : AppCompatActivity() {
 
         companion object {
             fun instance(owner: FragmentActivity): MainViewModel {
-                return ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory()).get(MainViewModel::class.java)
+                return ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory()).get(
+                    MainViewModel::class.java)
             }
         }
     }
 
-    inner class Binding(owner:LifecycleOwner, mode:MainViewModel): Binder() {
+    inner class Binding(owner:LifecycleOwner, mode: MainViewModel): Binder() {
         val slider:Slider by lazy { findViewById(R.id.slider) }
         val numberText:EditText by lazy { findViewById(R.id.numberText) }
         val radioGroup: RadioGroup by lazy { findViewById(R.id.radioGroup)}
@@ -101,22 +103,67 @@ class MainActivity : AppCompatActivity() {
 
         init {
             register(
-                SliderBinding.create(owner,slider,model.sliderValue, BindingMode.TwoWay, model.sliderMin,model.sliderMax),
-                EditNumberBinding.create(owner,numberText,model.sliderValue,BindingMode.TwoWay),
+                SliderBinding.create(
+                    owner,
+                    slider,
+                    model.sliderValue,
+                    BindingMode.TwoWay,
+                    model.sliderMin,
+                    model.sliderMax
+                ),
+                EditNumberBinding.create(owner, numberText, model.sliderValue, BindingMode.TwoWay),
 
-                RadioGroupBinding.create(owner,radioGroup, model.radioValue, RadioValue.idResolver, BindingMode.TwoWay),
-                TextBinding.create(owner, radioValue, model.radioValue.map {it.toString()}),
-                MaterialRadioButtonGroupBinding.create(owner,toggleGroupAsRadio,model.radioValue, RadioValue.mtIdResolver),
+                RadioGroupBinding.create(
+                    owner,
+                    radioGroup,
+                    model.radioValue,
+                    RadioValue.idResolver,
+                    BindingMode.TwoWay
+                ),
+                TextBinding.create(owner, radioValue, model.radioValue.map { it.toString() }),
+                MaterialRadioButtonGroupBinding.create(
+                    owner,
+                    toggleGroupAsRadio,
+                    model.radioValue,
+                    RadioValue.mtIdResolver
+                ),
 
-                MaterialToggleButtonGroupBinding.create(owner,toggleGroup, model.toggleValue, ToggleValue.idResolver),
-                TextBinding.create(owner, toggleValue, model.toggleValue.map { list-> list.map { it.toString() }.joinToString(", ") }),
+                MaterialToggleButtonGroupBinding.create(
+                    owner,
+                    toggleGroup,
+                    model.toggleValue,
+                    ToggleValue.idResolver
+                ),
+                TextBinding.create(
+                    owner,
+                    toggleValue,
+                    model.toggleValue.map { list ->
+                        list.map { it.toString() }.joinToString(", ")
+                    }),
 
-                MaterialToggleButtonsBinding.create(owner, toggleButtonGroup, BindingMode.TwoWay,
-                    MaterialToggleButtonsBinding.ButtonAndData(findViewById(R.id.toggleButton1),model.tbState1),
-                    MaterialToggleButtonsBinding.ButtonAndData(findViewById(R.id.toggleButton2),model.tbState2),
-                    MaterialToggleButtonsBinding.ButtonAndData(findViewById(R.id.toggleButton3),model.tbState3),
+                MaterialToggleButtonsBinding.create(
+                    owner, toggleButtonGroup, BindingMode.TwoWay,
+                    MaterialToggleButtonsBinding.ButtonAndData(
+                        findViewById(R.id.toggleButton1),
+                        model.tbState1
                     ),
-                TextBinding.create(owner,toggleButtonValue,combineLatest(model.tbState1, model.tbState2,model.tbState3){v1,v2,v3->"${v1},${v2},${v3}"})
+                    MaterialToggleButtonsBinding.ButtonAndData(
+                        findViewById(R.id.toggleButton2),
+                        model.tbState2
+                    ),
+                    MaterialToggleButtonsBinding.ButtonAndData(
+                        findViewById(R.id.toggleButton3),
+                        model.tbState3
+                    ),
+                ),
+                TextBinding.create(
+                    owner,
+                    toggleButtonValue,
+                    combineLatest(
+                        model.tbState1,
+                        model.tbState2,
+                        model.tbState3
+                    ) { v1, v2, v3 -> "${v1},${v2},${v3}" })
             )
         }
     }
