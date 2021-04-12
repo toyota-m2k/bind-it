@@ -1,0 +1,3 @@
+include ':libbindit'
+include ':sample'
+rootProject.name = "bindit"
