@@ -170,4 +170,4 @@ if [ "$(uname)" = "Darwin" ] && [ "$HOME" = "$PWD" ]; then
 fi
 
 # exec "$JAVACMD" "$@"
-exec "$JAVACMD" "$@" --refresh-dependencies --scan
+exec "$JAVACMD" "$@" --refresh-dependencies --scan --info --debug
