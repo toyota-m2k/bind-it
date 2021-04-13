@@ -30,12 +30,12 @@ buildscript {
 }
 
 allprojects {
-    repositories {
-        mavenCentral()
-        google()
-        maven { url "https://jitpack.io" }
-        jcenter()
-    }
+//    repositories {
+//        google()
+//        mavenCentral()
+//        jcenter() // Warning: this repository is going to shut down soon
+//        maven { url "https://jitpack.io" }
+//    }
 }
 
 task clean(type: Delete) {
