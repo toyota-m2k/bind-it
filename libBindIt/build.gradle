@@ -4,7 +4,14 @@ plugins {
     id 'maven-publish'
 }
 
-group = "io.github.toyota-m2k"
+repositories {
+    mavenCentral()
+    google()
+    maven { url "https://jitpack.io" }
+    jcenter()
+}
+
+group = "com.github.toyota-m2k"
 version = "0.0.2"
 
 android {
@@ -81,7 +88,7 @@ afterEvaluate {
                 from components.release
 
                 // You can then customize attributes of the publication as shown below.
-                groupId = 'io.github.toyota-m2k'
+                groupId = 'com.github.toyota-m2k'
                 artifactId = 'bindit'
                 version = '0.0.2'
             }
