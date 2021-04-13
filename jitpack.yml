@@ -1,3 +1,4 @@
 install:
   - echo "Running a custom install command"
+  - ./prepareEnvironment.sh
   - ./gradlew publishToMavenLocal
