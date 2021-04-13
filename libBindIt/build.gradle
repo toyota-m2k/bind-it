@@ -5,6 +5,9 @@ plugins {
     id 'com.github.dcendents.android-maven'
 }
 
+group = "io.github.toyota-m2k"
+version = "0.0.2"
+
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
@@ -81,15 +84,6 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'io.github.toyota-m2k'
                 artifactId = 'bindit'
-                version = '0.0.2'
-            }
-            // Creates a Maven publication called “debug”.
-            debug(MavenPublication) {
-                // Applies the component for the debug build variant.
-                from components.debug
-
-                groupId = 'io.github.toyota-m2k'
-                artifactId = 'bindit-debug'
                 version = '0.0.2'
             }
         }
