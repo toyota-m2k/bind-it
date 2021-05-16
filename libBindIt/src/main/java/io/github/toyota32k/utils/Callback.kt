@@ -6,7 +6,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 
 class Callback<T,R> private constructor(private var lifecycle: Lifecycle?, private var callback:((T)->R)?)
- : LifecycleEventObserver, ListenerKey {
+ : LifecycleEventObserver, IDisposable {
     constructor(owner:LifecycleOwner, fn:((T)->R)) : this(owner.lifecycle,fn)
     @Suppress("unused")
     constructor(): this(null,null)

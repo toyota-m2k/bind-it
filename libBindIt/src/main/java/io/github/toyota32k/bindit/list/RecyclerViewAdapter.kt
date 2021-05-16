@@ -37,7 +37,7 @@ class RecyclerViewAdapter {
             }
         }
         private val listMutationListener = ListMutationListener()
-        private var listenerKey: ListenerKey? = list.addListener(owner, listMutationListener::onListChanged)
+        private var listenerKey: IDisposable? = list.addListener(owner, listMutationListener::onListChanged)
 
         // region Disposable i/f
         @MainThread

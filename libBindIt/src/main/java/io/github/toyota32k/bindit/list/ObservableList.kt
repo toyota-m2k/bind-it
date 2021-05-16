@@ -3,6 +3,7 @@
 package io.github.toyota32k.bindit.list
 
 import androidx.lifecycle.LifecycleOwner
+import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.ListenerKey
 import io.github.toyota32k.utils.Listeners
 
@@ -39,11 +40,11 @@ class ObservableList<T> : MutableList<T> {
 
     private var mutationEvent = Listeners<MutationEventData>()
 
-    fun addListener(owner:LifecycleOwner, fn:(MutationEventData)->Unit): ListenerKey {
+    fun addListener(owner:LifecycleOwner, fn:(MutationEventData)->Unit): IDisposable {
         fn(RefreshEventData())
         return mutationEvent.add(owner,fn)
     }
-    fun addListener(owner:LifecycleOwner, listener: Listeners.IListener<MutationEventData>): ListenerKey {
+    fun addListener(owner:LifecycleOwner, listener: Listeners.IListener<MutationEventData>): IDisposable {
         listener.onChanged(RefreshEventData())
         return mutationEvent.add(owner,listener)
     }

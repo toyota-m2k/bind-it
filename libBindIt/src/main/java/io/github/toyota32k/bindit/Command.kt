@@ -56,6 +56,11 @@ class Command : View.OnClickListener, TextView.OnEditorActionListener {
     }
 
     @MainThread
+    fun bindForever(fn:()->Unit): IDisposable {
+        return listeners.addForever { fn() }
+    }
+
+    @MainThread
     fun connectAndBind(owner: LifecycleOwner, view:View, fn:((View?)->Unit)):IDisposable {
         connectView(view)
         return ClickListenerDisposer(view, bind(owner,fn))

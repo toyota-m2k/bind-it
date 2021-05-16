@@ -5,7 +5,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 
-interface ListenerKey:IDisposable
+interface ListenerKey<T>:IDisposable {
+    fun invoke(arg:T)
+}
 
 @Suppress("unused")
 class Listeners<T> {
@@ -13,11 +15,34 @@ class Listeners<T> {
         fun onChanged(value:T)
     }
 
-    private val functions = mutableListOf<OwnerWrapper>()
-    private val tobeDelete = mutableListOf<OwnerWrapper>()
+    private val functions = mutableListOf<ListenerKey<T>>()
+    private val tobeDelete = mutableSetOf<ListenerKey<T>>()
     private var busy:Boolean = false
 
-    inner class OwnerWrapper(owner:LifecycleOwner, val fn:(T)->Unit) : LifecycleEventObserver, ListenerKey {
+    inner open class IndependentInvoker(callback:(T)->Unit):ListenerKey<T> {
+        var fn:((T)->Unit)? = callback
+
+        @MainThread
+        override fun invoke(arg:T) {
+            fn?.invoke(arg)
+        }
+
+        override fun dispose() {
+            if(!busy) {
+                functions.remove(this)
+            } else {
+                tobeDelete.add(this)
+            }
+            fn = null
+        }
+
+        override fun isDisposed(): Boolean {
+            return fn == null
+        }
+
+    }
+
+    inner class OwneredInvoker(owner:LifecycleOwner, val fn:(T)->Unit) : LifecycleEventObserver, ListenerKey<T> {
         var lifecycle:Lifecycle?
         init {
             lifecycle = owner.lifecycle.also {
@@ -53,7 +78,7 @@ class Listeners<T> {
         }
 
         @MainThread
-        fun invoke(arg:T) {
+        override fun invoke(arg:T) {
             if(alive) {
                 fn(arg)
             } else {
@@ -64,19 +89,26 @@ class Listeners<T> {
 
 
     @MainThread
-    fun add(owner:LifecycleOwner, fn:(T)->Unit): ListenerKey {
-        return OwnerWrapper(owner, fn).apply {
+    fun add(owner:LifecycleOwner, fn:(T)->Unit): IDisposable {
+        return OwneredInvoker(owner, fn).apply {
             functions.add(this)
         }
     }
 
     @MainThread
-    fun add(owner: LifecycleOwner, listener:IListener<T>):ListenerKey {
+    fun add(owner: LifecycleOwner, listener:IListener<T>):IDisposable {
         return add(owner, listener::onChanged)
     }
 
     @MainThread
-    fun remove(key:ListenerKey) {
+    fun addForever(fn:(T)->Unit):IDisposable {
+        return IndependentInvoker(fn).apply {
+            functions.add(this)
+        }
+    }
+
+    @MainThread
+    fun remove(key:IDisposable) {
         key.dispose()
     }
 

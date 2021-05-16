@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import io.github.toyota32k.bindit.BindingMode
 import io.github.toyota32k.bindit.IBinding
 import io.github.toyota32k.utils.Callback
+import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.ListenerKey
 import io.github.toyota32k.utils.Listeners
 
@@ -18,7 +19,7 @@ class ClickBinding<V> (
 ) : IBinding, View.OnClickListener where V:View {
     constructor(owner:LifecycleOwner, view:V, fn:((View)->Unit)) : this(owner,view,Listeners<View>(), fn)
     override val mode: BindingMode = BindingMode.OneWayToSource
-    var key: ListenerKey? = null
+    var key: IDisposable? = null
     init {
         view.setOnClickListener(this)
         key = listeners.add(owner,fn)
