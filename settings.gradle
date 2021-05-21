@@ -1,2 +1,3 @@
 rootProject.name = "bindit"
 include ':library'
+include ':sample'
