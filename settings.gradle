@@ -1,2 +1,2 @@
-rootProject.name = "bind-it"
-include ':libbindit'
+rootProject.name = "bindit"
+include ':library'
