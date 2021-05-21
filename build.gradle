@@ -27,6 +27,10 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
+plugins {
+    id 'maven-publish'
+}
+
 
 allprojects {
     repositories {
@@ -39,3 +43,9 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+task install {
+    println("install-->publish")
+    publish
+}
+
