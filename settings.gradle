@@ -1,1 +1,3 @@
+rootProject.name = "bind-it"
 include ':libbindit'
+include ':sample'

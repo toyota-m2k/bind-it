@@ -92,4 +92,7 @@ afterEvaluate {
             }
         }
     }
+    task install {
+        publish
+    }
 }
