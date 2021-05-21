@@ -1,1 +1,2 @@
-include ':libbindit', ':sample'
+rootProject.name = "libbindit"
+include ':libbindit', ":sample"
