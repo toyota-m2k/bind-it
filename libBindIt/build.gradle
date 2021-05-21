@@ -85,9 +85,4 @@ afterEvaluate {
             }
         }
     }
-
-    task install {
-        println("install = publish")
-        publish
-    }
 }
