@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    inner class Binding(owner:LifecycleOwner, mode: MainViewModel): Binder() {
+    inner class Binding(owner:LifecycleOwner, model: MainViewModel): Binder() {
         val slider:Slider by lazy { findViewById(R.id.slider) }
         val numberText:EditText by lazy { findViewById(R.id.numberText) }
         val radioGroup: RadioGroup by lazy { findViewById(R.id.radioGroup)}
