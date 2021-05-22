@@ -7,6 +7,9 @@ import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.ListenerKey
 import io.github.toyota32k.utils.Listeners
 
+fun <T> observableListOf(vararg e:T) : ObservableList<T> = ObservableList.of(*e)
+fun <T> Collection<T>.toObservableList() = ObservableList.from(this)
+
 class ObservableList<T> : MutableList<T> {
     companion object {
         fun <T> from (collection:Collection<T>): ObservableList<T> {
@@ -47,6 +50,15 @@ class ObservableList<T> : MutableList<T> {
     fun addListener(owner:LifecycleOwner, listener: Listeners.IListener<MutationEventData>): IDisposable {
         listener.onChanged(RefreshEventData())
         return mutationEvent.add(owner,listener)
+    }
+
+    fun addListenerForever(fn:(MutationEventData)->Unit): IDisposable {
+        fn(RefreshEventData())
+        return mutationEvent.addForever(fn)
+    }
+    fun addListenerForever(listener: Listeners.IListener<MutationEventData>): IDisposable {
+        listener.onChanged(RefreshEventData())
+        return mutationEvent.addForever(listener)
     }
 
     private var internalList: MutableList<T> = mutableListOf()
