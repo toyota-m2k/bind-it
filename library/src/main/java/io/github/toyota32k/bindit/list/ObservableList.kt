@@ -4,7 +4,6 @@ package io.github.toyota32k.bindit.list
 
 import androidx.lifecycle.LifecycleOwner
 import io.github.toyota32k.utils.IDisposable
-import io.github.toyota32k.utils.ListenerKey
 import io.github.toyota32k.utils.Listeners
 
 fun <T> observableListOf(vararg e:T) : ObservableList<T> = ObservableList.of(*e)
