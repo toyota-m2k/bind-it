@@ -4,6 +4,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import io.github.toyota32k.bindit.list.ObservableList
 
 interface ListenerKey<T>:IDisposable {
     fun invoke(arg:T)
@@ -103,6 +104,13 @@ class Listeners<T> {
     @MainThread
     fun addForever(fn:(T)->Unit):IDisposable {
         return IndependentInvoker(fn).apply {
+            functions.add(this)
+        }
+    }
+
+    @MainThread
+    fun addForever(listener:IListener<T>):IDisposable {
+        return IndependentInvoker(listener::onChanged).apply {
             functions.add(this)
         }
     }
