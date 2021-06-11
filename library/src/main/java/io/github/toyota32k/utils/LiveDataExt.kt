@@ -9,9 +9,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.Closeable
 
-//fun <T,R> LiveData<T>.map(fn:(T)->R): LiveData<R>
-//        = Transformations.map(this) { x->fn(x)}
-//
+/**
+ * LiveData.map だと、初期値が反映されないので、初期値の反映が必要なときはこちらを使う。
+ */
+fun <T,R> LiveData<T>.mapEx(fn:(T?)->R): LiveData<R> {
+    return MediatorLiveData<R>().also { med ->
+        med.addSource(this) { med.value = fn(it) }
+        med.value = fn(this.value)
+    }
+}
+
 //
 //fun <T,R> LiveData<T>.flatMap(fn:(T)-> LiveData<R>): LiveData<R>
 //        = Transformations.switchMap(this) { x->fn(x)}
@@ -227,7 +234,7 @@ fun and(vararg args:LiveData<Boolean>):LiveData<Boolean> {
 }
 
 fun LiveData<Boolean>.not():LiveData<Boolean> {
-    return this.map { !it }
+    return this.mapEx { !(it==true) }
 }
 
 @ExperimentalCoroutinesApi

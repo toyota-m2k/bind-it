@@ -65,7 +65,7 @@ class Listeners<T> {
                 if(!busy) {
                     functions.remove(this)
                 } else {
-                    // invoke����delete���v�����ꂽ�ꍇ�͂����ɓ���
+                    // invoke中にdeleteが要求された場合はここに入る
                     tobeDelete.add(this)
                 }
             }
