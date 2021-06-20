@@ -111,7 +111,7 @@ class RecyclerViewAdapter {
 
         override fun onListChanged(t: ObservableList.MutationEventData?) {
             if (t == null) return
-            recyclerViewRef.get()?.also { recyclerView ->
+            recyclerViewRef?.get()?.also { recyclerView ->
                 recyclerView.adapter = null
                 recyclerView.adapter = this
                 notifyDataSetChanged()
