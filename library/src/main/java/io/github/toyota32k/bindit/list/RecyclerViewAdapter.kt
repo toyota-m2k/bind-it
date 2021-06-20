@@ -3,12 +3,14 @@ package io.github.toyota32k.bindit.list
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.LayoutRes
 import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import io.github.toyota32k.bindit.Binder
 import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.ListenerKey
+import java.lang.ref.WeakReference
 
 class RecyclerViewAdapter {
     /**
@@ -56,7 +58,7 @@ class RecyclerViewAdapter {
 
         // Observer i/f
 
-        private fun onListChanged(t: ObservableList.MutationEventData?) {
+        protected open fun onListChanged(t: ObservableList.MutationEventData?) {
             if (t == null) return
             when (t) {
                 is ObservableList.ChangedEventData -> notifyItemRangeChanged(t.position, t.range)
@@ -82,10 +84,10 @@ class RecyclerViewAdapter {
         // endregion
     }
 
-    class Simple<T>(
+    open class Simple<T>(
         owner:LifecycleOwner,
         list: ObservableList<T>,
-        private val itemViewLayoutId:Int,
+        private @LayoutRes val itemViewLayoutId:Int,
         val bindView: (binder: Binder, view: View, item:T)->Unit
     ) : Base<T, Simple.SimpleViewHolder>(owner,list) {
         class SimpleViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
@@ -102,6 +104,22 @@ class RecyclerViewAdapter {
             bindView(holder.binder, holder.itemView, list[position])
         }
     }
+
+    open class HeightWrapContent<T>(owner: LifecycleOwner, list:ObservableList<T>, @LayoutRes itemViewLayoutId: Int, recyclerView: RecyclerView, bindView: (binder: Binder, view: View, item:T)->Unit)
+        : Simple<T>(owner,list,itemViewLayoutId,bindView) {
+        private val recyclerViewRef: WeakReference<RecyclerView> = WeakReference(recyclerView)
+
+        override fun onListChanged(t: ObservableList.MutationEventData?) {
+            if (t == null) return
+            recyclerViewRef.get()?.also { recyclerView ->
+                recyclerView.adapter = null
+                recyclerView.adapter = this
+                notifyDataSetChanged()
+            }
+        }
+
+    }
+
 //    class SimpleWithDataBinding<T,B>(
 //        owner:LifecycleOwner,
 //        list: ObservableList<T>,

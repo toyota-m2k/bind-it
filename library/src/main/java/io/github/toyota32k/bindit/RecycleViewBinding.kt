@@ -35,6 +35,11 @@ class RecycleViewBinding<T>(
                 view.adapter = RecyclerViewAdapter.Simple(owner,list,itemViewLayoutId,bindView)
             }
         }
+        fun <T> createHeightWrapContent(owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int, bindView:(Binder, View, T)->Unit) : RecycleViewBinding<T> {
+            return RecycleViewBinding(list,view).apply {
+                view.adapter = RecyclerViewAdapter.HeightWrapContent(owner,list,itemViewLayoutId,view,bindView)
+            }
+        }
 //        fun <T,B> create(owner: LifecycleOwner, view: RecyclerView, list:ObservableList<T>, createView:(parent: ViewGroup, viewType:Int)->B, bind: (binding: B, item:T)->Unit) : RecycleViewBinding<T>
 //        where B: ViewDataBinding {
 //            return RecycleViewBinding(list,view).apply {
