@@ -75,6 +75,13 @@ class Command : View.OnClickListener, TextView.OnEditorActionListener {
         listeners.invoke(v)
     }
 
+    /**
+     * ボタンタップ以外からコマンドを実行するときに、onClick(null)と書くのはブサイクだから。
+     */
+    fun invoke() {
+        onClick(null)
+    }
+
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
         return if (actionId == EditorInfo.IME_ACTION_DONE || event?.action == KeyEvent.ACTION_DOWN && (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)) {
             listeners.invoke(v)
