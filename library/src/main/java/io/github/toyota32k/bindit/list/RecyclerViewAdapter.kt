@@ -84,7 +84,7 @@ class RecyclerViewAdapter {
         // endregion
     }
 
-    open class Simple<T>(
+    class Simple<T>(
         owner:LifecycleOwner,
         list: ObservableList<T>,
         private @LayoutRes val itemViewLayoutId:Int,
@@ -105,20 +105,20 @@ class RecyclerViewAdapter {
         }
     }
 
-    open class HeightWrapContent<T>(owner: LifecycleOwner, list:ObservableList<T>, @LayoutRes itemViewLayoutId: Int, recyclerView: RecyclerView, bindView: (binder: Binder, view: View, item:T)->Unit)
-        : Simple<T>(owner,list,itemViewLayoutId,bindView) {
-        private val recyclerViewRef: WeakReference<RecyclerView> = WeakReference(recyclerView)
-
-        override fun onListChanged(t: ObservableList.MutationEventData?) {
-            if (t == null) return
-            recyclerViewRef?.get()?.also { recyclerView ->
-                recyclerView.adapter = null
-                recyclerView.adapter = this
-                notifyDataSetChanged()
-            }
-        }
-
-    }
+//    open class HeightWrapContent<T>(owner: LifecycleOwner, list:ObservableList<T>, @LayoutRes itemViewLayoutId: Int, recyclerView: RecyclerView, bindView: (binder: Binder, view: View, item:T)->Unit)
+//        : Simple<T>(owner,list,itemViewLayoutId,bindView) {
+//        private val recyclerViewRef: WeakReference<RecyclerView> = WeakReference(recyclerView)
+//
+//        override fun onListChanged(t: ObservableList.MutationEventData?) {
+//            if (t == null) return
+//            recyclerViewRef?.get()?.also { recyclerView ->
+//                recyclerView.adapter = null
+//                recyclerView.adapter = this
+//                notifyDataSetChanged()
+//            }
+//        }
+//
+//    }
 
 //    class SimpleWithDataBinding<T,B>(
 //        owner:LifecycleOwner,

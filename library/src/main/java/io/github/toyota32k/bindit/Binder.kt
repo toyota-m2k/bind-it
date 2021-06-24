@@ -26,8 +26,16 @@ open class Binder : IDisposable {
         return this
     }
 
+    var clientData:Any? = null
+
     fun reset() {
         bindings.forEach { it.dispose() }
         bindings.clear()
+
+        // clientData が disposableならdispose()してnullにする。
+        // disposableでなければ何もしない。
+        val cd = clientData as? IDisposable ?: return
+        cd.dispose()
+        clientData = null
     }
 }
