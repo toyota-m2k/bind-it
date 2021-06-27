@@ -4,7 +4,7 @@ import java.io.Closeable
 import java.lang.Exception
 
 @Suppress("unused")
-class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, private val outputClassName:Boolean=true, private val outputMethodName:Boolean=true) {
+class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, private val omissionNamespace:String?=null, private val outputClassName:Boolean=true, private val outputMethodName:Boolean=true) {
     @Suppress("unused")
     companion object {
         fun hierarchicTag(tag:String, parent:UtLog?):String {
@@ -16,6 +16,14 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, pr
         }
         fun className():String {
             return Thread.currentThread().stackTrace[2].className
+        }
+        fun className(omissionNamespace: String?):String {
+            val cn = className()
+            if(!omissionNamespace.isNullOrBlank() && cn.startsWith(omissionNamespace)) {
+                return cn.substring(omissionNamespace.length)
+            } else {
+                return cn
+            }
         }
         fun methodName():String {
             return Thread.currentThread().stackTrace[2].methodName
@@ -36,6 +44,14 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, pr
 
     private val logger = UtLoggerInstance(hierarchicTag(tag,parent))
 
+    fun stripNamespace(classname:String):String {
+        if(!omissionNamespace.isNullOrBlank() && classname.startsWith(omissionNamespace)) {
+            return classname.substring(omissionNamespace.length)
+        } else {
+            return classname
+        }
+    }
+
     private fun compose(message:String?):String {
         return if(outputClassName||outputMethodName) {
             val stack = Thread.currentThread().stackTrace
@@ -48,9 +64,9 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, pr
             if(!outputClassName) {
                 if(message!=null) "${e.methodName}: ${message}" else e.methodName
             } else if(!outputMethodName) {
-                if(message!=null) "${e.className}:${message}" else e.className
+                if(message!=null) "${stripNamespace(e.className)}:${message}" else stripNamespace(e.className)
             } else {
-                if(message!=null) "${e.className}.${e.methodName}:${message}" else "${e.className}.${e.methodName}"
+                if(message!=null) "${stripNamespace(e.className)}.${e.methodName}:${message}" else "${stripNamespace(e.className)}.${e.methodName}"
             }
         } else {
             message ?: ""

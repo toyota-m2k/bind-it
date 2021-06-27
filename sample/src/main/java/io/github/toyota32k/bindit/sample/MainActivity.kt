@@ -10,9 +10,13 @@ import androidx.lifecycle.*
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.slider.Slider
 import io.github.toyota32k.bindit.*
+import io.github.toyota32k.utils.UtLog
 import io.github.toyota32k.utils.combineLatest
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        val logger = UtLog("BindIt.Sample", null, "io.github.toyota32k.bindit.sample")
+    }
     enum class RadioValue(val resId:Int, val mtResId:Int) {
         Radio1(R.id.radio1, R.id.mtRadio1),
         Radio2(R.id.radio2, R.id.mtRadio2),
@@ -84,6 +88,7 @@ class MainActivity : AppCompatActivity() {
 
         companion object {
             fun instance(owner: FragmentActivity): MainViewModel {
+                logger.debug()
                 return ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory()).get(
                     MainViewModel::class.java)
             }
@@ -102,6 +107,7 @@ class MainActivity : AppCompatActivity() {
         val toggleButtonValue:TextView by lazy {findViewById(R.id.toggleButtonValue)}
 
         init {
+            logger.debug()
             register(
                 SliderBinding.create(
                     owner,
@@ -171,6 +177,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: Binding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        logger.debug()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
