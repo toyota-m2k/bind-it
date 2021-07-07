@@ -1,6 +1,7 @@
 package io.github.toyota32k.bindit.sample
 
 import android.os.Bundle
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -86,6 +87,8 @@ class MainActivity : AppCompatActivity() {
         val tbState2 = MutableLiveData<Boolean>(true)
         val tbState3 = MutableLiveData<Boolean>(false)
 
+        val multiVisible = MutableLiveData<Boolean>(true)
+
         companion object {
             fun instance(owner: FragmentActivity): MainViewModel {
                 logger.debug()
@@ -105,6 +108,7 @@ class MainActivity : AppCompatActivity() {
         val toggleValue: TextView by lazy {findViewById(R.id.toggleValue)}
         val toggleButtonGroup:MaterialButtonToggleGroup by lazy {findViewById(R.id.toggleButtons)}
         val toggleButtonValue:TextView by lazy {findViewById(R.id.toggleButtonValue)}
+        val multiVisibleCheckBox: CheckBox by lazy { findViewById(R.id.multiVisibleCheckBox) }
 
         init {
             logger.debug()
@@ -169,7 +173,11 @@ class MainActivity : AppCompatActivity() {
                         model.tbState1,
                         model.tbState2,
                         model.tbState3
-                    ) { v1, v2, v3 -> "${v1},${v2},${v3}" })
+                    ) { v1, v2, v3 -> "${v1},${v2},${v3}" }),
+
+                MultiVisibilityBinding(model.multiVisible, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByInvisible)
+                    .connectAll(owner, radioGroup, toggleGroupAsRadio,toggleGroup, toggleButtonGroup),
+                CheckBinding.create(owner, multiVisibleCheckBox, model.multiVisible),
             )
         }
     }

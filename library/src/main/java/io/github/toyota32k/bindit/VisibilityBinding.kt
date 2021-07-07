@@ -6,12 +6,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import io.github.toyota32k.bindit.BindingMode
 import io.github.toyota32k.bindit.BoolConvert
+import io.github.toyota32k.utils.UtLogger
+import io.github.toyota32k.utils.disposableObserve
 
 @Suppress("unused")
 open class VisibilityBinding(
         data: LiveData<Boolean>,
         boolConvert: BoolConvert = BoolConvert.Straight,
-        private val hiddenMode:HiddenMode = HiddenMode.HideByGone
+        protected val hiddenMode:HiddenMode = HiddenMode.HideByGone
 ) : BoolBinding(data, BindingMode.OneWay, boolConvert) {
     enum class HiddenMode {
         HideByGone,
@@ -31,5 +33,42 @@ open class VisibilityBinding(
         fun create(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode:HiddenMode = HiddenMode.HideByGone) : VisibilityBinding {
             return VisibilityBinding(data, boolConvert, hiddenMode).apply { connect(owner, view) }
         }
+    }
+}
+
+class MultiVisibilityBinding(
+    data: LiveData<Boolean>,
+    boolConvert: BoolConvert = BoolConvert.Straight,
+    hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone
+) : VisibilityBinding(data, boolConvert, hiddenMode) {
+    private val views = mutableListOf<View>()
+
+    override fun onDataChanged(v: Boolean?) {
+        for(view in views) {
+            view.visibility = when {
+                v == true -> View.VISIBLE
+                hiddenMode == HiddenMode.HideByGone -> View.GONE
+                else -> View.INVISIBLE
+            }
+        }
+    }
+
+    override fun connect(owner: LifecycleOwner, view:View) {
+        UtLogger.assert( false,"use connectAll() method.")
+    }
+
+    fun connectAll(owner:LifecycleOwner, vararg targets:View) : MultiVisibilityBinding {
+        UtLogger.assert(mode==BindingMode.OneWay, "MultiVisibilityBinding ... support OneWay mode only.")
+        observed = data.disposableObserve(owner, this::onDataChanged)
+        views.addAll(targets)
+        if(data.value==null) {
+            onDataChanged(data.value)
+        }
+        return this
+    }
+
+    override fun dispose() {
+        views.clear()
+        super.dispose()
     }
 }

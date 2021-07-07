@@ -22,15 +22,18 @@ open class CheckBinding protected constructor(
         super.connect(owner, view)
         if(mode!=BindingMode.OneWay) {
             view.setOnCheckedChangeListener(this)
-            onCheckedChanged(view, view.isChecked)
+            if(mode==BindingMode.OneWayToSource||data.value==null) {
+                // view --> data
+                onCheckedChanged(view, view.isChecked)
+            }
         }
     }
 
-    override fun cleanup() {
+    override fun dispose() {
         if(mode!=BindingMode.OneWay) {
             compoundButton?.setOnCheckedChangeListener(null)
         }
-        super.cleanup()
+        super.dispose()
     }
 
     // region OnCheckedChangeListener

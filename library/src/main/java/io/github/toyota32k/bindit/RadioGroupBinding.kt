@@ -1,13 +1,14 @@
 package io.github.toyota32k.bindit
 
 import android.widget.RadioGroup
+import androidx.annotation.IdRes
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.github.toyota32k.bindit.BindingMode
 
 interface IIDValueResolver<T> {
-    fun id2value(id:Int) : T?
+    fun id2value(@IdRes id:Int) : T?
     fun value2id(v:T): Int
 }
 
@@ -27,12 +28,15 @@ open class RadioGroupBinding<T> (
         super.connect(owner,view)
         if(mode!=BindingMode.OneWay) {
             view.setOnCheckedChangeListener(this)
+            if(mode==BindingMode.OneWayToSource||data.value==null) {
+                onCheckedChanged(radioGroup, radioGroup?.checkedRadioButtonId?:-1)
+            }
         }
     }
 
-    override fun cleanup() {
+    override fun dispose() {
         radioGroup?.setOnCheckedChangeListener(null)
-        super.cleanup()
+        super.dispose()
     }
 
     override fun onDataChanged(v: T?) {
@@ -45,7 +49,7 @@ open class RadioGroupBinding<T> (
         }
     }
 
-    override fun onCheckedChanged(@Suppress("UNUSED_PARAMETER") group: RadioGroup?, checkedId: Int) {
+    override fun onCheckedChanged(@Suppress("UNUSED_PARAMETER") group: RadioGroup?, @IdRes checkedId: Int) {
         val v = idResolver.id2value(checkedId)
         mutableData?.apply {
             if (value != v) {

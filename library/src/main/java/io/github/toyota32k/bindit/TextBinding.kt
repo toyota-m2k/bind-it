@@ -72,15 +72,15 @@ open class EditTextBinding(
         super.connect(owner,view)
         if(mode!=BindingMode.OneWay) {
             view.addTextChangedListener(this)
-            if(mode==BindingMode.OneWayToSource) {
+            if(mode==BindingMode.OneWayToSource||data.value==null) {
                 afterTextChanged(view.text)
             }
         }
     }
 
-    override fun cleanup() {
+    override fun dispose() {
         editText?.removeTextChangedListener(this)
-        super.cleanup()
+        super.dispose()
     }
 
     // endregion

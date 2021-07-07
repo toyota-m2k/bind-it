@@ -20,15 +20,17 @@ open class SeekBarBinding(
         super.connect(owner,view)
         if(mode!=BindingMode.OneWay) {
             view.setOnSeekBarChangeListener(this)
-            onProgressChanged(seekBar, seekBar?.progress?:0, false)
+            if(mode==BindingMode.OneWayToSource||data.value==null) {
+                onProgressChanged(seekBar, seekBar?.progress ?: 0, false)
+            }
         }
     }
 
-    override fun cleanup() {
+    override fun dispose() {
         if(mode!=BindingMode.OneWay) {
             seekBar?.setOnSeekBarChangeListener(null)
         }
-        super.cleanup()
+        super.dispose()
     }
 
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {

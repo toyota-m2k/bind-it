@@ -1,6 +1,7 @@
 package io.github.toyota32k.utils
 
 import android.util.Log
+import java.lang.Exception
 
 @Suppress("unused")
 interface IUtExternalLogger {
@@ -50,9 +51,7 @@ class UtLoggerInstance(private val tag:String) : IUtVaLogger {
 
     override fun assert(chk:Boolean, msg:String?) {
         if(!chk) {
-            if(null!=msg) {
-                error(msg)
-            }
+            stackTrace(Exception("assertion failed."), msg)
         }
     }
 

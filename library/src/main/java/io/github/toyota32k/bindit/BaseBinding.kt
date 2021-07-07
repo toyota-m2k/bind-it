@@ -4,43 +4,39 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import io.github.toyota32k.bindit.BindingMode
-import io.github.toyota32k.bindit.IBinding
+import io.github.toyota32k.utils.IDisposable
+import io.github.toyota32k.utils.disposableObserve
 
 
-abstract class DisposableImpl : IBinding {
-    protected abstract fun cleanup()
+//abstract class DisposableImpl : IBinding {
+//    protected abstract fun cleanup()
+//
+//    private var alive:Boolean = true
+//
+//    override fun dispose() {
+//        if(alive) {
+//            alive = false
+//            cleanup()
+//        }
+//    }
+//
+//    override fun isDisposed(): Boolean {
+//        return !alive
+//    }
+//}
 
-    private var alive:Boolean = true
-
-    override fun dispose() {
-        if(alive) {
-            alive = false
-            cleanup()
-        }
-    }
-
-    override fun isDisposed(): Boolean {
-        return !alive
-    }
-}
-
-abstract class BaseBinding<T>(override val mode: BindingMode) : DisposableImpl() {
+abstract class BaseBinding<T>(override val mode: BindingMode) : IBinding {
     abstract val data: LiveData<T>
     open val mutableData : MutableLiveData<T>?
         get() = data as? MutableLiveData<T>
 
     open var view: View? = null
-    private var dataObserver:Observer<T?>? = null
+    protected var observed:IDisposable? = null
 
-    fun connect(owner:LifecycleOwner, view:View) {
+    open fun connect(owner:LifecycleOwner, view:View) {
         this.view = view
         if(mode!=BindingMode.OneWayToSource) {
-            dataObserver = Observer<T?> {
-                onDataChanged(it)
-            }
-            data.observe(owner,dataObserver!!)
+            observed = data.disposableObserve(owner,this::onDataChanged)
             // data.value==null のときobserveのタイミングでonDataChanged()が呼ばれないような現象があったので明示的に呼び出しておく。
             if(data.value==null) {
                 onDataChanged(data.value)
@@ -48,11 +44,15 @@ abstract class BaseBinding<T>(override val mode: BindingMode) : DisposableImpl()
         }
     }
 
+    override fun isDisposed(): Boolean {
+        return observed==null
+    }
+
     protected abstract fun onDataChanged(v:T?)
 
-    override fun cleanup() {
+    override fun dispose() {
         view = null
-        val ob = dataObserver ?: return
-        data.removeObserver(ob)
+        observed?.dispose()
+        observed = null
     }
 }
