@@ -55,11 +55,13 @@ open class SliderBinding (
         }
         if(mode!=BindingMode.OneWay) {
             view.addOnChangeListener(this)
-            onValueChange(view, view.value, false)
+            if(mode==BindingMode.OneWayToSource||data.value==null) {
+                onValueChange(view, view.value, false)
+            }
         }
     }
 
-    override fun cleanup() {
+    override fun dispose() {
         minObserver?.let {
             min?.removeObserver(it)
             minObserver = null
@@ -71,7 +73,7 @@ open class SliderBinding (
         if(mode!=BindingMode.OneWay) {
             slider?.removeOnChangeListener(this)
         }
-        super.cleanup()
+        super.dispose()
     }
 
     private fun clipByRange(a:Float, b:Float, v:Float):Float {

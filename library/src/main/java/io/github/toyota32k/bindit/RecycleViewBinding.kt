@@ -14,7 +14,7 @@ class RecycleViewBinding<T>(
         val view: RecyclerView
 //        private val itemViewLayoutId:Int,
 //        private val bindView:(Binder, View, T)->Unit
-) : DisposableImpl() {
+) : IBinding {
 
     override val mode: BindingMode = BindingMode.OneWay
 //    var adapter: Disposable? = null
@@ -24,9 +24,13 @@ class RecycleViewBinding<T>(
 //        view.adapter = RecyclerViewAdapter.Simple(owner,list,itemViewLayoutId,bindView)
 //    }
 
-    override fun cleanup() {
+    override fun dispose() {
         val adapter = view.adapter as? IDisposable ?: return
         adapter.dispose()
+    }
+
+    override fun isDisposed(): Boolean {
+        return (view.adapter as? IDisposable)?.isDisposed() ?: false
     }
 
     companion object {

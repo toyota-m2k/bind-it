@@ -3,6 +3,7 @@
 package io.github.toyota32k.bindit
 
 import android.view.View
+import androidx.annotation.IdRes
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -28,11 +29,11 @@ abstract class MaterialButtonGroupBindingBase<T,DataType> (
         }
     }
 
-    override fun cleanup() {
+    override fun dispose() {
         if(mode!=BindingMode.OneWay) {
             toggleGroup?.removeOnButtonCheckedListener(this)
         }
-        super.cleanup()
+        super.dispose()
     }
 }
 
@@ -48,10 +49,15 @@ class MaterialRadioButtonGroupBinding<T>(
     override fun connect(owner: LifecycleOwner, view: MaterialButtonToggleGroup, idResolver: IIDValueResolver<T>) {
         view.isSingleSelection = true
         super.connect(owner, view, idResolver)
+        if(mode==BindingMode.OneWayToSource||(mode== BindingMode.TwoWay &&  data.value==null)) {
+            val checkedId = toggleGroup?.checkedButtonId
+            onButtonChecked(toggleGroup, toggleGroup?.checkedButtonId?:View.NO_ID, true)
+        }
     }
 
     // View --> Source
-    override fun onButtonChecked(group: MaterialButtonToggleGroup?, checkedId: Int, isChecked: Boolean) {
+    override fun onButtonChecked(group: MaterialButtonToggleGroup?, @IdRes checkedId: Int, isChecked: Boolean) {
+        if(checkedId==View.NO_ID) return
         if(isChecked) {
             val v = idResolver.id2value(checkedId)
             if(data.value!=v) {
@@ -98,6 +104,16 @@ class MaterialToggleButtonGroupBinding<T>(
                 fn()
             } finally {
                 busy = false
+            }
+        }
+    }
+
+    override fun connect(owner: LifecycleOwner,view: MaterialButtonToggleGroup,idResolver: IIDValueResolver<T>) {
+        super.connect(owner, view, idResolver)
+        if(mode==BindingMode.OneWayToSource||(mode== BindingMode.TwoWay &&  data.value==null)) {
+            selected.clear()
+            for(c in toggleGroup?.checkedButtonIds ?:return) {
+                onButtonChecked(toggleGroup, c, true)
             }
         }
     }
@@ -152,7 +168,7 @@ class MaterialToggleButtonGroupBinding<T>(
  */
 class MaterialToggleButtonsBinding (
     override val mode:BindingMode = BindingMode.TwoWay
-) : DisposableImpl(),  MaterialButtonToggleGroup.OnButtonCheckedListener {
+) : IBinding, MaterialButtonToggleGroup.OnButtonCheckedListener {
 
     var toggleGroup:MaterialButtonToggleGroup? = null
 
@@ -199,6 +215,9 @@ class MaterialToggleButtonsBinding (
 
     fun add(owner:LifecycleOwner, button:View, data:MutableLiveData<Boolean>):MaterialToggleButtonsBinding {
         buttons[button.id] = DataObserver(owner,button,data)
+        if(mode==BindingMode.OneWayToSource||(mode== BindingMode.TwoWay &&  data.value==null)) {
+            data.value = toggleGroup?.checkedButtonIds?.find { it==button.id } != null
+        }
         return this
     }
 
@@ -209,7 +228,8 @@ class MaterialToggleButtonsBinding (
         return this
     }
 
-    override fun cleanup() {
+    private var disposed:Boolean = false
+    override fun dispose() {
         if (mode != BindingMode.OneWayToSource) {
             buttons.forEach { (_, data) ->
                 data.dispose()
@@ -219,6 +239,11 @@ class MaterialToggleButtonsBinding (
         if(mode!=BindingMode.OneWay) {
             toggleGroup?.removeOnButtonCheckedListener(this)
         }
+        disposed = true
+    }
+
+    override fun isDisposed(): Boolean {
+        return disposed
     }
 
     override fun onButtonChecked(
