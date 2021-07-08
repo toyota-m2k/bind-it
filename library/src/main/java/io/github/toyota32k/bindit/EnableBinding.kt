@@ -52,7 +52,9 @@ class MultiEnableBinding(
 
     fun connectAll(owner:LifecycleOwner, vararg targets:View) {
         UtLogger.assert(mode==BindingMode.OneWay, "MultiVisibilityBinding ... support OneWay mode only.")
-        observed = data.disposableObserve(owner, this::onDataChanged)
+        if(observed==null) {
+            observed = data.disposableObserve(owner, this::onDataChanged)
+        }
         views.addAll(targets)
         if(data.value==null) {
             onDataChanged(data.value)

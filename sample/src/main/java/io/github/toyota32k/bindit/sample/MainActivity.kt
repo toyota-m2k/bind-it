@@ -175,8 +175,11 @@ class MainActivity : AppCompatActivity() {
                         model.tbState3
                     ) { v1, v2, v3 -> "${v1},${v2},${v3}" }),
 
-                MultiVisibilityBinding(model.multiVisible, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByInvisible)
+                MultiFadeInOutBinding(model.multiVisible)
                     .connectAll(owner, radioGroup, toggleGroupAsRadio,toggleGroup, toggleButtonGroup),
+
+//                MultiVisibilityBinding(model.multiVisible, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByInvisible)
+//                    .connectAll(owner, radioGroup, toggleGroupAsRadio,toggleGroup, toggleButtonGroup),
                 CheckBinding.create(owner, multiVisibleCheckBox, model.multiVisible),
             )
         }
