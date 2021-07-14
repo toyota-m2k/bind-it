@@ -4,7 +4,7 @@ import java.io.Closeable
 import java.lang.Exception
 
 @Suppress("unused")
-class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, private val omissionNamespace:String?=null, private val outputClassName:Boolean=true, private val outputMethodName:Boolean=true) {
+class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, private val omissionNamespace:String?=parent?.omissionNamespace, private val outputClassName:Boolean=true, private val outputMethodName:Boolean=true) {
     @Suppress("unused")
     companion object {
         fun hierarchicTag(tag:String, parent:UtLog?):String {

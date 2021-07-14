@@ -1,22 +1,23 @@
 package io.github.toyota32k.bindit.sample
 
 import android.os.Bundle
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.RadioGroup
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.*
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.slider.Slider
 import io.github.toyota32k.bindit.*
+import io.github.toyota32k.bindit.anim.ParallelAnimation
+import io.github.toyota32k.bindit.anim.ReversibleValueAnimation
+import io.github.toyota32k.bindit.anim.SequentialAnimation
 import io.github.toyota32k.utils.UtLog
 import io.github.toyota32k.utils.combineLatest
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        val logger = UtLog("BindIt.Sample", null, "io.github.toyota32k.bindit.sample")
+        val logger = UtLog("BindIt.Sample", null, "io.github.toyota32k.bindit.")
     }
     enum class RadioValue(val resId:Int, val mtResId:Int) {
         Radio1(R.id.radio1, R.id.mtRadio1),
@@ -109,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         val toggleButtonGroup:MaterialButtonToggleGroup by lazy {findViewById(R.id.toggleButtons)}
         val toggleButtonValue:TextView by lazy {findViewById(R.id.toggleButtonValue)}
         val multiVisibleCheckBox: CheckBox by lazy { findViewById(R.id.multiVisibleCheckBox) }
+        val internalTestButton: Button by lazy { findViewById(R.id.internal_test_button) }
 
         init {
             logger.debug()
@@ -181,6 +183,9 @@ class MainActivity : AppCompatActivity() {
 //                MultiVisibilityBinding(model.multiVisible, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByInvisible)
 //                    .connectAll(owner, radioGroup, toggleGroupAsRadio,toggleGroup, toggleButtonGroup),
                 CheckBinding.create(owner, multiVisibleCheckBox, model.multiVisible),
+                ClickBinding(owner, internalTestButton) {
+                    internalTest()
+                }
             )
         }
     }
@@ -194,6 +199,190 @@ class MainActivity : AppCompatActivity() {
 
         model = MainViewModel.instance(this)
         binding = Binding(this, model)
+
+    }
+
+    enum class AnimTestTarget(val enabled:Boolean) {
+        VALUE_ANIMATION_SIMPLE(false),
+        VALUE_ANIMATION_CANCEL(true),
+        SEQUENTIAL_SIMPLE(false),
+        SEQUENTIAL_CANCEL(false),
+        PARALLEL_SIMPLE(false),
+        PARALLEL_CANCEL(false),
+    }
+
+    fun internalTest() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val logger = UtLog("XXX", MainActivity.logger)
+            if(AnimTestTarget.VALUE_ANIMATION_SIMPLE.enabled) {
+                logger.debug("Simple ValueAnimation")
+                async {
+                    var aniVal: Float = 0f
+                    val ani = ReversibleValueAnimation(1000).onUpdate {
+                        aniVal = it * 100
+                        logger.debug("value=${aniVal.toInt()}")
+                    }
+                    logger.debug("animation straight")
+                    var r = ani.run(false)
+                    logger.debug("animation straight ... done:$r ($aniVal)")
+                    logger.debug("animation reverse")
+                    r = ani.run(true)
+                    logger.debug("animation reverse ... done:$r ($aniVal)")
+                }.await()
+            }
+
+            if(AnimTestTarget.VALUE_ANIMATION_CANCEL.enabled) {
+                logger.debug("ValueAnimation cancel and reverse")
+                async {
+                    var aniVal: Float = 0f
+                    var sc = 0
+                    var ec = 0
+                    val ani = ReversibleValueAnimation(1000).onUpdate {
+                        aniVal = it * 100
+                        logger.debug("xxx value=${aniVal.toInt()}")
+                    }.onStart {r,v->
+                        sc++
+                        logger.debug("started($sc) from $v (reverse=$r)")
+                    }.onEnd {r,v ->
+                        ec++
+                        logger.debug("end($ec) at $v (reverse=$r)")
+                    }
+                    launch {
+                        logger.debug("animation straight")
+                        val r = ani.run(false)
+                        logger.debug("animation(1) straight ... done:$r ($aniVal)")
+                    }
+                    delay(500)
+                    logger.debug("animation(2) reverse")
+                    val r = ani.run(true)
+                    logger.debug("animation reverse ... done:$r ($aniVal)")
+                }.await()
+            }
+
+            if(AnimTestTarget.SEQUENTIAL_SIMPLE.enabled) {
+                logger.debug("Sequential Animation")
+                async {
+                    var v1: Float = 0f
+                    var v2: Float = 0f
+                    var v3: Float = 0f
+                    val ani = SequentialAnimation().add(
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v1 = it * 100
+                            logger.debug("v1=${v1.toInt()}")
+                        },
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v2 = it * 100
+                            logger.debug("v2=${v2.toInt()}")
+                        },
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v3 = it * 100
+                            logger.debug("v3=${v3.toInt()}")
+                        },
+                    )
+                    logger.debug("SequentialAnimation:Straight")
+                    ani.run(false)
+                    logger.debug("SequentialAnimation:Straight ... end: v1=$v1, v2=$v2, v3=$v3")
+                    logger.debug("SequentialAnimation:Reverse")
+                    ani.run(true)
+                    logger.debug("SequentialAnimation:Reverse ... end: v1=$v1, v2=$v2, v3=$v3")
+                }.await()
+            }
+
+            if(AnimTestTarget.SEQUENTIAL_CANCEL.enabled) {
+                logger.debug("Sequential Animation ... cancel and reverse")
+                async {
+                    var v1: Float = 0f
+                    var v2: Float = 0f
+                    var v3: Float = 0f
+                    val ani = SequentialAnimation().add(
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v1 = it * 100
+                            logger.debug("v1=${v1.toInt()}")
+                        },
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v2 = it * 100
+                            logger.debug("v2=${v2.toInt()}")
+                        },
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v3 = it * 100
+                            logger.debug("v3=${v3.toInt()}")
+                        },
+                    )
+                    launch {
+                        logger.debug("SequentialAnimation:Straight")
+                        ani.run(false)
+                        logger.debug("SequentialAnimation:Straight ... end: v1=$v1, v2=$v2, v3=$v3")
+                    }
+                    delay(1500)
+                    logger.debug("SequentialAnimation:Reverse")
+                    ani.run(true)
+                    logger.debug("SequentialAnimation:Reverse ... end: v1=$v1, v2=$v2, v3=$v3")
+                }.await()
+            }
+
+
+
+            if(AnimTestTarget.PARALLEL_SIMPLE.enabled) {
+                logger.debug("Parallel Animation")
+                async {
+                    var v1: Float = 0f
+                    var v2: Float = 0f
+                    var v3: Float = 0f
+                    val ani = ParallelAnimation().add(
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v1 = it * 100
+                            logger.debug("v1=${v1.toInt()}")
+                        },
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v2 = it * 100
+                            logger.debug("v2=${v2.toInt()}")
+                        },
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v3 = it * 100
+                            logger.debug("v3=${v3.toInt()}")
+                        },
+                    )
+                    logger.debug("ParallelAnimation:Straight")
+                    ani.run(false)
+                    logger.debug("ParallelAnimation:Straight ... end: v1=$v1, v2=$v2, v3=$v3")
+                    logger.debug("ParallelAnimation:Reverse")
+                    ani.run(true)
+                    logger.debug("ParallelAnimation:Reverse ... end: v1=$v1, v2=$v2, v3=$v3")
+                }.await()
+            }
+
+            if(AnimTestTarget.PARALLEL_CANCEL.enabled) {
+                logger.debug("Parallel Animation ... cancel and reverse")
+                async {
+                    var v1: Float = 0f
+                    var v2: Float = 0f
+                    var v3: Float = 0f
+                    val ani = ParallelAnimation().add(
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v1 = it * 100
+                            logger.debug("v1=${v1.toInt()}")
+                        },
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v2 = it * 100
+                            logger.debug("v2=${v2.toInt()}")
+                        },
+                        ReversibleValueAnimation(1000).onUpdate {
+                            v3 = it * 100
+                            logger.debug("v3=${v3.toInt()}")
+                        },
+                    )
+                    launch {
+                        logger.debug("ParallelAnimation:Straight")
+                        ani.run(false)
+                        logger.debug("ParallelAnimation:Straight ... end: v1=$v1, v2=$v2, v3=$v3")
+                    }
+                    delay(500)
+                    logger.debug("ParallelAnimation:Reverse")
+                    ani.run(true)
+                    logger.debug("ParallelAnimation:Reverse ... end: v1=$v1, v2=$v2, v3=$v3")
+                }.await()
+            }
+       }
 
     }
 }

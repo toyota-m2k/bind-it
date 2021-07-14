@@ -197,6 +197,19 @@
         app:layout_constraintTop_toBottomOf="@+id/toggleButtonValue"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/visibility_binding_test"
         />
+
+    <Button
+        android:id="@+id/internal_test_button"
+        android:text="@string/internal_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/multiVisibleCheckBox"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="?attr/materialButtonOutlinedStyle"
+        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

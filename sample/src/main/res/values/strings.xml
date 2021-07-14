@@ -6,4 +6,6 @@
     <string name="toggle1">Toggle-1</string>
     <string name="toggle2">Toggle-2</string>
     <string name="toggle3">Toggle-3</string>
+    <string name="visibility_binding_test">Visibility Binding Test</string>
+    <string name="internal_test">Internal Test</string>
 </resources>
