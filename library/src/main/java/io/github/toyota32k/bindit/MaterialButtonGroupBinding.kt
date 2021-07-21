@@ -50,7 +50,6 @@ class MaterialRadioButtonGroupBinding<T>(
         view.isSingleSelection = true
         super.connect(owner, view, idResolver)
         if(mode==BindingMode.OneWayToSource||(mode== BindingMode.TwoWay &&  data.value==null)) {
-            val checkedId = toggleGroup?.checkedButtonId
             onButtonChecked(toggleGroup, toggleGroup?.checkedButtonId?:View.NO_ID, true)
         }
     }
