@@ -31,7 +31,7 @@ abstract class BaseBinding<T>(override val mode: BindingMode) : IBinding {
         get() = data as? MutableLiveData<T>
 
     open var view: View? = null
-    protected var observed:IDisposable? = null
+    protected var observed: IDisposable? = null
 
     open fun connect(owner:LifecycleOwner, view:View) {
         this.view = view

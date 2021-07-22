@@ -8,7 +8,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.material.button.MaterialButtonToggleGroup
-import io.github.toyota32k.bindit.BindingMode
 
 abstract class MaterialButtonGroupBindingBase<T,DataType> (
     override val data:MutableLiveData<DataType>,

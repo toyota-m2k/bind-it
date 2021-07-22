@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.github.toyota32k.bindit.BindingMode
 
 open class TextBinding protected constructor(
     override val data:LiveData<String>,

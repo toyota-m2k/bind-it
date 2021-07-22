@@ -9,7 +9,7 @@ import io.github.toyota32k.utils.IDisposable
 @Suppress("unused")
 abstract class ListViewAdapter<T>(private val observableList: ObservableList<T>) : BaseAdapter(), IDisposable, MutableList<T> by observableList {
     constructor() : this(ObservableList())
-    var disposable :IDisposable? = null
+    private var disposable :IDisposable? = null
 
     interface IIdHolder {
         val id:Long

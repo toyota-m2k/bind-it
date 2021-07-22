@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.material.slider.Slider
-import io.github.toyota32k.bindit.BindingMode
 import java.lang.Float.max
 import java.lang.Float.min
 

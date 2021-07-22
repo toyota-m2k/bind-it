@@ -4,7 +4,6 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import io.github.toyota32k.bindit.BindingMode
 
 open class DrawableBinding<V>(
     override val data: LiveData<Drawable>,

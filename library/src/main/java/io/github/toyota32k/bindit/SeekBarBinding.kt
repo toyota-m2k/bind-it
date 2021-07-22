@@ -4,7 +4,6 @@ import android.widget.SeekBar
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.github.toyota32k.bindit.BindingMode
 
 @Suppress("unused")
 open class SeekBarBinding(

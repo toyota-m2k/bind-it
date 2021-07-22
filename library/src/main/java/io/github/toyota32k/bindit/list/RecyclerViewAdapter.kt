@@ -9,8 +9,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import io.github.toyota32k.bindit.Binder
 import io.github.toyota32k.utils.IDisposable
-import io.github.toyota32k.utils.ListenerKey
-import java.lang.ref.WeakReference
 
 class RecyclerViewAdapter {
     /**
@@ -87,7 +85,7 @@ class RecyclerViewAdapter {
     class Simple<T>(
         owner:LifecycleOwner,
         list: ObservableList<T>,
-        private @LayoutRes val itemViewLayoutId:Int,
+        @LayoutRes private val itemViewLayoutId:Int,
         val bindView: (binder: Binder, view: View, item:T)->Unit
     ) : Base<T, Simple.SimpleViewHolder>(owner,list) {
         class SimpleViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

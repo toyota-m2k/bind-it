@@ -12,7 +12,7 @@ import kotlin.math.max
 abstract class FadeInOutBase (
     data: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
-    var animDuration:Long = 500  // ms
+    private val animDuration:Long = 500  // ms
 ) : BoolBinding(data, BindingMode.OneWay, boolConvert), Animator.AnimatorListener {
 
     private var showing = false
@@ -24,7 +24,7 @@ abstract class FadeInOutBase (
         a.addListener(this)
     }
 
-    protected val targetVisible:Boolean               // data.value
+    private val targetVisible:Boolean               // data.value
         get() = data.value == true
 
     protected abstract var alpha:Float                // view.alpha
@@ -96,6 +96,7 @@ abstract class FadeInOutBase (
     }
 }
 
+@Suppress("unused")
 class FadeInOutBinding(
     data: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,

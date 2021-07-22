@@ -4,7 +4,6 @@ import android.widget.ProgressBar
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import io.github.toyota32k.bindit.BindingMode
 
 /**
  * 注意

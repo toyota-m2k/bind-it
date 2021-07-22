@@ -6,8 +6,6 @@ import android.widget.CompoundButton
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.github.toyota32k.bindit.BindingMode
-import io.github.toyota32k.bindit.BoolConvert
 
 open class CheckBinding protected constructor(
         rawData: LiveData<Boolean>,

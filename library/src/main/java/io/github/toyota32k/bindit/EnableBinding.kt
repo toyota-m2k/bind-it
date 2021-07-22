@@ -5,9 +5,6 @@ package io.github.toyota32k.bindit
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
-import io.github.toyota32k.bindit.BindingMode
-import io.github.toyota32k.bindit.BoolConvert
 import io.github.toyota32k.utils.UtLogger
 import io.github.toyota32k.utils.disposableObserve
 

@@ -5,7 +5,6 @@ import androidx.annotation.IdRes
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.github.toyota32k.bindit.BindingMode
 
 interface IIDValueResolver<T> {
     fun id2value(@IdRes id:Int) : T?
