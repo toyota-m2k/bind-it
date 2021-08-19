@@ -77,6 +77,11 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, pr
     fun debug(msg: String?=null) {
         logger.debug(compose(msg))
     }
+    fun debug(fn:()->String) {
+        if(BuildConfig.DEBUG) {
+            debug(fn())
+        }
+    }
 
     @JvmOverloads
     fun warn(msg: String?=null) {
