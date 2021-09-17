@@ -27,7 +27,7 @@ fun <T> List<T>.reverse():Iterable<T> {
 }
 
 fun <S,E> Collection<E>.reduce(accumulator:S, fn:(acc:S,element:E)->S): S {
-    var acc = accumulator
+    val acc = accumulator
     forEach {
         fn(acc,it)
     }

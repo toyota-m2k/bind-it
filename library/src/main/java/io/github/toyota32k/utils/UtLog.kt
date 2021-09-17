@@ -63,7 +63,7 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
                 e = stack[n]
             }
             if(!outputClassName) {
-                if(message!=null) "${e.methodName}: ${message}" else e.methodName
+                if(message!=null) "${e.methodName}: $message" else e.methodName
             } else if(!outputMethodName) {
                 if(message!=null) "${stripNamespace(e.className)}:${message}" else stripNamespace(e.className)
             } else {

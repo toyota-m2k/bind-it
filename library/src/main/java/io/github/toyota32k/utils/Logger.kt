@@ -1,6 +1,8 @@
 package io.github.toyota32k.utils
 
 import android.util.Log
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.lang.Exception
 
 @Suppress("unused")
@@ -62,12 +64,7 @@ class UtLoggerInstance(private val tag:String) : IUtVaLogger {
         e.message?.also { msg->
             error(msg)
         }
-        val sw = StringWriter()
-        PrintWriter(sw).use { pw->
-            e.printStackTrace(pw)
-            pw.flush()
-        }
-        print(Log.ERROR, sw.toString())
+        error(e.stackTraceToString())
     }
 
     private fun printToSystemOut(tag: String, s: String): Int {
