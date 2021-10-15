@@ -3,10 +3,11 @@
 package io.github.toyota32k.utils
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import java.io.Closeable
 
 /**
@@ -264,3 +265,38 @@ fun Boolean.onFalse(fn:()->Unit):Boolean {
     }
     return this
 }
+
+class UtMutableStateFlowLiveData<T>(val flow: MutableStateFlow<T>, lifecycleOwner: LifecycleOwner?=null): MutableLiveData<T>(), Observer<T> {
+    init {
+        value = flow.value
+        if(null!=lifecycleOwner) {
+            attachToLifecycle(lifecycleOwner)
+        }
+    }
+
+    fun attachToLifecycle(lifecycleOwner: LifecycleOwner) {
+        observe(lifecycleOwner, this)
+        // これが、今後推奨される方法だと思うが、repeatOnLifecycle を使うには、lifecycle_version = "2.4.0" が必要で、これがまだ alpha なので、当面は利用を見合わせる。
+        //        lifecycleOwner.lifecycleScope.launch {
+        //            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        //                flow.collect {
+        //                    postValue(it)
+        //                }
+        //            }
+        //        }
+        lifecycleOwner.lifecycleScope.launchWhenStarted {
+            flow.collect {
+                if(value!==it) {
+                    value = it
+                }
+            }
+        }
+    }
+
+    override fun onChanged(t: T) {
+        flow.value = t
+    }
+}
+
+fun <T> MutableStateFlow<T>.asMutableLiveData(lifecycleOwner: LifecycleOwner):MutableLiveData<T>
+        = UtMutableStateFlowLiveData(this, lifecycleOwner)
