@@ -115,6 +115,10 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
             stackTrace(Exception("assertion failed."), msg)
         }
     }
+    @JvmOverloads
+    fun jassert(chk:Boolean, msg:String?=null) {
+        assert(chk, msg)
+    }
 
     @JvmOverloads
     fun scopeWatch(msg:String?=null) : Closeable {

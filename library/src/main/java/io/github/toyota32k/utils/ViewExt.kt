@@ -9,6 +9,7 @@ import android.os.Parcel
 import android.util.Size
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ListView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
@@ -130,4 +131,26 @@ fun Parcel.writeBool(v:Boolean) {
 }
 fun Parcel.readBool() : Boolean {
     return readInt() != 0
+}
+
+fun ListView.calcContentHeight():Int {
+    val listAdapter = adapter ?: return 0
+    val count = listAdapter.count
+    if(count==0) return 0
+
+    var totalHeight = 0
+    for (i in 0 until count) {
+        val listItem = listAdapter.getView(i, null, this)
+        listItem.measure(0, 0)
+        totalHeight += listItem.measuredHeight
+    }
+    return totalHeight + dividerHeight * (count-1)
+}
+fun ListView.calcFixedContentHeight():Int {
+    val listAdapter = adapter ?: return 0
+    if(count==0) return 0
+    val listItem = listAdapter.getView(0, null, this)
+    listItem.measure(0, 0)
+    val itemHeight = listItem.measuredHeight
+    return itemHeight * count + dividerHeight * (count-1)
 }

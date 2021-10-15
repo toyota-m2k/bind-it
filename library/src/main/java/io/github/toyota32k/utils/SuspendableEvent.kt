@@ -11,6 +11,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
+/**
+ * ChannelベースのResetableEventクラス
+ */
 class SuspendableEvent(private var signal:Boolean, private val autoReset:Boolean) {
     private val channel = Channel<Unit>(capacity = 1)
     private val mutex = Mutex()

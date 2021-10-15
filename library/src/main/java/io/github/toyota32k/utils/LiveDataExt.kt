@@ -238,15 +238,15 @@ fun LiveData<Boolean>.not():LiveData<Boolean> {
     return this.mapEx { !(it==true) }
 }
 
-@ExperimentalCoroutinesApi
-fun <T> LiveData<T>.toFlow(): Flow<T?> = callbackFlow {
-    offer(value)
-    val observer = Observer<T> {
-        offer(it)
-    }
-    observeForever(observer)
-    awaitClose { removeObserver(observer) }
-}
+//@ExperimentalCoroutinesApi
+//fun <T> LiveData<T>.toFlow(): Flow<T?> = callbackFlow {
+//    offer(value)
+//    val observer = Observer<T> {
+//        offer(it)
+//    }
+//    observeForever(observer)
+//    awaitClose { removeObserver(observer) }
+//}
 
 //fun <T> LiveData<T>.toPublisher(owner: LifecycleOwner) =
 //        LiveDataReactiveStreams.toPublisher(owner,this)

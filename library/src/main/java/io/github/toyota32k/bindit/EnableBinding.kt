@@ -62,4 +62,11 @@ class MultiEnableBinding(
         views.clear()
         super.dispose()
     }
+
+    companion object {
+        fun create(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight) : MultiEnableBinding {
+            return MultiEnableBinding(data, boolConvert).apply { connectAll(owner, *views) }
+        }
+    }
+
 }
