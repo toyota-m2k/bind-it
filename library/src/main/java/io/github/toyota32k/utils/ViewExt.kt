@@ -29,9 +29,9 @@ inline fun <reified T> Context.findSpecialContext() : T? {
 fun Context.activity(): Activity? {
     return findSpecialContext()
 }
-fun Context.fragment(): Fragment? {
-    return findSpecialContext()
-}
+//fun Context.fragment(): Fragment? {
+//    return findSpecialContext()
+//}
 
 fun Context.lifecycleOwner() : LifecycleOwner? {
     return findSpecialContext()
@@ -44,9 +44,9 @@ fun Context.viewModelStorageOwner(): ViewModelStoreOwner? {
 fun View.activity(): Activity? {
     return context?.findSpecialContext()
 }
-fun View.fragment(): Fragment? {
-    return context?.findSpecialContext()
-}
+//fun View.fragment(): Fragment? {
+//    return context?.findSpecialContext()
+//}
 fun View.viewModelStorageOwner(): ViewModelStoreOwner? {
     return context?.findSpecialContext()
 }

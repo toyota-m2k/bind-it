@@ -71,4 +71,11 @@ class MultiVisibilityBinding(
         views.clear()
         super.dispose()
     }
+
+    companion object {
+        fun create(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight) : MultiVisibilityBinding {
+            return MultiVisibilityBinding(data, boolConvert).apply { connectAll(owner, *views) }
+        }
+    }
+
 }
