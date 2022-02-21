@@ -62,28 +62,14 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener {
     fun bind(owner: LifecycleOwner, fn:((View?)->Unit)): IDisposable {
         return listeners.add(owner,fn)
     }
-    @MainThread
-    fun bind(owner: LifecycleOwner, fn:(()->Unit)): IDisposable {
-        return listeners.add(owner) { fn() }
-    }
 
     @MainThread
     fun bindForever(fn:(View?)->Unit): IDisposable {
         return listeners.addForever(fn)
     }
-    @MainThread
-    fun bindForever(fn:()->Unit): IDisposable {
-        return listeners.addForever { fn() }
-    }
 
     @MainThread
     fun connectAndBind(owner: LifecycleOwner, view:View, fn:((View?)->Unit)):IDisposable {
-        connectView(view)
-        return ClickListenerDisposer(view, bind(owner,fn))
-    }
-
-    @MainThread
-    fun connectAndBind(owner: LifecycleOwner, view:View, fn:(()->Unit)):IDisposable {
         connectView(view)
         return ClickListenerDisposer(view, bind(owner,fn))
     }
