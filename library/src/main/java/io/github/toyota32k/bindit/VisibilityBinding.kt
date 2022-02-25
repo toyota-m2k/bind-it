@@ -73,8 +73,8 @@ class MultiVisibilityBinding(
     }
 
     companion object {
-        fun create(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight) : MultiVisibilityBinding {
-            return MultiVisibilityBinding(data, boolConvert).apply { connectAll(owner, *views) }
+        fun create(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode:HiddenMode = HiddenMode.HideByGone) : MultiVisibilityBinding {
+            return MultiVisibilityBinding(data, boolConvert,hiddenMode).apply { connectAll(owner, *views) }
         }
     }
 
