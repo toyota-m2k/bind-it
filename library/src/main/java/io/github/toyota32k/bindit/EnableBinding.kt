@@ -53,7 +53,7 @@ class MultiEnableBinding(
             observed = data.disposableObserve(owner, this::onDataChanged)
         }
         views.addAll(targets)
-        if(data.value==null) {
+        if(data.value!=null) {
             onDataChanged(data.value)
         }
     }
