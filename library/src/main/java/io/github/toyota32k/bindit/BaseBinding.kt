@@ -38,9 +38,7 @@ abstract class BaseBinding<T>(override val mode: BindingMode) : IBinding {
         if(mode!=BindingMode.OneWayToSource) {
             observed = data.disposableObserve(owner,this::onDataChanged)
             // data.value==null のときobserveのタイミングでonDataChanged()が呼ばれないような現象があったので明示的に呼び出しておく。
-            if(data.value==null) {
-                onDataChanged(data.value)
-            }
+            onDataChanged(data.value)
         }
     }
 
