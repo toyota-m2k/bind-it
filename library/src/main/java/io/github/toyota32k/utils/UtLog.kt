@@ -65,9 +65,9 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
             if(!outputClassName) {
                 if(message!=null) "${e.methodName}: $message" else e.methodName
             } else if(!outputMethodName) {
-                if(message!=null) "${stripNamespace(e.className)}:${message}" else stripNamespace(e.className)
+                if(message!=null) "${stripNamespace(e.className)}: ${message}" else stripNamespace(e.className)
             } else {
-                if(message!=null) "${stripNamespace(e.className)}.${e.methodName}:${message}" else "${stripNamespace(e.className)}.${e.methodName}"
+                if(message!=null) "${stripNamespace(e.className)}.${e.methodName}: ${message}" else "${stripNamespace(e.className)}.${e.methodName}"
             }
         } else {
             message ?: ""
@@ -80,7 +80,7 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
     }
     fun debug(fn:()->String) {
         if(BuildConfig.DEBUG) {
-            debug(fn())
+            logger.debug(compose(fn()))
         }
     }
 
@@ -118,6 +118,17 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
     @JvmOverloads
     fun jassert(chk:Boolean, msg:String?=null) {
         assert(chk, msg)
+    }
+
+    @JvmOverloads
+    fun assertStrongly(chk:Boolean, msg:String?=null) {
+        if(!chk) {
+            stackTrace(Exception("assertion failed."), msg)
+            if (BuildConfig.DEBUG) {
+                // デバッグ版なら例外を投げる
+                error(compose(msg))
+            }
+        }
     }
 
     @JvmOverloads

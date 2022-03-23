@@ -13,7 +13,13 @@ import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.Listeners
 import java.lang.ref.WeakReference
 
-class Command : View.OnClickListener, TextView.OnEditorActionListener {
+class Command() : View.OnClickListener, TextView.OnEditorActionListener {
+    // 永続的ハンドラをbindするコンストラクタ
+    // Command().apply { bindForever(fn) } と書いていたのをちょっと簡略化
+    constructor(foreverFn:(View?)->Unit) :this() {
+        bindForever(foreverFn)
+    }
+
     private val listeners = Listeners<View?>()
     private class ClickListenerDisposer(v:View, var bind:IDisposable?=null) : IDisposable {
         var view:WeakReference<View>? = WeakReference<View>(v)
@@ -58,8 +64,8 @@ class Command : View.OnClickListener, TextView.OnEditorActionListener {
     }
 
     @MainThread
-    fun bindForever(fn:()->Unit): IDisposable {
-        return listeners.addForever { fn() }
+    fun bindForever(fn:(View?)->Unit): IDisposable {
+        return listeners.addForever(fn)
     }
 
     @MainThread

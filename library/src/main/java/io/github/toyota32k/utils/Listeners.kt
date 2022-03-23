@@ -19,6 +19,7 @@ class Listeners<T> {
     private val functions = mutableListOf<ListenerKey<T>>()
     private val tobeDelete = mutableSetOf<ListenerKey<T>>()
     private var busy:Boolean = false
+    val count:Int get() = functions.size
 
     inner open class IndependentInvoker(callback:(T)->Unit):ListenerKey<T> {
         var fn:((T)->Unit)? = callback

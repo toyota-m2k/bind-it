@@ -61,7 +61,7 @@ class MultiVisibilityBinding(
             observed = data.disposableObserve(owner, this::onDataChanged)
         }
         views.addAll(targets)
-        if(data.value==null) {
+        if(data.value!=null) {
             onDataChanged(data.value)
         }
         return this
@@ -71,4 +71,11 @@ class MultiVisibilityBinding(
         views.clear()
         super.dispose()
     }
+
+    companion object {
+        fun create(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode:HiddenMode = HiddenMode.HideByGone) : MultiVisibilityBinding {
+            return MultiVisibilityBinding(data, boolConvert,hiddenMode).apply { connectAll(owner, *views) }
+        }
+    }
+
 }
