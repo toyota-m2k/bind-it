@@ -30,33 +30,34 @@ class ObservableList<T> : MutableList<T> {
         MOVE,
         CHANGED,
     }
-    abstract class MutationEventData(val kind: MutationKind)
-    class RefreshEventData : MutationEventData(MutationKind.REFRESH)
-    data class RemoveEventData(val position:Int, val range:Int=1) :
-        MutationEventData(MutationKind.REMOVE)
-    data class InsertEventData(val position:Int, val range:Int=1) :
-        MutationEventData(MutationKind.INSERT)
-    data class ChangedEventData(val position:Int, val range:Int=1) :
-        MutationEventData(MutationKind.CHANGED)
-    data class MoveEventData(val from:Int, val to:Int) : MutationEventData(MutationKind.MOVE)
+    abstract class MutationEventData<T>(val list:ObservableList<T>, val kind: MutationKind)
+    class RefreshEventData<T>(sender:ObservableList<T>) : MutationEventData<T>(sender, MutationKind.REFRESH)
+    class RemoveEventData<T>(sender:ObservableList<T>, val position:Int, val range:Int=1) :
+        MutationEventData<T>(sender, MutationKind.REMOVE)
+    class InsertEventData<T>(sender:ObservableList<T>, val position:Int, val range:Int=1) :
+        MutationEventData<T>(sender, MutationKind.INSERT)
+    class ChangedEventData<T>(sender:ObservableList<T>, val position:Int, val range:Int=1) :
+        MutationEventData<T>(sender, MutationKind.CHANGED)
+    class MoveEventData<T>(sender:ObservableList<T>, val from:Int, val to:Int) :
+        MutationEventData<T>(sender, MutationKind.MOVE)
 
-    private var mutationEvent = Listeners<MutationEventData>()
+    private var mutationEvent = Listeners<MutationEventData<T>>()
 
-    fun addListener(owner:LifecycleOwner, fn:(MutationEventData)->Unit): IDisposable {
-        fn(RefreshEventData())
+    fun addListener(owner:LifecycleOwner, fn:(MutationEventData<T>)->Unit): IDisposable {
+        fn(RefreshEventData(this))
         return mutationEvent.add(owner,fn)
     }
-    fun addListener(owner:LifecycleOwner, listener: Listeners.IListener<MutationEventData>): IDisposable {
-        listener.onChanged(RefreshEventData())
+    fun addListener(owner:LifecycleOwner, listener: Listeners.IListener<MutationEventData<T>>): IDisposable {
+        listener.onChanged(RefreshEventData(this))
         return mutationEvent.add(owner,listener)
     }
 
-    fun addListenerForever(fn:(MutationEventData)->Unit): IDisposable {
-        fn(RefreshEventData())
+    fun addListenerForever(fn:(MutationEventData<T>)->Unit): IDisposable {
+        fn(RefreshEventData(this))
         return mutationEvent.addForever(fn)
     }
-    fun addListenerForever(listener: Listeners.IListener<MutationEventData>): IDisposable {
-        listener.onChanged(RefreshEventData())
+    fun addListenerForever(listener: Listeners.IListener<MutationEventData<T>>): IDisposable {
+        listener.onChanged(RefreshEventData(this))
         return mutationEvent.addForever(listener)
     }
 
@@ -95,7 +96,7 @@ class ObservableList<T> : MutableList<T> {
 
     override fun add(element: T): Boolean {
         return if(internalList.add(element)) {
-            mutationEvent.invoke(InsertEventData(internalList.size-1))
+            mutationEvent.invoke(InsertEventData(this, internalList.size-1))
             true
         } else {
             false
@@ -104,12 +105,12 @@ class ObservableList<T> : MutableList<T> {
 
     override fun add(index: Int, element: T) {
         internalList.add(index, element)
-        mutationEvent.invoke(InsertEventData(index))
+        mutationEvent.invoke(InsertEventData(this, index))
     }
 
     override fun addAll(index: Int, elements: Collection<T>): Boolean {
         return if(internalList.addAll(index, elements)) {
-            mutationEvent.invoke(InsertEventData(index, elements.size))
+            mutationEvent.invoke(InsertEventData(this, index, elements.size))
             true
         } else {
             false
@@ -118,7 +119,7 @@ class ObservableList<T> : MutableList<T> {
 
     override fun addAll(elements: Collection<T>): Boolean {
         return if(internalList.addAll(elements)) {
-            mutationEvent.invoke(InsertEventData(internalList.size-elements.size, elements.size))
+            mutationEvent.invoke(InsertEventData(this, internalList.size-elements.size, elements.size))
             true
         } else {
             false
@@ -127,7 +128,7 @@ class ObservableList<T> : MutableList<T> {
 
     override fun clear() {
         internalList.clear()
-        mutationEvent.invoke(RefreshEventData())
+        mutationEvent.invoke(RefreshEventData(this))
     }
 
 //    private open inner class MIterator:MutableIterator<T> {
@@ -264,7 +265,7 @@ class ObservableList<T> : MutableList<T> {
 
     override fun removeAt(index: Int): T {
         val r = internalList.removeAt(index)
-        mutationEvent.invoke(RemoveEventData(index))
+        mutationEvent.invoke(RemoveEventData(this, index))
         return r
     }
 
@@ -275,7 +276,7 @@ class ObservableList<T> : MutableList<T> {
             itr.next()
             itr.remove()
         }
-        mutationEvent.invoke(RemoveEventData(index,count))
+        mutationEvent.invoke(RemoveEventData(this, index,count))
     }
 
     override fun retainAll(elements: Collection<T>): Boolean {
@@ -293,19 +294,19 @@ class ObservableList<T> : MutableList<T> {
     override fun set(index: Int, element: T): T {
         val r = internalList[index]
         internalList[index] = element
-        mutationEvent.invoke(ChangedEventData(index))
+        mutationEvent.invoke(ChangedEventData(this, index))
         return r
     }
 
     fun replace(list:Collection<T>) {
         internalList = list.toMutableList()
-        mutationEvent.invoke(RefreshEventData())
+        mutationEvent.invoke(RefreshEventData(this))
     }
 
     fun move(from:Int, to:Int) {
         val f = internalList.removeAt(from)
         internalList.add(to, f)
-        mutationEvent.invoke(MoveEventData(from,to))
+        mutationEvent.invoke(MoveEventData(this, from,to))
     }
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
