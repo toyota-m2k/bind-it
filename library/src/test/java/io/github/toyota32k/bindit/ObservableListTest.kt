@@ -88,7 +88,7 @@ class ObservableListTest {
     private lateinit var list:ObservableList<Int>
     private lateinit var listMirror:MutableList<Int>
 
-    private fun onListChanged(m: ObservableList.MutationEventData) {
+    private fun onListChanged(m: ObservableList.MutationEventData<*>) {
         when(m) {
             is ObservableList.RefreshEventData -> listMirror = list.toMutableList()
             is ObservableList.InsertEventData -> {

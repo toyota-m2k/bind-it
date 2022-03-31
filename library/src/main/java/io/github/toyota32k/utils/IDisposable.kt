@@ -5,5 +5,5 @@ package io.github.toyota32k.utils
  */
 interface IDisposable {
     fun dispose()
-    fun isDisposed():Boolean
+//    fun isDisposed():Boolean
 }

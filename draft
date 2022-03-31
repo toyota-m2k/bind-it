@@ -1,0 +1,67 @@
+## 
+
+- BoolBinding
+  These classes bind a boolean state represented by LiveData<Boolean> to a boolean property of view.
+  For example EnableBinding bind a boolean state to isEnabled property of a view.  
+  CheckBinding class supports TowWay binding mode for CompoundButtons such as CheckBox, Switch, ToggleButton, and so on.
+  The classes named Multi*Binding allow to bind a boolean state to properties of one or more views.
+  AnimationBinding and FadeInOutBinding bind a boolean state to visibility of a view with animation effects.
+
+- TextBinding / EditTextBinding
+  These classes bind a string value such as LiveData<String> or MutableLiveData<String> to a text property of view.
+  TextBinding supports only OneWay binding mode for TextView, Button, and so on.
+  EditTextBinding for EditText supports TwoWay binding mode.
+  NumberBinding / EditNumberBinding (and the sub-classes of it) are inherited from TextBinding / EditTextBinding respectively, 
+  and bind input string to numeric value such as LiveData<Int> / MutableLiveData<Int>.
+  
+- ProgressBarBinding / SeekBarBinding / SliderBinding
+
+  ProgressBarBinding supports OneWay binding mode for ProgressBar.
+  SeekBarBinding and SliderBinding support TwoWay binding progress value to the property of SeekBar and Slider that is one of the material component respectively.
+  Additionally, these classes support OneWay binding of the range properties such as min/max in ProgressBar and SeekBar, or valueFrom/valueTo in Slider.
+  
+- RadioGroupBinding family
+
+  RadioGroupBinding is for RadioGroup and it binds any value-list (enum class values, typically) to selection of radio buttons.
+  Similarly, MaterialRadioButtonGroupBinding and MaterialToggleButtonGroupBinding are for MaterialButtonToggleGroup 
+  as radio buttons and toggle buttons respectively.  
+
+  
+```
+IDisposable
+    +-- IBinding
+        +-- BindingBase
+            +-- AlphaBinding
+            +-- DrawableBinding
+            |
+            +-- BoolBinding
+            |   +-- GenericBoolBinding
+            |   +-- CheckBinding
+            |   +-- EnableBinding
+            |   +-- MultiEnableBinding
+            |   +-- VisibilityBinding
+            |   +-- MultiVisibilityBinding
+            |   +-- FadeInOutBinding
+            |   +-- AnimationBinding
+            |
+            +-- TextBinding
+            |   +-- NumberBinding
+            |       +-- IntBinding
+            |       +-- LongBinding
+            |       +-- FloatBinding
+            +-- EditTextBinding
+            |   +-- EditNumberBinding
+            |       +-- EditIntBinding
+            |       +-- EditLongBinding
+            |       +-- EditFloatBinding
+            |
+            +-- ProgressBarBinding
+            |   +-- SeekBarBinding
+            +-- SliderBinding
+            |
+            +-- RadioGroupBinding
+            +-- MaterialToggleButtonsBinding
+            +-- MaterialButtonGroupBindingBase
+                +-- MaterialRadioButtonGroupBinding
+                +-- MaterialToggleButtonGroupBinding
+```

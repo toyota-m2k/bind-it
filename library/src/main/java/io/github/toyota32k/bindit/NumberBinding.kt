@@ -1,14 +1,11 @@
 package io.github.toyota32k.bindit
 
-import android.text.Editable
-import android.text.TextWatcher
 import android.widget.EditText
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
-import io.github.toyota32k.bindit.BindingMode
 import io.github.toyota32k.utils.ConvertLiveData
 
 open class NumberBinding<N> (

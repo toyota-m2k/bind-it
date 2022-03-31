@@ -5,8 +5,9 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import com.metamoji.lib.utils.binding.BindingMode
-import com.metamoji.lib.utils.binding.BoolConvert
+import io.github.toyota32k.bindit.BindingMode
+import io.github.toyota32k.bindit.BoolBinding
+import io.github.toyota32k.bindit.BoolConvert
 
 class ReadOnlyBinding(
     rawData: LiveData<Boolean>,

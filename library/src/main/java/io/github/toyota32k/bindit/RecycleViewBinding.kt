@@ -29,9 +29,9 @@ class RecycleViewBinding<T>(
         adapter.dispose()
     }
 
-    override fun isDisposed(): Boolean {
-        return (view.adapter as? IDisposable)?.isDisposed() ?: false
-    }
+//    override fun isDisposed(): Boolean {
+//        return (view.adapter as? IDisposable)?.isDisposed() ?: false
+//    }
 
     companion object {
         fun <T> create(owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int, bindView:(Binder, View, T)->Unit) : RecycleViewBinding<T> {

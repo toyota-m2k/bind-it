@@ -15,9 +15,9 @@ open class Binder : IDisposable {
         }
     }
 
-    override fun isDisposed(): Boolean {
-        return disposed
-    }
+//    override fun isDisposed(): Boolean {
+//        return disposed
+//    }
 
     fun register(vararg bindings:IDisposable):Binder {
         for(b in bindings) {

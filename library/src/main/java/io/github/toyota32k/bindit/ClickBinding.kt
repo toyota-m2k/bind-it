@@ -32,9 +32,9 @@ class ClickBinding<V> (
         key = null
     }
 
-    override fun isDisposed(): Boolean {
-        return key!=null
-    }
+//    override fun isDisposed(): Boolean {
+//        return key!=null
+//    }
 }
 
 class LongClickBinding<V>(
@@ -57,7 +57,7 @@ class LongClickBinding<V>(
         callback = null
     }
 
-    override fun isDisposed(): Boolean {
-        return callback!=null
-    }
+//    override fun isDisposed(): Boolean {
+//        return callback!=null
+//    }
 }

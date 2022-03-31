@@ -132,9 +132,9 @@ class DisposableObserver<T>(data: LiveData<T>, owner: LifecycleOwner, private va
         data = null
     }
 
-    override fun isDisposed(): Boolean {
-        return data==null
-    }
+//    override fun isDisposed(): Boolean {
+//        return data==null
+//    }
 }
 
 fun <T> LiveData<T>.disposableObserve(owner: LifecycleOwner, fn:(v:T?)->Unit) : IDisposable

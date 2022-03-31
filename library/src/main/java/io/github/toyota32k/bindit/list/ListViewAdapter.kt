@@ -74,7 +74,7 @@ abstract class ListViewAdapter<T>(private val observableList: ObservableList<T>)
 
     }
 
-    override fun isDisposed(): Boolean {
-        return disposable==null
-    }
+//    override fun isDisposed(): Boolean {
+//        return disposable==null
+//    }
 }

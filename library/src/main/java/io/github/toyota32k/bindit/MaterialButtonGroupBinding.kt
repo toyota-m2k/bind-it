@@ -57,7 +57,7 @@ class MaterialRadioButtonGroupBinding<T>(
     override fun onButtonChecked(group: MaterialButtonToggleGroup?, @IdRes checkedId: Int, isChecked: Boolean) {
         if(checkedId==View.NO_ID) return
         if(isChecked) {
-            val v = idResolver.id2value(checkedId)
+            val v = idResolver.id2value(checkedId) ?: return
             if(data.value!=v) {
                 data.value = v
             }
@@ -240,9 +240,9 @@ class MaterialToggleButtonsBinding (
         disposed = true
     }
 
-    override fun isDisposed(): Boolean {
-        return disposed
-    }
+//    override fun isDisposed(): Boolean {
+//        return disposed
+//    }
 
     override fun onButtonChecked(
         group: MaterialButtonToggleGroup?,

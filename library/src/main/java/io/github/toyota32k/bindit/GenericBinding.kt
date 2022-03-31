@@ -3,7 +3,8 @@ package com.metamoji.lib.utils.binding.impl
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import com.metamoji.lib.utils.binding.BindingMode
+import io.github.toyota32k.bindit.BaseBinding
+import io.github.toyota32k.bindit.BindingMode
 
 open class GenericBinding<V,T>(
     override val data: LiveData<T>,
