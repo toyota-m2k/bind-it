@@ -61,9 +61,7 @@ class MultiVisibilityBinding(
             observed = data.disposableObserve(owner, this::onDataChanged)
         }
         views.addAll(targets)
-        if(data.value!=null) {
-            onDataChanged(data.value)
-        }
+        onDataChanged(data.value)
         return this
     }
 

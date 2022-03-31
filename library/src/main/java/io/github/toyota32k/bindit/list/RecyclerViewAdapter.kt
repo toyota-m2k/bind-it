@@ -32,7 +32,7 @@ class RecyclerViewAdapter {
          * というワーニングが出るので、一枚ラッパをはさむ。
          */
         private inner class ListMutationListener {
-            fun onListChanged(t: ObservableList.MutationEventData?) {
+            fun onListChanged(t: ObservableList.MutationEventData<T>?) {
                 this@Base.onListChanged(t)
             }
         }

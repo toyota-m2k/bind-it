@@ -19,6 +19,9 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener {
     constructor(foreverFn:(View?)->Unit) :this() {
         bindForever(foreverFn)
     }
+    constructor(foreverFn: () -> Unit): this() {
+        bindForever(foreverFn)
+    }
 
     private val listeners = Listeners<View?>()
     private class ClickListenerDisposer(v:View, var bind:IDisposable?=null) : IDisposable {
@@ -66,6 +69,10 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener {
     @MainThread
     fun bindForever(fn:(View?)->Unit): IDisposable {
         return listeners.addForever(fn)
+    }
+    @MainThread
+    fun bindForever(fn:()->Unit): IDisposable {
+        return listeners.addForever { fn() }
     }
 
     @MainThread
