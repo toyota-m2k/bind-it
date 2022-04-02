@@ -2,11 +2,11 @@
 # Bind It 
 
 Android platform has a View - ViewModel binding system called `DataBinding`.
-Some programmer came from WPF/UWP world (... it' me) may feel it very poor and mysterious.
+Some programmers came from WPF/UWP world (... it' me) may feel it very poor and mysterious.
 View - ViewModel binding in WPF/UWP is straight forward and go as planned in most cases.
-But DataBinding in Android is not. Some properties won't be bound, KAPT generates errors beyond my comprehension, the code working yesterday is not working today, ...
+But DataBinding in Android is not. Some properties won't be bound, KAPT generates errors beyond my comprehension, the code working yesterday does not work today, ...
 I'm tired to use it, and gave up it... but, I want to use some binding mechanism like WPF... I have made it by myself.
-This library contains several classes for data-view bindings and a little utilities for them.
+This library contains several classes for data-view bindings and utilities for them.
 
 ## Use Bind-It
 
