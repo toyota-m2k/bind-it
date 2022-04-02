@@ -5,8 +5,8 @@ Android platform has a View - ViewModel binding system called `DataBinding`.
 Some programmer came from WPF/UWP world (... it' me) may feel it very poor and mysterious.
 View - ViewModel binding in WPF/UWP is straight forward and go as planned in most cases.
 But DataBinding in Android is not. Some properties won't be bound, KAPT generates errors beyond my comprehension, the code working yesterday is not working today, ...
-I'm tired to use it, and gave up it... but, I want to use some binding mechanism like WPF... I have made it by myself. It's Bind-It!
-This library contains several classes for data binding and a little utilities.
+I'm tired to use it, and gave up it... but, I want to use some binding mechanism like WPF... I have made it by myself.
+This library contains several classes for data-view bindings and a little utilities for them.
 
 ## Use Bind-It
 
@@ -49,10 +49,7 @@ class MainViewModel : ViewModel() {
 ```kotlin
 class MainActivity : AppCompatActivity {
   val viewModel by lazy {
-    ViewModelProvider(
-      this,
-      ViewModelProvider.NewInstanceFactory()
-    )[MainViewModel::class.java]
+    ViewModelProvider(this,ViewModelProvider.NewInstanceFactory())[MainViewModel::class.java]
   }
   val binder = Binder()
 
@@ -81,23 +78,30 @@ class MainActivity : AppCompatActivity {
 ## Binding Mode
 
 - OneWay
-  Binding LiveData (=source) to View.
+  Binding `LiveData` (=source) to `View`.
   Updates the property of view only when the source value changes.
 
 - OneWayToSource
-  Binding View to MutableLiveData (=source).
+  Binding `View` to `MutableLiveData` (=source).
   Updates the source value when the property of view changes.
 
 - TwoWay
-  Binding mutual View and MutableLiveData.
+  Binding mutual `View` and `MutableLiveData`.
   Updates the property of view only when the source value changes, and updates the source value when the property of view changes.
-
-
 
 ## Binding Classes
 
-Binding class named `*Binding` binds a LiveData as data source with a property of view.
-Every binding classes have `create()` APIs to create and initialize them and it is recommended to use them instead of using their constructor.
+Binding class named `*Binding` binds a LiveData as data source with a property of view,
+and these binding are automatically revoked when the lifecycle owner is destroyed.
+Every binding classes have `create()` APIs to create and initialize them and we recommend you to use them instead of using their constructor.
+
+### Using Kotlin Flow
+
+Though our library designed to use with `LiveData`/`MutableLiveData` originally,
+we recently prefer to use `Kotlin Flow` (especially StateFlow/MutableStateFlow) rather than LiveData.
+`StateFlow` can be convert into LiveData with `Flow.asLiveData()` extension function and can be used in `OneWay` bindings.
+And we provide `MutableStateFlow.asMutableLiveData()` extension function to convert `MutableStateFlow` to MutableLiveData for `TwoWay` bindings.
+These converters enable you to use Kotlin Flow with our library.
 
 ### Boolean Binding Classes
 
@@ -111,9 +115,9 @@ Every binding classes have `create()` APIs to create and initialize them and it 
 |FadeInOutBinding|Boolean|View|visibility with fade in/out effect|OneWay|
 |AnimationBinding|Boolean|View|animation effect|OneWay|
 
-Boolean Binding classes accept a BoolConvert argument. If BoolConvert.Invert is set, inverted boolean value of source will be set to (and/or get from) the view.
-VisibilityBinding accepts a HiddenMode argument in construction. HiddenMode.HideByGone uses View.GONE, and HiddenMode.HideByInvisible uses View.GONE to hide the view.
-MultiEnableBinding and MultiVisibilityBinding bind a boolean source to the property of one or more views in same options. 
+Boolean Binding classes (inherited from `BoolBinding` abstract class) accept a BoolConvert argument. If BoolConvert.Inverse is set, inverted boolean value of source will be set to (and/or get from) the view.
+`VisibilityBinding` accepts a HiddenMode argument in its construction. HiddenMode.HideByGone uses View.GONE, and HiddenMode.HideByInvisible uses View.INVISIBLE to hide the view.
+`MultiEnableBinding` and `MultiVisibilityBinding` bind a boolean source to the property of one or more views in same options. 
 
 ### Text Binding Classes
 
@@ -127,6 +131,12 @@ MultiEnableBinding and MultiVisibilityBinding bind a boolean source to the prope
 |EditIntBinding|Int|EditText|text|TwoWay|
 |EditLongBinding|Long|EditText|text|TwoWay|
 |EditFloatBinding|Float|EditText|text|TwoWay|
+
+`TextBinding` class binds a String source to a text property of the View in OneWay mode.
+`Int/Long/FloatBinding` are inherited from `NumberBinding` and can bind a numeric source to a text property of the View using simple data conversion with `toString()`.
+`EditTextBinding` class binds a String source to a text property of the EditText in TwoWay mode.
+`EditInt/Long/FloatBinding` can bind numeric sources in TwoWay mode. `String.toInt/Long/FloatOrNull()` extension function are used for reverse conversion.
+If you need more complex text formatting rule, you can create a Binding class inherit from `TextBinding` and write converter (and reverse converters) to do so.  
 
 ### Progress/Slider Binding Classes
 
@@ -142,8 +152,10 @@ MultiEnableBinding and MultiVisibilityBinding bind a boolean source to the prope
 ||Float|Slider|valueFrom|OneWay|
 ||Float|Slider|valueTo|OneWay|
 
-These classes bind a numeric source to a value of the view.
-And optionally, they can bind min/max parameters to range of the value.
+`ProgressBarBinding` binds a integer source to a value of the ProgressBar in OneWay mode.
+`SeekBarBinding` binds a integer source to a value of the SeekBar in TwoWay mode.
+`SliderBinding` is similar to `SeekBarBinding` and it binds a float source to the Slider (which comes from Material Components).
+And optionally, they can bind min/max parameters to the range property of the view.
 
 ### Radio / Toggle Button Binding Classes
 
@@ -154,31 +166,86 @@ And optionally, they can bind min/max parameters to range of the value.
 |MaterialToggleButtonGroupBinding|Any (using IIDValueResolver)|MaterialButtonToggleGroup|checkedButtonIds|TwoWay|
 |MaterialToggleButtonsBinding|Boolean(s)|MaterialButtonToggleGroup|checkedButtonIds|TwoWay|
 
-RadioGroupBinding, MaterialRadioButtonGroupBinding and MaterialToggleButtonGroupBinding bind any value type to selection of radio/toggle buttons using IIDValueResolver interface.
-IIDValueResolver supplies bi-directional conversion between the value (like a value of enum class typically) and @ResId of the button.
-On the other hand MaterialToggleButtonsBinding binds sources (MutableLiveData) and Buttons one by one.  
+`RadioGroupBinding`, `MaterialRadioButtonGroupBinding` and `MaterialToggleButtonGroupBinding` bind any value type to selection of radio/toggle buttons using `IIDValueResolver` interface.
+`IIDValueResolver` supplies bi-directional conversion between the value (for example enum class) and @ResId of the button.
+On the other hand `MaterialToggleButtonsBinding` binds sources (MutableLiveData) and Buttons one by one.  
 
-### ObservableList and RecycleViewBinding
+### ObservableList and RecyclerViewBinding
 
 |Binding Class|Source Type|View Type|Target Property|Mode|
 |---|---|---|---|---|
 |RecycleViewBinding|ObservableList|RecycleView|RecyclerViewAdapter|OneWay|
 
-ObservableList and RecycleViewBinding are inspired from ObservableCollection in .NET/XAML.
+`ObservableList` is inspired from ObservableCollection in .NET/XAML.
+RecyclerViewBinding class binds a ObservableList as source to RecycleView.
 The contents of RecycleView will be automatically updated whenever the elements of ObservableList is modified. 
+RecyclerViewBinding.create() method prepares a `Simple` RecyclerView.Adapter instance internally, which manage every chores about RecyclerView, 
+and all you have to do is to implement `bindView` as lambda that initialize a item view.   
+
+```kotlin
+class VideoActivity : AppCompatActivity {
+  data class VideoItem(val title:String, val source:Uri)
+  class VideoViewModel : ViewModel() {
+    val videoSources = ObservableList<VideoItem>()
+    val currentSource = MutableStateFlow<VideoItem?>(null)
+  }
+  
+  val viewModel by lazy { ViewModelProvider(this,ViewModelProvider.NewInstanceFactory())[VideoViewModel::class.java] }
+  val binder = Binder()
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    val videoListView = findViewById<RecyclerView>(R.id.video_list_view)    // RecyclerView instance
+    binder.register(
+      // create a RecycleViewBinding on videoListView, of which item view will be inflated from R.layout.list_item_view.
+      RecycleViewBinding.create(this, videoListView, viewModel.videoSources, R.layout.list_item_view) { itemBinder, view, videoItem ->
+        // bindView lambda implements here! 
+        // show video title on item view.
+        view.findViewById<TextView>(R.id.video_item_text).text = videoItem.title
+        // itemBinder is prepared by RecycleViewBinding for binding contents in a item view, and it will be disposed when item view is recycled.
+        itemBinder.register(
+          // item selection on tapping item view
+          Command().connectAndBind(owner, textView) { viewModel.currentSource.value = videoItem },
+          // check mark at the current playing item
+          CheckBinding.create(owner, view.findViewById<CheckBox>(R.id.check_box), viewModel.currentSource.map { it?.id == videoItem.id }.asLiveData()),
+        )
+      },
+    )
+
+    // play the selected item    
+    viewModel.currentSource.onEach {
+      pleyer.setSource(it)
+    }.launchIn(lifecyclescope)
+  }
+}
+```
 
 ### Command
 
-This class provides a mechanism of event listener which can associate to View.OnClickListener and TextView.OnEditorActionListener in IDisposable manner.
-It is possible to prepare a Command instance with a handler by it's constructor or bind() method, and associate view to it by connectViewEx() method separately.   
-The bind() and connectViewEx() methods return a IDisposable instances and you can dispose() them to revoke corresponding listeners. 
+`Command` class provides a mechanism of event listener which can bind to `View.OnClickListener' and/or `TextView.OnEditorActionListener` in IDisposable manner.
+It is possible to prepare a Command instance with a handler by it's constructor or `bind()` method, and associate view to it by `connectViewEx()` method separately.   
+The bind() and connectViewEx() methods return a `IDisposable` instances and you can `dispose()` them to revoke corresponding listeners 
+though they will be revoked automatically when lifecycle over is destroyed. 
 
 ## Utilities
 
+- Binder
+
+  This is a simple collection of IDisposable, and dispose all of registered IDisposables with reset() or dispose() methods.
+
 - Callback
+
+  Registering a single callback which will be revoked when the lifecycle owner is destroyed or dispose() method is invoked explicitly.
 
 - Listeners
 
+  Registering multiple callbacks which will be revoked when the lifecycle owner is destroyed or dispose() method is invoked explicitly.
+
+- UtLog
+
+  These are internal logging system to write logs with class and method name.
+  You can instantiate UtLog to use this logging system.
+  Though it write to LogCat by default, if you want to use other logging system, implement IUtVaLogger interface and put it to UtLoggerInstance.externalLogger.
+  
 - 
 
 

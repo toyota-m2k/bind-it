@@ -9,7 +9,7 @@ import io.github.toyota32k.bindit.list.ObservableList
 import io.github.toyota32k.bindit.list.RecyclerViewAdapter
 import io.github.toyota32k.utils.IDisposable
 
-class RecycleViewBinding<T>(
+class RecyclerViewBinding<T>(
         val list: ObservableList<T>,
         val view: RecyclerView
 //        private val itemViewLayoutId:Int,
@@ -34,8 +34,8 @@ class RecycleViewBinding<T>(
 //    }
 
     companion object {
-        fun <T> create(owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int, bindView:(Binder, View, T)->Unit) : RecycleViewBinding<T> {
-            return RecycleViewBinding(list,view).apply {
+        fun <T> create(owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int, bindView:(Binder, View, T)->Unit) : RecyclerViewBinding<T> {
+            return RecyclerViewBinding(list,view).apply {
                 view.adapter = RecyclerViewAdapter.Simple(owner,list,itemViewLayoutId,bindView)
             }
         }
