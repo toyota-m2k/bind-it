@@ -4,6 +4,7 @@ package io.github.toyota32k.bindit
 
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import io.github.toyota32k.bindit.list.ObservableList
 import io.github.toyota32k.bindit.list.RecyclerViewAdapter
@@ -27,6 +28,29 @@ class RecyclerViewBinding<T>(
     override fun dispose() {
         val adapter = view.adapter as? IDisposable ?: return
         adapter.dispose()
+        enableDragAndDrop(false)
+    }
+
+    private var itemTouchHelper: ItemTouchHelper? = null
+    fun enableDragAndDrop(sw:Boolean) {
+        if(sw) {
+            if(itemTouchHelper==null) {
+                itemTouchHelper = ItemTouchHelper(object:ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
+                    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                        val from = viewHolder.bindingAdapterPosition
+                        val to = target.bindingAdapterPosition
+                        list.move(from, to)
+                        return true
+                    }
+
+                    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                    }
+                }).apply { attachToRecyclerView(view) }
+            }
+        } else {
+            itemTouchHelper?.attachToRecyclerView(null)
+            itemTouchHelper = null
+        }
     }
 
 //    override fun isDisposed(): Boolean {
