@@ -5,6 +5,7 @@ package io.github.toyota32k.bindit
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.github.toyota32k.bindit.list.ObservableList
 import io.github.toyota32k.bindit.list.RecyclerViewAdapter
@@ -58,8 +59,13 @@ class RecyclerViewBinding<T>(
 //    }
 
     companion object {
-        fun <T> create(owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int, bindView:(Binder, View, T)->Unit) : RecyclerViewBinding<T> {
+        fun <T> create(owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int,
+                       fixedSize:Boolean = true,
+                       layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(view.context),
+                       bindView:(Binder, View, T)->Unit) : RecyclerViewBinding<T> {
             return RecyclerViewBinding(list,view).apply {
+                view.setHasFixedSize(fixedSize)
+                view.layoutManager = layoutManager
                 view.adapter = RecyclerViewAdapter.Simple(owner,list,itemViewLayoutId,bindView)
             }
         }
