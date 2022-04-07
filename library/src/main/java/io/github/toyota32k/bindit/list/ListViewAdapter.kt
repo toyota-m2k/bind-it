@@ -52,6 +52,7 @@ open class ListViewAdapter<T>(
      */
     open fun updateItemView(itemView:View, position:Int) {
         val binder = binderMap[itemView] ?: Binder().apply { binderMap[itemView] = this }
+        binder.reset()
         bindView(binder, itemView, list[position])
     }
 
