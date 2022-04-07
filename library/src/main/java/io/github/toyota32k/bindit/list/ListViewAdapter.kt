@@ -1,39 +1,33 @@
 package io.github.toyota32k.bindit.list
 
 import android.database.DataSetObserver
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ListAdapter
+import androidx.annotation.LayoutRes
+import io.github.toyota32k.bindit.Binder
 import io.github.toyota32k.utils.IDisposable
 
-@Suppress("unused")
-abstract class ListViewAdapter<T>(private val observableList: ObservableList<T>) : BaseAdapter(), IDisposable, MutableList<T> by observableList {
-    constructor() : this(ObservableList())
-    private var disposable :IDisposable? = null
+open class ListViewAdapter<T>(
+    private val list: List<T>,
+    @LayoutRes private val  itemViewLayoutId: Int,
+    private val bindView:(Binder, View, T)->Unit
+) : BaseAdapter(), IDisposable {
+
+    val binderMap = mutableMapOf<View,Binder>()
 
     interface IIdHolder {
         val id:Long
     }
 
-    override fun registerDataSetObserver(observer: DataSetObserver?) {
-        disposable?.dispose()
-        disposable = observableList.addListenerForever {
-            notifyDataSetChanged()
-        }
-        super.registerDataSetObserver(observer)
-    }
-    override fun unregisterDataSetObserver(observer: DataSetObserver?) {
-        disposable?.dispose()
-        disposable = null
-        super.unregisterDataSetObserver(observer)
-    }
-
     override fun getCount(): Int {
-        return observableList.size
+        return list.size
     }
 
     override fun getItem(position: Int): Any {
-        return observableList[position]!!
+        return list[position]!!
     }
 
     override fun getItemId(position: Int): Long {
@@ -48,33 +42,56 @@ abstract class ListViewAdapter<T>(private val observableList: ObservableList<T>)
     /**
      * アイテムビューを作る
      */
-    abstract fun createItemView(parent: ViewGroup?):View
+    open fun createItemView(parent: ViewGroup):View {
+        val inflater = LayoutInflater.from(parent.context)
+        return inflater.inflate(itemViewLayoutId, parent, false)
+    }
 
     /**
      * アイテムビューにデータをセットする
      */
-    abstract fun updateItemView(itemView:View, position:Int)
+    open fun updateItemView(itemView:View, position:Int) {
+        val binder = binderMap[itemView] ?: Binder().apply { binderMap[itemView] = this }
+        bindView(binder, itemView, list[position])
+    }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val itemView = convertView ?: createItemView(parent)
         updateItemView(itemView, position)
         return itemView
     }
 
-    override fun isEmpty(): Boolean {
-        return observableList.isEmpty()
+    override fun dispose() {
+    }
+}
+
+class MutableListViewAdapter<T>(
+    private val observableList: ObservableList<T>,
+    @LayoutRes itemViewLayoutId: Int,
+    bindView:(Binder, View, T)->Unit
+    ) : ListViewAdapter<T>(observableList, itemViewLayoutId, bindView) {
+    private var disposable: IDisposable? = null
+
+    override fun registerDataSetObserver(observer: DataSetObserver?) {
+        disposable?.dispose()
+        disposable = observableList.addListenerForever {
+            notifyDataSetChanged()
+        }
+        super.registerDataSetObserver(observer)
+    }
+
+    override fun unregisterDataSetObserver(observer: DataSetObserver?) {
+        disposable?.dispose()
+        disposable = null
+        super.unregisterDataSetObserver(observer)
     }
 
     override fun dispose() {
+        super.dispose()
         disposable?.let {
             notifyDataSetInvalidated()
             it.dispose()
             disposable = null
         }
-
     }
-
-//    override fun isDisposed(): Boolean {
-//        return disposable==null
-//    }
 }

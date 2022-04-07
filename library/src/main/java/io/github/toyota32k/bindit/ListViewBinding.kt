@@ -1,0 +1,31 @@
+package io.github.toyota32k.bindit
+
+import android.view.View
+import android.widget.ListAdapter
+import android.widget.ListView
+import androidx.annotation.LayoutRes
+import io.github.toyota32k.bindit.list.ListViewAdapter
+import io.github.toyota32k.bindit.list.MutableListViewAdapter
+import io.github.toyota32k.bindit.list.ObservableList
+import io.github.toyota32k.utils.IDisposable
+
+class ListViewBinding(val view: ListView, adapter:ListAdapter) : IBinding {
+    override val mode: BindingMode = BindingMode.OneWay
+    override fun dispose() {
+        val adapter = view.adapter as? IDisposable ?: return
+        view.adapter = null
+        adapter.dispose()
+    }
+
+    companion object {
+        fun <T> create(view:ListView, list:List<T>, @LayoutRes itemLayout:Int, bindView:(Binder, View, T)->Unit):ListViewBinding {
+            val adapter = ListViewAdapter(list, itemLayout, bindView)
+            return ListViewBinding(view, adapter)
+        }
+
+        fun <T> create(view:ListView, list:ObservableList<T>, @LayoutRes itemLayout:Int, bindView:(Binder, View, T)->Unit):ListViewBinding {
+            val adapter = MutableListViewAdapter(list, itemLayout, bindView)
+            return ListViewBinding(view, adapter)
+        }
+    }
+}
