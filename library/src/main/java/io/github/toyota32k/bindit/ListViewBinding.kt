@@ -11,6 +11,11 @@ import io.github.toyota32k.utils.IDisposable
 
 class ListViewBinding(val view: ListView, adapter:ListAdapter) : IBinding {
     override val mode: BindingMode = BindingMode.OneWay
+
+    init {
+        view.adapter = adapter
+    }
+
     override fun dispose() {
         val adapter = view.adapter as? IDisposable ?: return
         view.adapter = null
