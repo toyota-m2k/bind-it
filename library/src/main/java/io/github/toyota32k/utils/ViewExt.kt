@@ -10,6 +10,7 @@ import android.util.Size
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
+import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
 import kotlin.math.roundToInt
@@ -153,3 +154,6 @@ fun ListView.calcFixedContentHeight():Int {
     val itemHeight = listItem.measuredHeight
     return itemHeight * count + dividerHeight * (count-1)
 }
+
+inline fun <reified T: View> ViewGroup.listChildren():Sequence<View>
+    = this.children.filter { it is T }

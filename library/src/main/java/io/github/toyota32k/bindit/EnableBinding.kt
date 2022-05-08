@@ -10,29 +10,34 @@ import io.github.toyota32k.utils.disposableObserve
 
 open class EnableBinding(
     rawData: LiveData<Boolean>,
-    boolConvert: BoolConvert = BoolConvert.Straight
+    boolConvert: BoolConvert = BoolConvert.Straight,
+    val alphaOnDisabled:Float = 1f
 ) : BoolBinding(rawData, BindingMode.OneWay, boolConvert) {
     override fun onDataChanged(v: Boolean?) {
         val view = this.view ?: return
         val enabled = v==true
         view.isEnabled = enabled
         view.isClickable = enabled
+        if(alphaOnDisabled<1f) {
+            view.alpha = if(enabled) 1f else alphaOnDisabled
+        }
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
 //            view.focusable = if(enabled) View.FOCUSABLE_AUTO else View.NOT_FOCUSABLE
 //        }
 //        view.isFocusableInTouchMode = enabled
     }
     companion object {
-        fun create(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight) : EnableBinding {
-            return EnableBinding(data, boolConvert).apply { connect(owner, view) }
+        fun create(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f) : EnableBinding {
+            return EnableBinding(data, boolConvert, alphaOnDisabled).apply { connect(owner, view) }
         }
     }
 }
 
 class MultiEnableBinding(
     rawData: LiveData<Boolean>,
-    boolConvert: BoolConvert = BoolConvert.Straight
-) : EnableBinding(rawData, boolConvert) {
+    boolConvert: BoolConvert = BoolConvert.Straight,
+    alphaOnDisabled:Float = 1f
+) : EnableBinding(rawData, boolConvert, alphaOnDisabled) {
     private val views = mutableListOf<View>()
 
     override fun onDataChanged(v: Boolean?) {
@@ -40,6 +45,9 @@ class MultiEnableBinding(
             val enabled = v == true
             view.isEnabled = enabled
             view.isClickable = enabled
+            if(alphaOnDisabled<1f) {
+                view.alpha = if(enabled) 1f else alphaOnDisabled
+            }
         }
     }
 
@@ -62,8 +70,8 @@ class MultiEnableBinding(
     }
 
     companion object {
-        fun create(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight) : MultiEnableBinding {
-            return MultiEnableBinding(data, boolConvert).apply { connectAll(owner, *views) }
+        fun create(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f) : MultiEnableBinding {
+            return MultiEnableBinding(data, boolConvert, alphaOnDisabled).apply { connectAll(owner, *views) }
         }
     }
 
