@@ -29,7 +29,7 @@ class UtObservableFlag (private val flag:MutableStateFlow<Boolean> = MutableStat
         } else false
     }
 
-    fun <T> ifSet(def:T, fn:()->T):T {
+    inline fun <T> ifSet(def:T, fn:()->T):T {
         return if(set()) {
             try {
                 fn()
@@ -39,7 +39,7 @@ class UtObservableFlag (private val flag:MutableStateFlow<Boolean> = MutableStat
         } else def
     }
 
-    fun ifSet(fn:()->Unit):Boolean {
+    inline fun ifSet(fn:()->Unit):Boolean {
         return if(set()) {
             try {
                 fn()
