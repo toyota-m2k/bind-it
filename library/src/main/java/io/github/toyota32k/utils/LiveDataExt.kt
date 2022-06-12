@@ -3,12 +3,11 @@
 package io.github.toyota32k.utils
 
 import androidx.lifecycle.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.io.Closeable
+import kotlin.coroutines.CoroutineContext
 
 /**
  * LiveData.map だと、初期値が反映されないので、初期値の反映が必要なときはこちらを使う。
@@ -300,3 +299,30 @@ class UtMutableStateFlowLiveData<T>(val flow: MutableStateFlow<T>, lifecycleOwne
 
 fun <T> MutableStateFlow<T>.asMutableLiveData(lifecycleOwner: LifecycleOwner):MutableLiveData<T>
         = UtMutableStateFlowLiveData(this, lifecycleOwner)
+
+/**
+ * 値が変化しないLiveData
+ * LiveData は abstract なので直接作成できないので、継承したクラスを用意してみた。
+ * 値が変化しないことがわかっているけど、Bindingの仕掛けを使いたいときに、無駄なMutableLiveDataを作るのも気が引けるので。
+ */
+class ConstantLiveData<T>(value:T) : LiveData<T>(value)
+
+fun <T> T.asConstantLiveData() = ConstantLiveData<T>(this)
+
+class DisposableFlowObserver<T> constructor(flow: Flow<T>, coroutineContext: CoroutineContext, private val callback:(v:T)->Unit): IDisposable {
+    constructor(flow:Flow<T>, callback:(v:T)->Unit) : this(flow, Dispatchers.Main, callback)
+    constructor(flow:Flow<T>, owner:LifecycleOwner, callback:(v:T)->Unit) : this(flow, owner.lifecycleScope.coroutineContext, callback)
+    val scope:CoroutineScope = CoroutineScope(coroutineContext+ SupervisorJob())
+    init {
+        flow.onEach {
+            callback(it)
+        }.launchIn(scope)
+    }
+
+    override fun dispose() {
+        scope.cancel()
+    }
+}
+
+fun <T> Flow<T>.disposableObserve(owner:LifecycleOwner, callback:(v:T)->Unit):DisposableFlowObserver<T> =
+    DisposableFlowObserver(this, owner, callback)
