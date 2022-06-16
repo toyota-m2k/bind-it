@@ -23,12 +23,12 @@ class ListViewBinding(val view: ListView, adapter:ListAdapter) : IBinding {
     }
 
     companion object {
-        fun <T> create(view:ListView, list:List<T>, @LayoutRes itemLayout:Int, bindView:(Binder, View, T)->Unit):ListViewBinding {
+        fun <T> create(view:ListView, list:List<T>, @LayoutRes itemLayout:Int, bindView:(Binder, View, T)->Unit): ListViewBinding {
             val adapter = ListViewAdapter(list, itemLayout, bindView)
             return ListViewBinding(view, adapter)
         }
 
-        fun <T> create(view:ListView, list:ObservableList<T>, @LayoutRes itemLayout:Int, bindView:(Binder, View, T)->Unit):ListViewBinding {
+        fun <T> create(view:ListView, list: ObservableList<T>, @LayoutRes itemLayout:Int, bindView:(Binder, View, T)->Unit): ListViewBinding {
             val adapter = MutableListViewAdapter(list, itemLayout, bindView)
             return ListViewBinding(view, adapter)
         }

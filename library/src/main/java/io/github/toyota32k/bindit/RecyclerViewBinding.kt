@@ -12,8 +12,8 @@ import io.github.toyota32k.bindit.list.RecyclerViewAdapter
 import io.github.toyota32k.utils.IDisposable
 
 class RecyclerViewBinding<T>(
-        val list: ObservableList<T>,
-        val view: RecyclerView
+    val list: ObservableList<T>,
+    val view: RecyclerView
 //        private val itemViewLayoutId:Int,
 //        private val bindView:(Binder, View, T)->Unit
 ) : IBinding {
@@ -27,9 +27,8 @@ class RecyclerViewBinding<T>(
 //    }
 
     override fun dispose() {
-        val adapter = view.adapter as? IDisposable ?: return
-        adapter.dispose()
         enableDragAndDrop(false)
+        (view.adapter as? IDisposable)?.dispose()
     }
 
     private var itemTouchHelper: ItemTouchHelper? = null

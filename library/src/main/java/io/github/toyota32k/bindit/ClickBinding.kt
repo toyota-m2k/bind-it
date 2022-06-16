@@ -8,7 +8,6 @@ import io.github.toyota32k.utils.Callback
 import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.Listeners
 
-@Deprecated("use Command class instead.")
 class ClickBinding<V> (
     owner:LifecycleOwner,
     val view: V,
@@ -31,10 +30,6 @@ class ClickBinding<V> (
         key?.dispose()
         key = null
     }
-
-//    override fun isDisposed(): Boolean {
-//        return key!=null
-//    }
 }
 
 class LongClickBinding<V>(
@@ -56,8 +51,4 @@ class LongClickBinding<V>(
         callback?.dispose()
         callback = null
     }
-
-//    override fun isDisposed(): Boolean {
-//        return callback!=null
-//    }
 }

@@ -50,7 +50,7 @@ class SingleLiveData<T> : MutableLiveData<T>(), Observer<T> {
     @MainThread
     override fun observe(owner: LifecycleOwner, observer: Observer<in T>) {
         if (hasActiveObservers()) {
-            UtLogger.error("only one observer can be registered to SingleLiveData")
+            UtLog.libLogger.error("only one observer can be registered to SingleLiveData")
             throw IllegalStateException("SingleLiveData.observe prevent from registering multiple observers.")
         }
 

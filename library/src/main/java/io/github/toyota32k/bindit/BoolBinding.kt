@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.github.toyota32k.utils.ConvertLiveData
-import io.github.toyota32k.utils.UtLogger
+import io.github.toyota32k.utils.UtLog
 import io.github.toyota32k.utils.disposableObserve
 
 abstract class BoolBinding(
@@ -50,11 +50,11 @@ open class GenericBoolMultiBinding(
     }
 
     override fun connect(owner: LifecycleOwner, view:View) {
-        UtLogger.assert( false,"use connectAll() method.")
+        UtLog.libLogger.assert( false,"use connectAll() method.")
     }
 
     fun connectAll(owner:LifecycleOwner, vararg targets:View) {
-        UtLogger.assert(mode==BindingMode.OneWay, "GenericBoolMultiBinding ... support OneWay mode only.")
+        UtLog.libLogger.assert(mode==BindingMode.OneWay, "GenericBoolMultiBinding ... support OneWay mode only.")
         if(observed==null) {
             observed = data.disposableObserve(owner, this::onDataChanged)
         }

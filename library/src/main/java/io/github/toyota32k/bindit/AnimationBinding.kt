@@ -5,7 +5,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.distinctUntilChanged
 import io.github.toyota32k.bindit.anim.IReversibleAnimation
-import io.github.toyota32k.utils.UtLogger
+import io.github.toyota32k.utils.UtLog
 import io.github.toyota32k.utils.disposableObserve
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,7 @@ class AnimationBinding(
     }
 
     override fun connect(owner: LifecycleOwner, view: View) {
-        UtLogger.assert( false,"use setAnimation().")
+        UtLog.libLogger.assert( false,"use setAnimation().")
     }
 
     override fun onDataChanged(v: Boolean?) {

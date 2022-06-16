@@ -2,6 +2,7 @@
 
 package io.github.toyota32k.bindit
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -110,6 +111,7 @@ open class SliderBinding (
         }
     }
     // Slider.OnChangeListener
+    @SuppressLint("RestrictedApi")
     override fun onValueChange(slider: Slider, value: Float, fromUser: Boolean) {
         if(data.value!=value) {
             mutableData?.value = value

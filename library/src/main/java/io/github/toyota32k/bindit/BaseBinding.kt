@@ -42,10 +42,6 @@ abstract class BaseBinding<T>(override val mode: BindingMode) : IBinding {
         }
     }
 
-//    override fun isDisposed(): Boolean {
-//        return observed==null
-//    }
-
     protected abstract fun onDataChanged(v:T?)
 
     override fun dispose() {

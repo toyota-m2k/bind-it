@@ -25,10 +25,6 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDispos
         connectView(view)
     }
 
-//    constructor(foreverFn: () -> Unit): this() {
-//        bindForever(foreverFn)
-//    }
-
     private val listeners = Listeners<View?>()
     private class ClickListenerDisposer(v:View, var bind:IDisposable?=null) : IDisposable {
         var view:WeakReference<View>? = WeakReference<View>(v)

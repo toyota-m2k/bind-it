@@ -9,7 +9,7 @@ import io.github.toyota32k.utils.Listeners
 fun <T> observableListOf(vararg e:T) : ObservableList<T> = ObservableList.of(*e)
 fun <T> Collection<T>.toObservableList() = ObservableList.from(this)
 
-class ObservableList<T> : MutableList<T> {
+class ObservableList<T> : MutableList<T>, IDisposable {
     companion object {
         fun <T> from (collection:Collection<T>): ObservableList<T> {
             return ObservableList<T>().apply {
@@ -311,6 +311,14 @@ class ObservableList<T> : MutableList<T> {
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<T> {
         return internalList.subList(fromIndex, toIndex)
+    }
+
+    /**
+     * 変更監視リスナーをクリアする
+     * 配列そのものは変更しない。
+     */
+    override fun dispose() {
+        mutationEvent.clear()
     }
 
 }

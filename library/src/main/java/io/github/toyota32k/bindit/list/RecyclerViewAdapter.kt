@@ -9,7 +9,6 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import io.github.toyota32k.bindit.Binder
-import io.github.toyota32k.bindit.list.ObservableList.MutationEventData
 import io.github.toyota32k.utils.IDisposable
 
 class RecyclerViewAdapter {
@@ -19,8 +18,7 @@ class RecyclerViewAdapter {
     abstract class Base<T, VH>(
         owner: LifecycleOwner,
         val list: ObservableList<T>
-    ) : IDisposable, RecyclerView.Adapter<VH>() where VH : RecyclerView.ViewHolder
-    {
+    ) : IDisposable, RecyclerView.Adapter<VH>() where VH : RecyclerView.ViewHolder {
 
 //            set(v) {
 //                field = v
@@ -34,7 +32,7 @@ class RecyclerViewAdapter {
          * というワーニングが出るので、一枚ラッパをはさむ。
          */
         private inner class ListMutationListener {
-            fun onListChanged(t: MutationEventData<T>?) {
+            fun onListChanged(t: ObservableList.MutationEventData<T>?) {
                 this@Base.onListChanged(t)
             }
         }
@@ -50,22 +48,18 @@ class RecyclerViewAdapter {
             }
         }
 
-//        override fun isDisposed(): Boolean {
-//            return listenerKey==null
-//        }
-
         // endregion
 
         // Observer i/f
 
         @SuppressLint("NotifyDataSetChanged")
-        protected open fun onListChanged(t: MutationEventData<*>?) {
+        protected open fun onListChanged(t: ObservableList.MutationEventData<T>?) {
             if (t == null) return
             when (t) {
-                is ObservableList.ChangedEventData<*> -> notifyItemRangeChanged(t.position, t.range)
-                is ObservableList.MoveEventData<*> -> notifyItemMoved(t.from, t.to)
-                is ObservableList.RemoveEventData<*> -> notifyItemRangeRemoved(t.position, t.range)
-                is ObservableList.InsertEventData<*> -> notifyItemRangeInserted(t.position, t.range)
+                is ObservableList.ChangedEventData -> notifyItemRangeChanged(t.position, t.range)
+                is ObservableList.MoveEventData -> notifyItemMoved(t.from, t.to)
+                is ObservableList.RemoveEventData -> notifyItemRangeRemoved(t.position, t.range)
+                is ObservableList.InsertEventData -> notifyItemRangeInserted(t.position, t.range)
                 else -> notifyDataSetChanged()
             }
         }

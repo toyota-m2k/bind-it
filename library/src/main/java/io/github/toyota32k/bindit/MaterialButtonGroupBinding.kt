@@ -240,10 +240,6 @@ class MaterialToggleButtonsBinding (
         disposed = true
     }
 
-//    override fun isDisposed(): Boolean {
-//        return disposed
-//    }
-
     override fun onButtonChecked(
         group: MaterialButtonToggleGroup?,
         checkedId: Int,
