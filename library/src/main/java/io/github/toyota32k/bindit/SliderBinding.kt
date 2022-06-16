@@ -35,18 +35,28 @@ open class SliderBinding (
     open fun connect(owner: LifecycleOwner, view:Slider) {
         super.connect(owner, view)
         if(max!=null) {
-            maxObserver = Observer<Float?> {
-                if(it!=null) {
-                    view.valueTo = it
+            maxObserver = Observer<Float?> { newValueTo ->
+                if(newValueTo!=null) {
+                    // max を変更した結果、value がレンジアウトする状態になると Slider::onDrawで死ぬので、valueをクリップしておく。
+                    val v = clipByRange(view.valueFrom, newValueTo, view.value)
+                    if(v!=view.value) {
+                        view.value = v      // view.value を変えると、onValueChangedが呼ばれて、data.value 自動的にクリップされる。
+                    }
+                    view.valueTo = newValueTo
                 }
             }.apply {
                 max.observe(owner,this)
             }
         }
         if(min!=null) {
-            minObserver = Observer<Float?> {
-                if(it!=null) {
-                    view.valueFrom = it
+            minObserver = Observer<Float?> { newValueFrom->
+                if(newValueFrom!=null) {
+                    // min を変更した結果、value がレンジアウトする状態になると Slider::onDrawで死ぬので、valueをクリップしておく。
+                    val v = clipByRange(newValueFrom, view.valueTo, view.value)
+                    if(v!=view.value) {
+                        view.value = v      // view.value を変えると、onValueChangedが呼ばれて、data.value 自動的にクリップされる。
+                    }
+                    view.valueFrom = newValueFrom
                 }
             }.apply {
                 min.observe(owner,this)
