@@ -1,11 +1,14 @@
 package io.github.toyota32k.utils
 
+import android.util.Log
 import io.github.toyota32k.bindit.BuildConfig
 import java.io.Closeable
 import java.lang.Exception
 
 class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, val omissionNamespace:String?=parent?.omissionNamespace, private val outputClassName:Boolean=true, private val outputMethodName:Boolean=true) {
     companion object {
+        var logLevel = Log.DEBUG
+
         fun hierarchicTag(tag:String, parent:UtLog?):String {
             return if(parent!=null) {
                 "${hierarchicTag(parent.tag, parent.parent)}.${tag}"
@@ -76,10 +79,12 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
 
     @JvmOverloads
     fun debug(msg: String?=null) {
-        logger.debug(compose(msg))
+        if(logLevel<=Log.DEBUG) {
+            logger.debug(compose(msg))
+        }
     }
     fun debug(fn:()->String) {
-        if(BuildConfig.DEBUG) {
+        if(logLevel<=Log.DEBUG) {
             logger.debug(compose(fn()))
         }
     }
@@ -101,7 +106,14 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
 
     @JvmOverloads
     fun verbose(msg: String?=null) {
-        logger.verbose(compose(msg))
+        if(logLevel<=Log.VERBOSE) {
+            logger.verbose(compose(msg))
+        }
+    }
+    fun verbose(fn: () -> String) {
+        if(logLevel<=Log.VERBOSE) {
+            logger.verbose(compose(fn()))
+        }
     }
 
     @JvmOverloads
@@ -112,12 +124,8 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
     @JvmOverloads
     fun assert(chk:Boolean, msg:String?=null) {
         if(!chk) {
-            stackTrace(Exception("assertion failed."), msg)
+            stackTrace(Exception("assertion failed."), compose(msg))
         }
-    }
-    @JvmOverloads
-    fun jassert(chk:Boolean, msg:String?=null) {
-        assert(chk, msg)
     }
 
     @JvmOverloads
