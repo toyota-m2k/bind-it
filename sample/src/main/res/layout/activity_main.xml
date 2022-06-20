@@ -37,6 +37,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:gravity="center_horizontal"
         >
         <androidx.appcompat.widget.AppCompatRadioButton
             android:id="@+id/radio1"
@@ -78,6 +79,7 @@
         android:orientation="horizontal"
         app:singleSelection="true"
         app:selectionRequired="true"
+        android:gravity="center_horizontal"
         >
         <Button
             android:id="@+id/mtRadio1"
@@ -114,6 +116,7 @@
         android:orientation="horizontal"
         app:singleSelection="false"
         app:selectionRequired="false"
+        android:gravity="center_horizontal"
         >
         <Button
             android:id="@+id/toggle1"
@@ -157,6 +160,7 @@
         android:orientation="horizontal"
         app:singleSelection="false"
         app:selectionRequired="false"
+        android:gravity="center_horizontal"
         >
         <Button
             android:id="@+id/toggleButton1"
@@ -210,6 +214,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         style="?attr/materialButtonOutlinedStyle"
         />
+
+    <Button
+        android:id="@+id/command_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/internal_test_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/command_test"
+        style="?attr/materialButtonOutlinedStyle"
+        />
+    <TextView
+        android:id="@+id/command_test_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/command_test"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/text_command_message"
+        />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

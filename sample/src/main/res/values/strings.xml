@@ -8,4 +8,6 @@
     <string name="toggle3">Toggle-3</string>
     <string name="visibility_binding_test">Visibility Binding Test</string>
     <string name="internal_test">Internal Test</string>
+    <string name="command_test">command test</string>
+    <string name="text_command_message">Click Command Test Button!</string>
 </resources>

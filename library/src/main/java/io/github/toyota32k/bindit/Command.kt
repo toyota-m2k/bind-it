@@ -26,7 +26,7 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDispos
     }
 
     private val listeners = Listeners<View?>()
-    private class ClickListenerDisposer(v:View, var bind:IDisposable?=null) : IDisposable {
+    class ClickListenerDisposer(v:View, var bind:IDisposable?=null) : IDisposable {
         var view:WeakReference<View>? = WeakReference<View>(v)
 
         override fun dispose() {
@@ -48,6 +48,7 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDispos
 
     }
 
+    @Deprecated("Use attachView", ReplaceWith("attachView"))
     @MainThread
     fun connectView(view:View):Command {
         if(view is EditText) {
@@ -58,9 +59,19 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDispos
         return this
     }
 
+    @Deprecated("Use attachView", ReplaceWith("attachView"))
     @MainThread
     fun connectViewEx(view:View) : IDisposable {
-        connectView(view)
+        return attachView(view)
+    }
+
+    @MainThread
+    fun attachView(view:View): IDisposable {
+        if(view is EditText) {
+            view.setOnEditorActionListener(this)
+        } else {
+            view.setOnClickListener(this)
+        }
         return ClickListenerDisposer(view)
     }
 

@@ -1,6 +1,7 @@
 package io.github.toyota32k.bindit.sample
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
@@ -90,6 +91,32 @@ class MainActivity : AppCompatActivity() {
 
         val multiVisible = MutableLiveData<Boolean>(true)
 
+        val commandTextMessage = MutableLiveData<String>()
+        val commandTest = LiteUnitCommand(this::onCommandTest)
+
+        val liteCommand = LiteCommand<Boolean> {
+            logger.info("LiteCommand called.")
+        }
+        val reliableCommand = ReliableCommand(false) {
+            logger.info("ReliableCommand called.")
+        }
+
+        private fun onCommandTest() {
+            commandTextMessage.value = "Testing..."
+            CoroutineScope(Dispatchers.IO).launch {
+                for(i in 10 downTo 0) {
+                    delay(1000L)
+                    withContext(Dispatchers.Main) {
+                        commandTextMessage.value = "Testing...($i)"
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    liteCommand.invoke(true)
+                    reliableCommand.invoke(true)
+                }
+            }
+        }
+
         companion object {
             fun instance(owner: FragmentActivity): MainViewModel {
                 logger.debug()
@@ -111,6 +138,8 @@ class MainActivity : AppCompatActivity() {
         val toggleButtonValue:TextView by lazy {findViewById(R.id.toggleButtonValue)}
         val multiVisibleCheckBox: CheckBox by lazy { findViewById(R.id.multiVisibleCheckBox) }
         val internalTestButton: Button by lazy { findViewById(R.id.internal_test_button) }
+        val commandTestButton:Button by lazy {findViewById(R.id.command_test)}
+        val commandTestText:TextView by lazy {findViewById(R.id.command_test_message)}
 
         init {
             logger.debug()
@@ -185,7 +214,17 @@ class MainActivity : AppCompatActivity() {
                 CheckBinding.create(owner, multiVisibleCheckBox, model.multiVisible),
                 ClickBinding(owner, internalTestButton) {
                     internalTest()
-                }
+                },
+
+                TextBinding.create(owner, commandTestText, model.commandTextMessage),
+                model.commandTest.attachView(commandTestButton),
+                model.liteCommand.bind(owner) {
+                    logger.info("liteCommand bound to owner is called")
+                },
+                model.reliableCommand.bind(owner) {
+                    logger.info("reliableCommand bound to owner is called")
+                },
+
             )
         }
     }
@@ -199,7 +238,46 @@ class MainActivity : AppCompatActivity() {
 
         model = MainViewModel.instance(this)
         binding = Binding(this, model)
+    }
 
+    override fun onStart() {
+        super.onStart()
+        logger.debug()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        logger.debug()
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        logger.debug()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        logger.debug()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        logger.debug()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        logger.debug()
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        logger.debug()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logger.debug()
     }
 
     enum class AnimTestTarget(val enabled:Boolean) {
