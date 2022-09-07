@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion '31.0.0'
+    compileSdkVersion 33
+    buildToolsVersion '33.0.0'
 
     defaultConfig {
         applicationId "io.github.toyota32k.bindit.sample"
         minSdkVersion 26
-        targetSdkVersion 30
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
@@ -31,7 +31,12 @@ android {
         jvmTarget = '1.8'
     }
     packagingOptions {
-        pickFirst  'META-INF/*'
+        jniLibs {
+            pickFirsts += ['META-INF/*']
+        }
+        resources {
+            pickFirsts += ['META-INF/*']
+        }
     }
 }
 

@@ -77,10 +77,10 @@ abstract class FadeInOutBase (
         return max(100L, d)
     }
 
-    override fun onAnimationStart(animation: Animator?) {
+    override fun onAnimationStart(animation: Animator) {
     }
 
-    override fun onAnimationEnd(animation: Animator?) {
+    override fun onAnimationEnd(animation: Animator) {
         if(targetVisible) {
             alpha = 1f
             visibility = View.VISIBLE
@@ -89,10 +89,10 @@ abstract class FadeInOutBase (
         }
     }
 
-    override fun onAnimationCancel(animation: Animator?) {
+    override fun onAnimationCancel(animation: Animator) {
     }
 
-    override fun onAnimationRepeat(animation: Animator?) {
+    override fun onAnimationRepeat(animation: Animator) {
     }
 }
 
