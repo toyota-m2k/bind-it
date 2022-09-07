@@ -73,11 +73,11 @@ class ReversibleValueAnimation(override val duration:Long) : IReversibleAnimatio
             }
         }
 
-        override fun onAnimationStart(animation: Animator?) {
+        override fun onAnimationStart(animation: Animator) {
             logger.debug()
         }
 
-        override fun onAnimationEnd(animation: Animator?) {
+        override fun onAnimationEnd(animation: Animator) {
             logger.debug()
             if(!closed) {
                 endEvent?.invoke(reverse, correctedValue)
@@ -85,15 +85,15 @@ class ReversibleValueAnimation(override val duration:Long) : IReversibleAnimatio
             }
         }
 
-        override fun onAnimationCancel(animation: Animator?) {
+        override fun onAnimationCancel(animation: Animator) {
             logger.debug()
         }
 
-        override fun onAnimationRepeat(animation: Animator?) {
+        override fun onAnimationRepeat(animation: Animator) {
             logger.debug()
         }
 
-        override fun onAnimationUpdate(animation: ValueAnimator?) {
+        override fun onAnimationUpdate(animation: ValueAnimator) {
             updateEvent?.invoke(correctedValue)
         }
     }
