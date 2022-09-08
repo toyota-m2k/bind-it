@@ -5,10 +5,57 @@ import androidx.annotation.IdRes
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import io.github.toyota32k.utils.asMutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 interface IIDValueResolver<T> {
     fun id2value(@IdRes id:Int) : T?
     fun value2id(v:T): Int
+}
+
+/**
+ * コンストラクタ渡した value → id のマップを使って解決してくれる IIDValueResolver
+ *
+ * ```
+ * val resolver = SimpleIdValueResolver<HogeFuga>(mapOf(
+ *   HogeFuga.HOGE to R.id.dialog_hoge,
+ *   HogeFuga.FUGA to R.id.dialog_fuga,
+ * ))
+ * ```
+ * 
+ * 当然のことながら、異なる value が同じ id を返すことがあるようなマップを渡してしまうと、
+ * 期待通りには動きません。
+ */
+class SimpleIdValueResolver<T>(private val valueIdMap: Map<T, Int>) : IIDValueResolver<T> {
+    private val idValueMap: Map<Int, T> = valueIdMap.entries.associate { (key, value) -> value to key }
+    override fun id2value(id: Int): T? = idValueMap[id]
+    override fun value2id(v: T): Int = valueIdMap[v] ?: 0
+}
+
+/**
+ * enum classの値をidに変換する関数を使って、SimpleIdValueResolverを構築します。
+ * 
+ * ```
+ * val resolver = SimpleIdValueResolver<HogeFuga> {
+ *   when (it) {
+ *     HogeFuga.HOGE -> R.id.dialog_hoge
+ *     HogeFuga.FUGA -> R.id.dialog_fuga
+ *   }
+ * }
+ * ```
+ *
+ * mapを渡す代わりにこっちを使うことで、 when の網羅性チェックの恩恵を
+ * 受けられます（後になってenumにメンバを追加したときにここがエラーになってくれるので
+ * 修正漏れを防げます）。
+ * 
+ * 当然のことながら、異なる値に対して同じ id を返すことがあるような関数を渡してしまうと、
+ * 期待通りには動きません。
+ */
+@Suppress("FunctionName", "unused")
+inline fun <reified T: Enum<T>> SimpleIdValueResolver(valueToId: (value: T) -> Int): SimpleIdValueResolver<T> {
+    return SimpleIdValueResolver(enumValues<T>().associateWith(valueToId))
 }
 
 @Suppress("unused")
@@ -63,6 +110,13 @@ open class RadioGroupBinding<T> (
         }
         fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):RadioGroupBinding<T> {
             return RadioGroupBinding(data, mode).apply { connect(owner, view, idResolver) }
+        }
+        // for StateFlow
+        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: StateFlow<T>, idResolver: IIDValueResolver<T>): RadioGroupBinding<T> {
+            return create(owner, view, data.asLiveData(), idResolver)
+        }
+        fun <T> create(owner: LifecycleOwner, view: RadioGroup, data: MutableStateFlow<T>, idResolver: IIDValueResolver<T>, mode: BindingMode = BindingMode.TwoWay): RadioGroupBinding<T> {
+            return create(owner, view, data.asMutableLiveData(owner), idResolver, mode)
         }
     }
 }

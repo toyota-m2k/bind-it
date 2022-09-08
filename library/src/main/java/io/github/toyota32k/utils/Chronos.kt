@@ -35,7 +35,7 @@ class Chronos(callerLogger:UtLog) {
         return "${t / 1000f} sec"
     }
 
-    fun <T> measure(msg: String? = null, fn: () -> T): T {
+    inline fun <T> measure(msg: String? = null, fn: () -> T): T {
         val begin = System.currentTimeMillis()
         logger.debug("enter ${msg ?: ""}")
         return try {
@@ -45,13 +45,13 @@ class Chronos(callerLogger:UtLog) {
         }
     }
 
-    suspend fun <T> measureAsync(msg: String? = null, fn: suspend () -> T): T {
-        val begin = System.currentTimeMillis()
-        logger.debug("enter ${msg ?: ""}")
-        return try {
-            fn()
-        } finally {
-            logger.debug("exit ${formatMS(System.currentTimeMillis() - begin)} ${msg ?: ""}")
-        }
-    }
+//    suspend fun <T> measureAsync(msg: String? = null, fn: suspend () -> T): T {
+//        val begin = System.currentTimeMillis()
+//        logger.debug("enter ${msg ?: ""}")
+//        return try {
+//            fn()
+//        } finally {
+//            logger.debug("exit ${formatMS(System.currentTimeMillis() - begin)} ${msg ?: ""}")
+//        }
+//    }
 }

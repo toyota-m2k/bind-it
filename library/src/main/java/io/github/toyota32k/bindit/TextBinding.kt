@@ -9,6 +9,10 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import io.github.toyota32k.utils.asMutableLiveData
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 open class TextBinding protected constructor(
     override val data:LiveData<String>,
@@ -36,6 +40,10 @@ open class TextBinding protected constructor(
     companion object {
         fun create(owner:LifecycleOwner, view:TextView, data:LiveData<String>) : TextBinding {
             return TextBinding(data, BindingMode.OneWay).apply { connect(owner,view) }
+        }
+        // for StateFlow
+        fun create(owner: LifecycleOwner, view: TextView, data: StateFlow<String>): TextBinding {
+            return create(owner, view, data.asLiveData())
         }
     }
 }
@@ -86,6 +94,10 @@ open class EditTextBinding(
     companion object {
         fun create(owner:LifecycleOwner, view:EditText, data:MutableLiveData<String>, mode:BindingMode=BindingMode.TwoWay):EditTextBinding {
             return EditTextBinding(data,mode).apply { connect(owner,view) }
+        }
+        // for StateFlow
+        fun create(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<String>, mode: BindingMode = BindingMode.TwoWay): EditTextBinding {
+            return create(owner, view, data.asMutableLiveData(owner), mode)
         }
     }
 }

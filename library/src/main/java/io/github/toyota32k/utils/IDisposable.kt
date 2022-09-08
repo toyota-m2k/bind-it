@@ -5,5 +5,8 @@ package io.github.toyota32k.utils
  */
 interface IDisposable {
     fun dispose()
-//    fun isDisposed():Boolean
+}
+
+interface IDisposableEx : IDisposable {
+    val disposed:Boolean
 }

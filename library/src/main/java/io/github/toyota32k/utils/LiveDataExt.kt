@@ -118,28 +118,6 @@ fun <T1,T2,T3,T4,T5,R> combineLatest(src1:LiveData<T1>, src2: LiveData<T2>, src3
     }
 }
 
-class DisposableObserver<T>(data: LiveData<T>, owner: LifecycleOwner, private val callback:(v:T?)->Unit): Observer<T?>, IDisposable {
-    private var data:LiveData<T>? = data
-    init {
-        data.observe(owner, this)
-    }
-    override fun onChanged(t: T?) {
-        callback(t)
-    }
-    override fun dispose() {
-        data?.removeObserver(this)
-        data = null
-    }
-
-//    override fun isDisposed(): Boolean {
-//        return data==null
-//    }
-}
-
-fun <T> LiveData<T>.disposableObserve(owner: LifecycleOwner, fn:(v:T?)->Unit) : IDisposable
-        = DisposableObserver(this,owner,fn)
-
-
 ///**
 // * LiveData.observe()で、ラムダ式を使えるようにする拡張メソッド。
 // * （今は、直接ラムダ式を渡せない。そのうち、Kotlinがサポートするようになるかもしれないが。）
@@ -159,29 +137,29 @@ fun <T> LiveData<T>.disposableObserve(owner: LifecycleOwner, fn:(v:T?)->Unit) : 
 //    return this.observe(owner, fn)
 //}
 
-class CloseableObserver<T>(private val data: LiveData<T>, owner: LifecycleOwner, private val callback:(v:T?)->Unit): Observer<T?>, Closeable {
-    init {
-        data.observe(owner, this)
-    }
-    override fun onChanged(t: T?) {
-        callback(t)
-    }
-    override fun close() {
-        data.removeObserver(this)
-    }
-    // alias
-    fun dispose() = close()
-}
+//class CloseableObserver<T>(private val data: LiveData<T>, owner: LifecycleOwner, private val callback:(v:T?)->Unit): Observer<T?>, Closeable {
+//    init {
+//        data.observe(owner, this)
+//    }
+//    override fun onChanged(t: T?) {
+//        callback(t)
+//    }
+//    override fun close() {
+//        data.removeObserver(this)
+//    }
+//    // alias
+//    fun dispose() = close()
+//}
 
-fun <T> LiveData<T>.closableObserve(owner: LifecycleOwner, fn:(v:T?)->Unit) : Closeable
-        = CloseableObserver(this,owner,fn)
+//fun <T> LiveData<T>.closableObserve(owner: LifecycleOwner, fn:(v:T?)->Unit) : Closeable
+//        = CloseableObserver(this,owner,fn)
 
 //fun <T> LiveData<T>.observe(view: View, fn:(v:T?)->Unit) : Closeable? {
 //    val owner = view.lifecycleOwner()?:return null
 //    return CloseableObserver(this, owner, fn)
 //}
 
-class Closeables : Closeable {
+class Closeables : Closeable, IDisposable {
     private val list = mutableListOf<Closeable>()
 
     operator fun plusAssign(c: Closeable?) {
@@ -204,7 +182,7 @@ class Closeables : Closeable {
     }
 
     // alias
-    fun dispose() = close()
+    override fun dispose() = close()
 }
 
 
@@ -252,77 +230,19 @@ fun LiveData<Boolean>.not():LiveData<Boolean> {
 //
 //fun <T> Publisher<T>.toLiveData() =
 //        LiveDataReactiveStreams.fromPublisher(this)
-fun Boolean.onTrue(fn:()->Unit):Boolean {
-    if(this==true) {
-        fn()
-    }
-    return this
-}
-fun Boolean.onFalse(fn:()->Unit):Boolean {
-    if(this!=true) {
-        fn()
-    }
-    return this
-}
 
-class UtMutableStateFlowLiveData<T>(val flow: MutableStateFlow<T>, lifecycleOwner: LifecycleOwner?=null): MutableLiveData<T>(), Observer<T> {
-    init {
-        value = flow.value
-        if(null!=lifecycleOwner) {
-            attachToLifecycle(lifecycleOwner)
-        }
-    }
-
-    fun attachToLifecycle(lifecycleOwner: LifecycleOwner) {
-        observe(lifecycleOwner, this)
-        // これが、今後推奨される方法だと思うが、repeatOnLifecycle を使うには、lifecycle_version = "2.4.0" が必要で、これがまだ alpha なので、当面は利用を見合わせる。
-        //        lifecycleOwner.lifecycleScope.launch {
-        //            repeatOnLifecycle(Lifecycle.State.STARTED) {
-        //                flow.collect {
-        //                    postValue(it)
-        //                }
-        //            }
-        //        }
-        lifecycleOwner.lifecycleScope.launchWhenStarted {
-            flow.collect {
-                if(value!==it) {
-                    value = it
-                }
-            }
-        }
-    }
-
-    override fun onChanged(t: T) {
-        flow.value = t
-    }
-}
-
-fun <T> MutableStateFlow<T>.asMutableLiveData(lifecycleOwner: LifecycleOwner):MutableLiveData<T>
-        = UtMutableStateFlowLiveData(this, lifecycleOwner)
 
 /**
  * 値が変化しないLiveData
  * LiveData は abstract なので直接作成できないので、継承したクラスを用意してみた。
  * 値が変化しないことがわかっているけど、Bindingの仕掛けを使いたいときに、無駄なMutableLiveDataを作るのも気が引けるので。
+ * ... もともとは、LiveDataを派生していたけれど、BoolBinding で、BoolConvert.Invert を指定したとき、
+ * （変更する/しないにかかわらず）MutableLiveDataを要求し、LiveDataだとキャスト違反になるので、MutableLiveData派生に変更した。
+ * そもそも、それなら派生は必要ない、という話なんだが。
+ * MutableLiveDataのコンストラクタを見ると、LiveData()を呼んでいるだけなので、コスト的には、LiveDataを作るのと変わらないと思う。
  */
-class ConstantLiveData<T>(value:T) : LiveData<T>(value)
+class ConstantLiveData<T>(value:T) : MutableLiveData<T>(value)
 
 fun <T> T.asConstantLiveData() = ConstantLiveData<T>(this)
 
-class DisposableFlowObserver<T> constructor(flow: Flow<T>, coroutineContext: CoroutineContext, private val callback:(v:T)->Unit): IDisposable {
-    constructor(flow:Flow<T>, callback:(v:T)->Unit) : this(flow, Dispatchers.Main, callback)
-    constructor(flow:Flow<T>, owner:LifecycleOwner, callback:(v:T)->Unit) : this(flow, owner.lifecycleScope.coroutineContext, callback)
-    val scope:CoroutineScope = CoroutineScope(coroutineContext+ SupervisorJob())
-    init {
-        flow.onEach {
-            callback(it)
-        }.launchIn(scope)
-    }
 
-    override fun dispose() {
-        scope.cancel()
-    }
-}
-
-fun <T> Flow<T>.disposableObserve(owner:LifecycleOwner, callback:(v:T)->Unit):DisposableFlowObserver<T> =
-    DisposableFlowObserver(this, owner, callback)
