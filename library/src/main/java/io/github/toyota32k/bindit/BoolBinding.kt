@@ -4,9 +4,11 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
 import io.github.toyota32k.utils.ConvertLiveData
 import io.github.toyota32k.utils.UtLog
 import io.github.toyota32k.utils.disposableObserve
+import kotlinx.coroutines.flow.StateFlow
 
 abstract class BoolBinding(
     rawData: LiveData<Boolean>,
@@ -17,6 +19,7 @@ abstract class BoolBinding(
 }
 
 
+@Suppress("unused")
 open class GenericBoolBinding(
     rawData: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
@@ -34,9 +37,14 @@ open class GenericBoolBinding(
         fun create(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit) : GenericBoolBinding {
             return GenericBoolBinding(data, boolConvert,applyValue).apply { connect(owner, view) }
         }
+        // for StateFlow
+        fun create(owner: LifecycleOwner, view: View, data: StateFlow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit): GenericBoolBinding {
+            return create(owner, view, data.asLiveData(), boolConvert, applyValue)
+        }
     }
 }
 
+@Suppress("unused")
 open class GenericBoolMultiBinding(
     rawData: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
@@ -72,6 +80,10 @@ open class GenericBoolMultiBinding(
             return GenericBoolMultiBinding(data, boolConvert, applyValue).apply {
                 connectAll(owner, *targets)
             }
+        }
+        // for StateFlow
+        fun create(owner: LifecycleOwner, vararg targets: View, data: StateFlow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (List<View>, Boolean) -> Unit): GenericBoolMultiBinding {
+            return create(owner, targets = targets, data.asLiveData(), boolConvert, applyValue)
         }
     }
 }

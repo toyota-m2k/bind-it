@@ -28,6 +28,7 @@ class RecyclerViewBinding<T>(
 
     override fun dispose() {
         enableDragAndDrop(false)
+//        list.dispose()    adapter の リスナーは、adapter.dispose()でクリアされるので、これは不要。むしろ、Binder以外でaddされたリスナーも解除されてしまうのでダメぜったい
         (view.adapter as? IDisposable)?.dispose()
     }
 

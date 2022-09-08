@@ -66,7 +66,7 @@ class LiteCommand<T>() : ICommand<T> {
     }
 }
 
-class LiteUnitCommand() : UnitCommand(LiteCommand<Unit>()) {
+class LiteUnitCommand() : UnitCommand(LiteCommand()) {
     constructor(callback:()->Unit):this() {
         bindForever(callback)
     }

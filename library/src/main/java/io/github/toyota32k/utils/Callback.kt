@@ -41,10 +41,6 @@ class Callback<T,R> private constructor(private var lifecycle: Lifecycle?, priva
     private val alive: Boolean
         get() = lifecycle != null
 
-//    override fun isDisposed(): Boolean {
-//        return lifecycle == null
-//    }
-
     @MainThread
     fun invoke(arg: T) :R? {
         return if (alive) {

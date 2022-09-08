@@ -11,10 +11,10 @@ import io.github.toyota32k.utils.Listeners
 class ClickBinding<V> (
     owner:LifecycleOwner,
     val view: V,
-    private val listeners :Listeners<View>,
-    fn:((View)->Unit),
+    private val listeners :Listeners<V>,
+    fn:((V)->Unit),
 ) : IBinding, View.OnClickListener where V:View {
-    constructor(owner:LifecycleOwner, view:V, fn:((View)->Unit)) : this(owner,view,Listeners<View>(), fn)
+    constructor(owner:LifecycleOwner, view:V, fn:((V)->Unit)) : this(owner,view,Listeners<V>(), fn)
     override val mode: BindingMode = BindingMode.OneWayToSource
     private var key: IDisposable? = null
     init {
@@ -29,6 +29,12 @@ class ClickBinding<V> (
     override fun dispose() {
         key?.dispose()
         key = null
+    }
+
+    companion object {
+        fun <V> create(owner: LifecycleOwner, view:V, fn:(View)->Unit):ClickBinding<V> where V:View{
+            return ClickBinding(owner, view, fn)
+        }
     }
 }
 

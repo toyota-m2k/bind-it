@@ -106,3 +106,51 @@ class UtResetableFlowValue<T>(private val flow: MutableStateFlow<T?> = MutableSt
         }
     }
 }
+
+/**
+ * @param allowKeepNull     trueにすると、nullがセットされてもそれを立派な値として hasValue = true にする。
+ */
+class UtNullableResetableValue<T>(private val allowKeepNull:Boolean=false, private val lazy:(()->T?)?=null){
+    var value:T? = null
+        get() {
+            if(!hasValue && lazy!=null) {
+                field = lazy.invoke()
+                if(field!=null || allowKeepNull) {
+                    hasValue = true
+                }
+            }
+            return field
+        }
+        private set
+
+    var hasValue:Boolean = false
+        private set
+
+    fun setIfNeed(fn:()->T?):T? {
+        if(!hasValue) {
+            value = fn()
+            if(value!=null ||allowKeepNull) {
+                hasValue = true
+            }
+        }
+        return value
+    }
+
+    suspend fun setIfNeedAsync(fn:suspend ()->T?):T? {
+        if(!hasValue) {
+            value = fn()
+            if(value!=null ||allowKeepNull) {
+                hasValue = true
+            }
+        }
+        return value
+    }
+
+    fun reset(preReset:((T)->Unit)?) {
+        if(value!=null && preReset!=null) {
+            preReset.invoke(value!!)
+        }
+        hasValue = false
+        value = null
+    }
+}

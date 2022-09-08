@@ -36,11 +36,6 @@ class Listeners<T> {
             }
             fn = null
         }
-
-//        override fun isDisposed(): Boolean {
-//            return fn == null
-//        }
-
     }
 
     inner class OwneredInvoker(owner:LifecycleOwner, val fn:(T)->Unit) : LifecycleEventObserver, ListenerKey<T> {
@@ -73,10 +68,6 @@ class Listeners<T> {
 
         private val alive:Boolean
             get() = lifecycle !=null
-
-//        override fun isDisposed(): Boolean {
-//            return lifecycle == null
-//        }
 
         @MainThread
         override fun invoke(arg:T) {

@@ -110,6 +110,12 @@ class FadeInOutBinding(
     override var visibility: Int
         get() = view?.visibility ?: View.INVISIBLE
         set(value) { view?.visibility = value }
+
+    companion object {
+        fun create(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):FadeInOutBinding {
+            return FadeInOutBinding(data, boolConvert, duration).apply { connect(owner, view) }
+        }
+    }
 }
 
 class MultiFadeInOutBinding(

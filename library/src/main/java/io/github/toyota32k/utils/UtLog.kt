@@ -61,7 +61,8 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
             val stack = Thread.currentThread().stackTrace
             var n:Int = stackOffset
             var e = stack[n]
-            while(e.methodName.endsWith("\$default") && n<stack.size) {
+            while(e.className == this.javaClass.name) {
+//            while(e.methodName.endsWith("\$default") && n<stack.size) {
                 n++
                 e = stack[n]
             }
