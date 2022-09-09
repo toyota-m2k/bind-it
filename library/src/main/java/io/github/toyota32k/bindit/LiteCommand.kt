@@ -12,6 +12,8 @@ import io.github.toyota32k.utils.*
  * ButtonのonClickハンドラとして使うだけならこれで十分。
  * 従来の Command クラスは、引数に役に立たない view を持っていたりして使いづらかったのだが、こちらは、任意の型を渡せるようにした。
  * たとえば、Okボタンなら、invoke(true)、キャンセルボタンなら invoke(false) のように使い分けることを想定。
+ * 一方、ボタンクリック以外に、サブスレッド（タスク）からinvoke され、ActivityやViewを操作するようなハンドラを呼び出す必要があるときは、
+ * ReliableCommand を使うべき。
  */
 class LiteCommand<T>() : ICommand<T> {
     constructor(callback:(T)->Unit):this() {
@@ -66,7 +68,7 @@ class LiteCommand<T>() : ICommand<T> {
     }
 }
 
-class LiteUnitCommand() : UnitCommand(LiteCommand()) {
+class LiteUnitCommand() : UnitCommand(LiteCommand<Unit>()) {
     constructor(callback:()->Unit):this() {
         bindForever(callback)
     }

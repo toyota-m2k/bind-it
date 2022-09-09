@@ -13,6 +13,12 @@ import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.Listeners
 import java.lang.ref.WeakReference
 
+/**
+ * Button の onClickイベントにバインドできるコマンドクラス。
+ * View引数が不要なら、LiteCommand がお勧め。
+ * ただし、ボタンクリック以外に、サブスレッド（タスク）からinvoke され、ActivityやViewを操作するようなハンドラを呼び出す必要があるときは、
+ * ReliableCommand を使うべき。
+ */
 class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDisposable {
     // 永続的ハンドラをbindするコンストラクタ
     // Command().apply { bindForever(fn) } と書いていたのをちょっと簡略化
