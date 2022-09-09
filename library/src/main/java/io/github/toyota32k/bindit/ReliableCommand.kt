@@ -129,8 +129,7 @@ class ReliableCommand<T>(initialValue:T) : ICommand<T> {
     }
 }
 
-@Suppress("unused")
-class ReliableUnitCommand() : UnitCommand(ReliableCommand(Unit)) {
+class ReliableUnitCommand() : UnitCommand(ReliableCommand<Unit>(Unit)) {
     constructor(forever:()->Unit):this() {
         bindForever(forever)
     }
