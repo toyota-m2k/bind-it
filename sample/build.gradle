@@ -38,6 +38,7 @@ android {
             pickFirsts += ['META-INF/*']
         }
     }
+    namespace 'io.github.toyota32k.bindit.sample'
 }
 
 dependencies {

@@ -55,6 +55,7 @@ android {
             withJavadocJar()
         }
     }
+    namespace 'io.github.toyota32k.bindit'
 }
 
 dependencies {
