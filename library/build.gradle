@@ -75,7 +75,7 @@ dependencies {
 
     testImplementation "junit:junit:$junit_version"
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
-    testImplementation "androidx.test:core:1.4.0"
+    testImplementation "androidx.test:core:1.5.0"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
     testImplementation 'org.mockito:mockito-inline:4.0.0'
     testImplementation 'org.robolectric:robolectric:4.6.1'
