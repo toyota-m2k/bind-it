@@ -29,5 +29,6 @@ class DisposableObserver<T>(data: LiveData<T>, owner: LifecycleOwner, private va
  */
 fun <T> LiveData<T>.disposableObserve(owner: LifecycleOwner, fn:(v:T?)->Unit) : IDisposable
         = DisposableObserver(this,owner,fn)
+
 fun <T> LiveData<T>.closableObserve(owner: LifecycleOwner, fn:(v:T?)->Unit) : Closeable
         = DisposableObserver(this,owner,fn)

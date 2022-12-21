@@ -27,6 +27,10 @@ class Chronos(callerLogger:UtLog) {
         logger.debug("total = ${formatMS(totalTime)} $msg")
     }
 
+    fun resetLap() {
+        prev = System.currentTimeMillis()
+    }
+
     fun lap(msg: String = "") {
         logger.debug("lap = ${formatMS(lapTime)} $msg")
     }

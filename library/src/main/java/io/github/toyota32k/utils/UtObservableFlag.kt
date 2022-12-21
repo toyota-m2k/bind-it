@@ -2,52 +2,79 @@ package io.github.toyota32k.utils
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import java.io.Closeable
 
 /**
  * Flow による監視可能なフラグクラス。
+ * 内部的にフラグ状態はカウンタとして保持しており、ネストした呼び出しが可能。
+ * trySetIfNot(), withFlagIfNot()を使うことで、普通のフラグ的にも使える。
  */
-class UtObservableFlag (private val flag:MutableStateFlow<Boolean> = MutableStateFlow(false)) : Flow<Boolean> by flag {
-//    fun set() = synchronized(this) {
-//        flag.value = true
-//    }
-//    fun reset() = synchronized(this) {
-//        flag.value = false
-//    }
-    val value get() = synchronized(this) { flag.value }
+class UtObservableFlag private constructor(val flag:MutableStateFlow<Int>, val boolFlag: Flow<Boolean>) : Flow<Boolean> by boolFlag {
+    private constructor(flag:MutableStateFlow<Int>) : this(flag, flag.map { it!=0 })
+    constructor():this(MutableStateFlow(0))
 
-    fun set():Boolean = synchronized(this) {
-        if(!flag.value) {
-            flag.value = true
-            true
-        } else false
-    }
-    fun reset():Boolean = synchronized(this) {
-        if(flag.value) {
-            flag.value = false
-            true
-        } else false
+    /**
+     * 現在、フラグは立っているか？
+     */
+    val flagged:Boolean get() = synchronized(this) {
+        flag.value!=0
     }
 
-    inline fun <T> ifSet(def:T, fn:()->T):T {
-        return if(set()) {
-            try {
-                fn()
-            } finally {
-                reset()
-            }
-        } else def
+    /**
+     * カウンタをインクリメントする。
+     * 必ず、reset()を呼び出すこと。
+     */
+    fun set() = synchronized(this) {
+        flag.value++
     }
 
-    inline fun ifSet(fn:()->Unit):Boolean {
-        return if(set()) {
-            try {
-                fn()
-            } finally {
-                reset()
-            }
+    /**
+     * フラグが立っていなければ、フラグを立ててtrueを返す。
+     * もし、フラグが立っていれば、何もしないで、falseを返す。
+     * このメソッドがtrueを返した場合に限り、必ずreset()を呼び出すこと。
+     */
+    fun trySetIfNot():Boolean = synchronized(this) {
+        if(flag.value==0) {
+            flag.value++
             true
-        } else false
+        } else {
+            false
+        }
+    }
+
+    /**
+     * カウンタをデクリメントする。
+     */
+    fun reset() = synchronized(this) {
+        flag.value--
+    }
+
+    /**
+     * カウンタをインクリメントして、fnを実行。
+     * fnが終わったらカウンタを元に戻す。
+     */
+    inline fun <T> withFlag(fn:()->T):T {
+        set()
+        try {
+            return fn()
+        } finally {
+            reset()
+        }
+    }
+
+    /**
+     * フラグが立っていなければ、カウンタをインクリメントして、fnを実行。
+     * fnが終わったらカウンタを元に戻す。
+     * フラグが立っていれば 何もしないで　null を返す。
+     */
+    inline fun <T> withFlagIfNot(fn:()->T):T? {
+        if(!trySetIfNot()) return null
+        try {
+            return fn()
+        } finally {
+            reset()
+        }
     }
 
     private inner class Closer : Closeable {
@@ -56,9 +83,14 @@ class UtObservableFlag (private val flag:MutableStateFlow<Boolean> = MutableStat
         }
     }
 
-    fun closeableSetFlag():Closeable? {
-        return if(set()) {
+    fun closeableTrySetIfNot():Closeable? {
+        return if(trySetIfNot()) {
             Closer()
         } else null
+    }
+
+    fun closeableSet():Closeable {
+        set()
+        return Closer()
     }
 }

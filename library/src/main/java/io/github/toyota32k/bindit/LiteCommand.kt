@@ -24,10 +24,9 @@ class LiteCommand<T>() : ICommand<T> {
 
     private fun internalAttachView(view: View, value: T) {
         if(view is EditText) {
-            view.setOnEditorActionListener {_,actionId,event->
-                if (actionId == EditorInfo.IME_ACTION_DONE || event?.action == KeyEvent.ACTION_DOWN && (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)) {
+            view.setOnEditorActionListener {_,actionId,event-> if (actionId == EditorInfo.IME_ACTION_DONE || event?.action == KeyEvent.ACTION_DOWN && (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)) {
                     invoke(value)
-                    true
+                    false
                 } else false
             }
         } else {
