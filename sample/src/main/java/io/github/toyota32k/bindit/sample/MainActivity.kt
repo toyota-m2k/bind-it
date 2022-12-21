@@ -101,6 +101,8 @@ class MainActivity : AppCompatActivity() {
             logger.info("ReliableCommand called.")
         }
 
+        val textValue = MutableLiveData<String>("");
+
         private fun onCommandTest() {
             commandTextMessage.value = "Testing..."
             CoroutineScope(Dispatchers.IO).launch {
@@ -140,6 +142,8 @@ class MainActivity : AppCompatActivity() {
         val internalTestButton: Button by lazy { findViewById(R.id.internal_test_button) }
         val commandTestButton:Button by lazy {findViewById(R.id.command_test)}
         val commandTestText:TextView by lazy {findViewById(R.id.command_test_message)}
+        val textInput:EditText by lazy { findViewById(R.id.text_input) }
+        val textOutput:TextView by lazy { findViewById(R.id.text_output) }
 
         init {
             logger.debug()
@@ -224,7 +228,9 @@ class MainActivity : AppCompatActivity() {
                 model.reliableCommand.bind(owner) {
                     logger.info("reliableCommand bound to owner is called")
                 },
-
+                EditTextBinding.create(owner, textInput, model.textValue),
+                model.commandTest.attachView(textInput),
+                TextBinding.create(owner, textOutput, model.textValue),
             )
         }
     }
