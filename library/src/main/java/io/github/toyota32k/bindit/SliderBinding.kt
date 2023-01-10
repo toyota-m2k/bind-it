@@ -3,11 +3,11 @@
 package io.github.toyota32k.bindit
 
 import android.annotation.SuppressLint
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.*
 import com.google.android.material.slider.Slider
+import io.github.toyota32k.utils.asMutableLiveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.lang.Float.max
 import java.lang.Float.min
 
@@ -126,4 +126,18 @@ open class SliderBinding (
             return SliderBinding(data, mode, min, max).apply { connect(owner, view) }
         }
     }
+}
+
+fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder {
+    return add(SliderBinding.create(owner,view,data,min,max))
+}
+fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data: Flow<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder {
+    return add(SliderBinding.create(owner,view,data.asLiveData(),min,max))
+}
+
+fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:MutableLiveData<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder {
+    return add(SliderBinding.create(owner,view,data,mode,min,max))
+}
+fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:MutableStateFlow<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder {
+    return add(SliderBinding.create(owner,view,data.asMutableLiveData(owner),mode,min,max))
 }

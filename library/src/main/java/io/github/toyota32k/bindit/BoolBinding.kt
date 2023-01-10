@@ -8,6 +8,7 @@ import androidx.lifecycle.asLiveData
 import io.github.toyota32k.utils.ConvertLiveData
 import io.github.toyota32k.utils.UtLog
 import io.github.toyota32k.utils.disposableObserve
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 abstract class BoolBinding(
@@ -38,10 +39,17 @@ open class GenericBoolBinding(
             return GenericBoolBinding(data, boolConvert,applyValue).apply { connect(owner, view) }
         }
         // for StateFlow
-        fun create(owner: LifecycleOwner, view: View, data: StateFlow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit): GenericBoolBinding {
+        fun create(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit): GenericBoolBinding {
             return create(owner, view, data.asLiveData(), boolConvert, applyValue)
         }
     }
+}
+
+fun Binder.genericBoolBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit):Binder {
+    return add(GenericBoolBinding.create(owner,view,data,boolConvert,applyValue))
+}
+fun Binder.genericBoolBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit):Binder {
+    return add(GenericBoolBinding.create(owner,view,data,boolConvert,applyValue))
 }
 
 @Suppress("unused")
@@ -82,8 +90,15 @@ open class GenericBoolMultiBinding(
             }
         }
         // for StateFlow
-        fun create(owner: LifecycleOwner, vararg targets: View, data: StateFlow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (List<View>, Boolean) -> Unit): GenericBoolMultiBinding {
+        fun create(owner: LifecycleOwner, vararg targets: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (List<View>, Boolean) -> Unit): GenericBoolMultiBinding {
             return create(owner, targets = targets, data.asLiveData(), boolConvert, applyValue)
         }
     }
+}
+
+fun Binder.genericBoolMultiBinding(owner: LifecycleOwner, vararg targets:View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue:(List<View>,Boolean)->Unit):Binder {
+    return add(GenericBoolMultiBinding.create(owner, targets=targets, data, boolConvert, applyValue))
+}
+fun Binder.genericBoolMultiBinding(owner: LifecycleOwner, vararg targets:View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue:(List<View>,Boolean)->Unit):Binder {
+    return add(GenericBoolMultiBinding.create(owner, targets=targets, data, boolConvert, applyValue))
 }

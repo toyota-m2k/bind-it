@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.view.View
@@ -20,4 +22,8 @@ open class GenericBinding<V,T>(
             return GenericBinding(data, action).apply { connect(owner,view) }
         }
     }
+}
+
+fun <V:View,T> Binder.genericBinding(owner: LifecycleOwner, view:V, data:LiveData<T>, action:(V,T?)->Unit):Binder {
+    return add(GenericBinding.create(owner, view, data, action))
 }

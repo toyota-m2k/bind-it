@@ -38,6 +38,9 @@ class ClickBinding<V> (
     }
 }
 
+fun <V:View> Binder.clickBinding(owner:LifecycleOwner, view:V, fn:(View)->Unit):Binder
+    = add(ClickBinding(owner, view, fn))
+
 class LongClickBinding<V>(
     owner: LifecycleOwner,
     val view: V,
@@ -58,3 +61,6 @@ class LongClickBinding<V>(
         callback = null
     }
 }
+
+fun <V:View> Binder.longClickBinding(owner: LifecycleOwner, view:V, fn:(V)->Boolean) : Binder
+    = add(LongClickBinding(owner,view,fn))

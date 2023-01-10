@@ -50,3 +50,6 @@ class AnimationBinding(
         animation = null
     }
 }
+
+fun Binder.animationBinding(owner:LifecycleOwner, animation:IReversibleAnimation,data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyLastState:Boolean):Binder
+    = add(AnimationBinding(data,boolConvert).apply { setAnimation(owner, animation, applyLastState) })

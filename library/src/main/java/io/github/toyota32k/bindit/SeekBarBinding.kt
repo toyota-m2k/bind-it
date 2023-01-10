@@ -1,11 +1,16 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.widget.SeekBar
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import io.github.toyota32k.utils.asMutableLiveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
-@Suppress("unused")
 open class SeekBarBinding(
     data: LiveData<Int>,
     min: LiveData<Int>? = null,
@@ -47,8 +52,24 @@ open class SeekBarBinding(
     }
 
     companion object {
+        fun create(owner: LifecycleOwner, view:SeekBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null):SeekBarBinding {
+            return SeekBarBinding(data,min,max,BindingMode.OneWay).apply { connect(owner,view) }
+        }
         fun create(owner: LifecycleOwner, view:SeekBar, data:MutableLiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay):SeekBarBinding {
             return SeekBarBinding(data,min,max,mode).apply { connect(owner,view) }
         }
     }
+}
+
+fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null) : Binder {
+    return add(SeekBarBinding.create(owner,view,data,min,max))
+}
+fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data: Flow<Int>, min:LiveData<Int>?=null, max:LiveData<Int>?=null) : Binder {
+    return add(SeekBarBinding.create(owner,view,data.asLiveData(),min,max))
+}
+fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:MutableLiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay) : Binder {
+    return add(SeekBarBinding.create(owner,view,data,min,max,mode))
+}
+fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:MutableStateFlow<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay) : Binder {
+    return add(SeekBarBinding.create(owner,view,data.asMutableLiveData(owner),min,max,mode))
 }

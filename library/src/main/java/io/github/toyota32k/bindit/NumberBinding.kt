@@ -1,12 +1,14 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.widget.EditText
 import android.widget.TextView
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.*
 import io.github.toyota32k.utils.ConvertLiveData
+import io.github.toyota32k.utils.asMutableLiveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 open class NumberBinding<N> (
     data: LiveData<N>
@@ -70,3 +72,45 @@ class EditLongBinding(data: MutableLiveData<Long>, mode:BindingMode=BindingMode.
 
 class FloatBinding(data: LiveData<Float>) : NumberBinding<Float>(data)
 class EditFloatBinding(data: MutableLiveData<Float>, mode:BindingMode=BindingMode.TwoWay) : EditNumberBinding<Float>(data,mode,{it?.toFloatOrNull()})
+
+fun Binder.intBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Int>):Binder {
+    return add(NumberBinding.create(owner,view,data))
+}
+fun Binder.intBinding(owner: LifecycleOwner, view: TextView, data: Flow<Int>):Binder {
+    return add(NumberBinding.create(owner,view,data.asLiveData()))
+}
+
+fun Binder.longBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Long>):Binder {
+    return add(NumberBinding.create(owner,view,data))
+}
+fun Binder.longBinding(owner: LifecycleOwner, view: TextView, data: Flow<Long>):Binder {
+    return add(NumberBinding.create(owner,view,data.asLiveData()))
+}
+
+fun Binder.floatBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Float>):Binder {
+    return add(NumberBinding.create(owner,view,data))
+}
+fun Binder.floatBinding(owner: LifecycleOwner, view: TextView, data: Flow<Float>):Binder {
+    return add(NumberBinding.create(owner,view,data.asLiveData()))
+}
+
+fun Binder.editIntBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Int>, mode: BindingMode = BindingMode.TwoWay):Binder {
+    return add(EditNumberBinding.create(owner,view,data,mode))
+}
+fun Binder.editIntBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Int>, mode: BindingMode = BindingMode.TwoWay):Binder {
+    return add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
+}
+
+fun Binder.editLongBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Long>, mode: BindingMode = BindingMode.TwoWay):Binder {
+    return add(EditNumberBinding.create(owner,view,data,mode))
+}
+fun Binder.editLongBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Long>, mode: BindingMode = BindingMode.TwoWay):Binder {
+    return add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
+}
+
+fun Binder.editFloatBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Float>, mode: BindingMode = BindingMode.TwoWay):Binder {
+    return add(EditNumberBinding.create(owner,view,data,mode))
+}
+fun Binder.editFloatBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Float>, mode: BindingMode = BindingMode.TwoWay):Binder {
+    return add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
+}

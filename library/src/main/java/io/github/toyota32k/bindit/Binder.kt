@@ -2,58 +2,42 @@
 
 package io.github.toyota32k.bindit
 
+import io.github.toyota32k.utils.Disposer
 import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.IDisposableEx
+import java.util.concurrent.locks.Condition
 
 @Suppress("MemberVisibilityCanBePrivate")
-open class Binder : IDisposable {
-    var disposed: Boolean = false
-        private set
-    protected val bindings = mutableListOf<IDisposable>()
-    override fun dispose() {
-        if(!disposed) {
-            disposed = true
-            reset()
-        }
+open class Binder : Disposer() {
+    val bindings get() = disposables
+
+    operator fun plus(binding:IDisposable):Binder {
+        return add(binding)
+    }
+    operator fun minus(binding:IDisposable):Binder {
+        return remove(binding)
     }
 
-    fun register(vararg bindings:IDisposable):Binder {
-        for(b in bindings) {
-            this.bindings.add(b)
-        }
+    fun add(vararg bindings:IDisposable):Binder {
+        register(*bindings)
         return this
     }
 
-    fun unregister(vararg bindings:IDisposable?):Binder {
-        for(b in bindings) {
-            if(b!=null && this.bindings.contains(b)) {
-                this.bindings.remove(b)
-                b.dispose()
-            }
-        }
+    fun remove(vararg bindings:IDisposable):Binder {
+        unregister(*bindings)
         return this
     }
 
-    var clientData:Any? = null
-
-    fun reset() {
-        bindings.forEach { it.dispose() }
-        bindings.clear()
-
-        // clientData が disposableならdispose()してnullにする。
-        // disposableでなければ何もしない。
-        val cd = clientData as? IDisposable ?: return
-        cd.dispose()
-        clientData = null
-    }
-
-    fun clean() {
-        val itr = bindings.iterator()
-        while(itr.hasNext()) {
-            val v = itr.next() as? IDisposableEx ?: continue
-            if(v.disposed) {
-                itr.remove()
-            }
+    fun add(fn:()->IDisposable?):Binder {
+        fn()?.apply {
+            register(this)
         }
+        return this
+    }
+    fun conditional(condition: Boolean, fn:Binder.()->Unit):Binder {
+        if(condition) {
+            fn()
+        }
+        return this
     }
 }

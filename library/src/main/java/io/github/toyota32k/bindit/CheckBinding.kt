@@ -6,6 +6,10 @@ import android.widget.CompoundButton
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asLiveData
+import io.github.toyota32k.utils.asMutableLiveData
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 open class CheckBinding protected constructor(
         rawData: LiveData<Boolean>,
@@ -61,4 +65,17 @@ open class CheckBinding protected constructor(
             return CheckBinding(data, mode, boolConvert).apply { connect(owner, view) }
         }
     }
+}
+
+fun Binder.checkBinding(owner: LifecycleOwner, view: CompoundButton, data: LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):Binder {
+    return add(CheckBinding.create(owner,view,data,boolConvert))
+}
+fun Binder.checkBinding(owner: LifecycleOwner, view: CompoundButton, data: Flow<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):Binder {
+    return add(CheckBinding.create(owner,view,data.asLiveData(),boolConvert))
+}
+fun Binder.checkBinding(owner: LifecycleOwner, view:CompoundButton, data: MutableLiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):Binder {
+    return add(CheckBinding.create(owner, view, data, boolConvert, mode))
+}
+fun Binder.checkBinding(owner: LifecycleOwner, view:CompoundButton, data: MutableStateFlow<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):Binder {
+    return add(CheckBinding.create(owner, view, data.asMutableLiveData(owner), boolConvert, mode))
 }

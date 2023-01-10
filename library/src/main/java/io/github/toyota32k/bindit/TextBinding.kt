@@ -11,8 +11,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import io.github.toyota32k.utils.asMutableLiveData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 open class TextBinding protected constructor(
     override val data:LiveData<String>,
@@ -42,10 +42,17 @@ open class TextBinding protected constructor(
             return TextBinding(data, BindingMode.OneWay).apply { connect(owner,view) }
         }
         // for StateFlow
-        fun create(owner: LifecycleOwner, view: TextView, data: StateFlow<String>): TextBinding {
+        fun create(owner: LifecycleOwner, view: TextView, data: Flow<String>): TextBinding {
             return create(owner, view, data.asLiveData())
         }
     }
+}
+
+fun Binder.textBinding(owner:LifecycleOwner, view:TextView, data:LiveData<String>):Binder {
+    return add(TextBinding.create(owner,view,data))
+}
+fun Binder.textBinding(owner: LifecycleOwner, view: TextView, data: Flow<String>):Binder {
+    return add(TextBinding.create(owner,view,data))
 }
 
 open class EditTextBinding(
@@ -100,4 +107,11 @@ open class EditTextBinding(
             return create(owner, view, data.asMutableLiveData(owner), mode)
         }
     }
+}
+
+fun Binder.editTextBinding(owner:LifecycleOwner, view:EditText, data:MutableLiveData<String>, mode:BindingMode=BindingMode.TwoWay):Binder {
+    return add(EditTextBinding.create(owner,view,data,mode))
+}
+fun Binder.editTextBinding(owner:LifecycleOwner, view:EditText, data:MutableStateFlow<String>, mode:BindingMode=BindingMode.TwoWay):Binder {
+    return add(EditTextBinding.create(owner,view,data,mode))
 }

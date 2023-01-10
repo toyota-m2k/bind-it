@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.view.View
@@ -5,7 +7,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import io.github.toyota32k.bindit.BindingMode
 
-@Suppress("unused")
 class AlphaBinding(
     override val data:LiveData<Float>
 ) : BaseBinding<Float>(BindingMode.OneWay) {
@@ -22,3 +23,6 @@ class AlphaBinding(
         }
     }
 }
+
+fun Binder.alphaBinding(owner: LifecycleOwner, view: View, data:LiveData<Float>):Binder
+    = add(AlphaBinding.create(owner, view, data))

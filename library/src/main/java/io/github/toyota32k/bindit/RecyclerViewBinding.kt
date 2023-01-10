@@ -86,3 +86,11 @@ class RecyclerViewBinding<T>(
 //        }
     }
 }
+
+fun <T> Binder.recyclerViewBinding(
+    owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int,
+    fixedSize:Boolean = true,
+    layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(view.context),
+    bindView:(Binder, View, T)->Unit):Binder {
+    return add(RecyclerViewBinding.create(owner,view,list,itemViewLayoutId,fixedSize,layoutManager,bindView))
+}

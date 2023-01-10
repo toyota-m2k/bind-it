@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.view.View
@@ -33,4 +35,12 @@ class ListViewBinding(val view: ListView, adapter:ListAdapter) : IBinding {
             return ListViewBinding(view, adapter)
         }
     }
+}
+
+fun <T> Binder.listViewBinding(view:ListView, list:List<T>, @LayoutRes itemLayout:Int, bindView:(Binder, View, T)->Unit):Binder {
+    return add(ListViewBinding.create(view,list,itemLayout,bindView))
+}
+
+fun <T> Binder.listViewBinding(view:ListView, list:ObservableList<T>, @LayoutRes itemLayout:Int, bindView:(Binder, View, T)->Unit):Binder {
+    return add(ListViewBinding.create(view,list,itemLayout,bindView))
 }

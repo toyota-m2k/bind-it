@@ -5,9 +5,11 @@ package io.github.toyota32k.bindit
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import io.github.toyota32k.utils.UtLog
 
 import io.github.toyota32k.utils.disposableObserve
+import kotlinx.coroutines.flow.Flow
 
 open class EnableBinding(
     rawData: LiveData<Boolean>,
@@ -32,6 +34,13 @@ open class EnableBinding(
             return EnableBinding(data, boolConvert, alphaOnDisabled).apply { connect(owner, view) }
         }
     }
+}
+
+fun Binder.enableBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder {
+    return add(EnableBinding.create(owner,view,data,boolConvert,alphaOnDisabled))
+}
+fun Binder.enableBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder {
+    return add(EnableBinding.create(owner,view,data.asLiveData(),boolConvert,alphaOnDisabled))
 }
 
 class MultiEnableBinding(
@@ -75,5 +84,11 @@ class MultiEnableBinding(
             return MultiEnableBinding(data, boolConvert, alphaOnDisabled).apply { connectAll(owner, *views) }
         }
     }
+}
 
+fun Binder.multiEnableBinding(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder {
+    return add(MultiEnableBinding.create(owner, views=views, data, boolConvert, alphaOnDisabled))
+}
+fun Binder.multiEnableBinding(owner: LifecycleOwner, vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder {
+    return add(MultiEnableBinding.create(owner, views=views, data.asLiveData(), boolConvert, alphaOnDisabled))
 }

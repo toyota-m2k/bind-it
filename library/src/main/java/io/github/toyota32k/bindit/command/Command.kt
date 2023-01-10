@@ -55,7 +55,7 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDispos
     }
 
     @MainThread
-    fun connectView(view:View):Command {
+    fun connectView(view:View): Command {
         if(view is EditText) {
             view.setOnEditorActionListener(this)
         } else {

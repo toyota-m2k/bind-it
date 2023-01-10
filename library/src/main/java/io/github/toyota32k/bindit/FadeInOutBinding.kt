@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.animation.Animator
@@ -5,8 +7,10 @@ import android.animation.ValueAnimator
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import io.github.toyota32k.utils.UtLog
 import io.github.toyota32k.utils.disposableObserve
+import kotlinx.coroutines.flow.Flow
 import kotlin.math.max
 
 abstract class FadeInOutBase (
@@ -118,6 +122,11 @@ class FadeInOutBinding(
     }
 }
 
+fun Binder.fadeInOutBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+    = add(FadeInOutBinding.create(owner,view, data, boolConvert, duration))
+fun Binder.fadeInOutBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+    = add(FadeInOutBinding.create(owner,view, data.asLiveData(), boolConvert, duration))
+
 class MultiFadeInOutBinding(
     data: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
@@ -154,3 +163,8 @@ class MultiFadeInOutBinding(
         super.dispose()
     }
 }
+
+fun Binder.multiFadeInOutBinding(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+    = add(MultiFadeInOutBinding(data, boolConvert, duration).apply { connectAll(owner, *views) })
+fun Binder.multiFadeInOutBinding(owner: LifecycleOwner, vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+    = add(MultiFadeInOutBinding(data.asLiveData(), boolConvert, duration).apply { connectAll(owner, *views) })

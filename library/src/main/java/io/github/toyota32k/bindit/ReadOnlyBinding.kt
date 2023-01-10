@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.view.View
@@ -5,6 +7,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.flow.Flow
 
 class ReadOnlyBinding(
     rawData: LiveData<Boolean>,
@@ -34,4 +38,11 @@ class ReadOnlyBinding(
             return ReadOnlyBinding(data, boolConvert).apply { connect(owner, view) }
         }
     }
+}
+
+fun Binder.readOnlyBinding(owner: LifecycleOwner, view: EditText, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight):Binder {
+    return add(ReadOnlyBinding.create(owner,view,data,boolConvert))
+}
+fun Binder.readOnlyBinding(owner: LifecycleOwner, view: EditText, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight):Binder {
+    return add(ReadOnlyBinding.create(owner,view,data.asLiveData(),boolConvert))
 }

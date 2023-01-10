@@ -1,13 +1,16 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.UtLog
 import io.github.toyota32k.utils.disposableObserve
+import kotlinx.coroutines.flow.Flow
 
-@Suppress("unused")
 open class VisibilityBinding(
         data: LiveData<Boolean>,
         boolConvert: BoolConvert = BoolConvert.Straight,
@@ -32,6 +35,13 @@ open class VisibilityBinding(
             return VisibilityBinding(data, boolConvert, hiddenMode).apply { connect(owner, view) }
         }
     }
+}
+
+fun Binder.visibilityBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder {
+    return add(VisibilityBinding.create(owner,view,data,boolConvert,hiddenMode))
+}
+fun Binder.visibilityBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder {
+    return add(VisibilityBinding.create(owner,view,data.asLiveData(),boolConvert,hiddenMode))
 }
 
 @Suppress("unused")
@@ -76,6 +86,13 @@ class MultiVisibilityBinding(
             return MultiVisibilityBinding(data, boolConvert,hiddenMode).apply { connectAll(owner, *views) }
         }
     }
+}
+
+fun Binder.multiVisibilityBinding(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder {
+    return add(MultiVisibilityBinding.create(owner, views= views, data,boolConvert,hiddenMode))
+}
+fun Binder.multiVisibilityBinding(owner: LifecycleOwner, vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder {
+    return add(MultiVisibilityBinding.create(owner, views= views, data.asLiveData(),boolConvert,hiddenMode))
 }
 
 
@@ -134,4 +151,11 @@ class CombinatorialVisibilityBinding(
             return CombinatorialVisibilityBinding(owner, data)
         }
     }
+}
+
+fun Binder.combinatorialVisibilityBinding(owner: LifecycleOwner, data:LiveData<Boolean>, fnBindView:(CombinatorialVisibilityBinding)->Unit):Binder {
+    return add(CombinatorialVisibilityBinding.create(owner,data).apply { fnBindView(this) })
+}
+fun Binder.combinatorialVisibilityBinding(owner: LifecycleOwner, data: Flow<Boolean>, fnBindView:(CombinatorialVisibilityBinding)->Unit):Binder {
+    return add(CombinatorialVisibilityBinding.create(owner,data.asLiveData()).apply { fnBindView(this) })
 }

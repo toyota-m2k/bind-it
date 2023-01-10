@@ -1,9 +1,13 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.widget.ProgressBar
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.flow.Flow
 
 /**
  * 注意
@@ -12,8 +16,6 @@ import androidx.lifecycle.Observer
  * > ProgressBar#isIntdeterminate = false
  * とするだけではだめで、スタイルに "@android:style/Widget.Holo.Light.ProgressBar.Horizontal" など、進捗表示可能なものを指定しなければならない。
  */
-
-@Suppress("unused")
 open class ProgressBarBinding protected constructor(
     override val data: LiveData<Int>,
     private val min:LiveData<Int>?,
@@ -76,4 +78,10 @@ open class ProgressBarBinding protected constructor(
     }
 }
 
+fun Binder.progressBarBinding(owner: LifecycleOwner, view:ProgressBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null):Binder {
+    return add(ProgressBarBinding.create(owner,view,data,min,max))
+}
 
+fun Binder.progressBarBinding(owner: LifecycleOwner, view:ProgressBar, data: Flow<Int>, min:LiveData<Int>?=null, max:LiveData<Int>?=null):Binder {
+    return add(ProgressBarBinding.create(owner,view,data.asLiveData(),min,max))
+}
