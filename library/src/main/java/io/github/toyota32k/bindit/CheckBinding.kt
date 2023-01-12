@@ -67,15 +67,20 @@ open class CheckBinding protected constructor(
     }
 }
 
-fun Binder.checkBinding(owner: LifecycleOwner, view: CompoundButton, data: LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):Binder {
-    return add(CheckBinding.create(owner,view,data,boolConvert))
-}
-fun Binder.checkBinding(owner: LifecycleOwner, view: CompoundButton, data: Flow<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):Binder {
-    return add(CheckBinding.create(owner,view,data.asLiveData(),boolConvert))
-}
-fun Binder.checkBinding(owner: LifecycleOwner, view:CompoundButton, data: MutableLiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):Binder {
-    return add(CheckBinding.create(owner, view, data, boolConvert, mode))
-}
-fun Binder.checkBinding(owner: LifecycleOwner, view:CompoundButton, data: MutableStateFlow<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):Binder {
-    return add(CheckBinding.create(owner, view, data.asMutableLiveData(owner), boolConvert, mode))
-}
+fun Binder.checkBinding(owner: LifecycleOwner, view: CompoundButton, data: LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):Binder
+        = add(CheckBinding.create(owner,view,data,boolConvert))
+fun Binder.checkBinding(owner: LifecycleOwner, view: CompoundButton, data: Flow<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):Binder
+        = add(CheckBinding.create(owner,view,data.asLiveData(),boolConvert))
+fun Binder.checkBinding(owner: LifecycleOwner, view:CompoundButton, data: MutableLiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):Binder
+        = add(CheckBinding.create(owner, view, data, boolConvert, mode))
+fun Binder.checkBinding(owner: LifecycleOwner, view:CompoundButton, data: MutableStateFlow<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):Binder
+        = add(CheckBinding.create(owner, view, data.asMutableLiveData(owner), boolConvert, mode))
+
+fun Binder.checkBinding(view: CompoundButton, data: LiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):Binder
+        = add(CheckBinding.create(requireOwner,view,data,boolConvert))
+fun Binder.checkBinding(view: CompoundButton, data: Flow<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight):Binder
+        = add(CheckBinding.create(requireOwner,view,data.asLiveData(),boolConvert))
+fun Binder.checkBinding(view:CompoundButton, data: MutableLiveData<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):Binder
+        = add(CheckBinding.create(requireOwner, view, data, boolConvert, mode))
+fun Binder.checkBinding(view:CompoundButton, data: MutableStateFlow<Boolean>, boolConvert: BoolConvert=BoolConvert.Straight, mode: BindingMode=BindingMode.TwoWay):Binder
+        = add(CheckBinding.create(requireOwner, view, data.asMutableLiveData(requireOwner), boolConvert, mode))

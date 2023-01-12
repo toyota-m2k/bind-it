@@ -26,3 +26,5 @@ class AlphaBinding(
 
 fun Binder.alphaBinding(owner: LifecycleOwner, view: View, data:LiveData<Float>):Binder
     = add(AlphaBinding.create(owner, view, data))
+fun Binder.alphaBinding(view: View, data:LiveData<Float>):Binder
+    = add(AlphaBinding.create(requireOwner, view, data))

@@ -78,10 +78,11 @@ open class ProgressBarBinding protected constructor(
     }
 }
 
-fun Binder.progressBarBinding(owner: LifecycleOwner, view:ProgressBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null):Binder {
-    return add(ProgressBarBinding.create(owner,view,data,min,max))
-}
-
-fun Binder.progressBarBinding(owner: LifecycleOwner, view:ProgressBar, data: Flow<Int>, min:LiveData<Int>?=null, max:LiveData<Int>?=null):Binder {
-    return add(ProgressBarBinding.create(owner,view,data.asLiveData(),min,max))
-}
+fun Binder.progressBarBinding(owner: LifecycleOwner, view:ProgressBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null):Binder
+        = add(ProgressBarBinding.create(owner,view,data,min,max))
+fun Binder.progressBarBinding(owner: LifecycleOwner, view:ProgressBar, data: Flow<Int>, min:LiveData<Int>?=null, max:LiveData<Int>?=null):Binder
+        = add(ProgressBarBinding.create(owner,view,data.asLiveData(),min,max))
+fun Binder.progressBarBinding(view:ProgressBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null):Binder
+        = add(ProgressBarBinding.create(requireOwner,view,data,min,max))
+fun Binder.progressBarBinding(view:ProgressBar, data: Flow<Int>, min:LiveData<Int>?=null, max:LiveData<Int>?=null):Binder
+        = add(ProgressBarBinding.create(requireOwner,view,data.asLiveData(),min,max))

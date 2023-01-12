@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.view.KeyEvent
@@ -15,7 +17,7 @@ import io.github.toyota32k.utils.*
  * 一方、ボタンクリック以外に、サブスレッド（タスク）からinvoke され、ActivityやViewを操作するようなハンドラを呼び出す必要があるときは、
  * ReliableCommand を使うべき。
  */
-class LiteCommand<T>() : ICommand<T> {
+open class LiteCommand<T>() : CommandBase<T>() {
     constructor(callback:(T)->Unit):this() {
         bindForever(callback)
     }
@@ -36,22 +38,12 @@ class LiteCommand<T>() : ICommand<T> {
         }
     }
 
-    override fun attachView(view: View, value: T): IDisposable {
-        internalAttachView(view, value)
-        return Command.ClickListenerDisposer(view)
-    }
-
     override fun bind(owner: LifecycleOwner, fn: (T) -> Unit): IDisposable {
         return listeners.add(owner,fn)
     }
 
-    override fun bindForever(fn: (T) -> Unit): IDisposable {
+    final override fun bindForever(fn: (T) -> Unit): IDisposable {
         return listeners.addForever(fn)
-    }
-
-    override fun attachAndBind(owner: LifecycleOwner, view: View, value: T, fn: (T) -> Unit): IDisposable {
-        attachView(view, value)
-        return Command.ClickListenerDisposer(view, bind(owner, fn))
     }
 
     override fun reset() {
@@ -67,8 +59,13 @@ class LiteCommand<T>() : ICommand<T> {
     }
 }
 
-class LiteUnitCommand() : UnitCommand(LiteCommand<Unit>()) {
-    constructor(callback:()->Unit):this() {
-        bindForever(callback)
-    }
+/**
+ * コールバックに引数を取らないコマンドクラス
+ */
+class LiteUnitCommand private constructor(rc:LiteCommand<Unit>): UnitCommand(rc) {
+    constructor():this(LiteCommand<Unit>())
+    constructor(callback:(Unit)->Unit):this(LiteCommand(callback))
 }
+
+//fun <T> Binder.bindCommand(callback:(T)->Unit, attachViews:LiteCommand<T>.()->Unit):Binder
+//    = add(LiteCommand(callback).apply{ attachViews() })

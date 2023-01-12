@@ -36,13 +36,6 @@ open class EnableBinding(
     }
 }
 
-fun Binder.enableBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder {
-    return add(EnableBinding.create(owner,view,data,boolConvert,alphaOnDisabled))
-}
-fun Binder.enableBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder {
-    return add(EnableBinding.create(owner,view,data.asLiveData(),boolConvert,alphaOnDisabled))
-}
-
 class MultiEnableBinding(
     rawData: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
@@ -86,9 +79,20 @@ class MultiEnableBinding(
     }
 }
 
-fun Binder.multiEnableBinding(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder {
-    return add(MultiEnableBinding.create(owner, views=views, data, boolConvert, alphaOnDisabled))
-}
-fun Binder.multiEnableBinding(owner: LifecycleOwner, vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder {
-    return add(MultiEnableBinding.create(owner, views=views, data.asLiveData(), boolConvert, alphaOnDisabled))
-}
+fun Binder.enableBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder
+        = add(EnableBinding.create(owner,view,data,boolConvert,alphaOnDisabled))
+fun Binder.enableBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder
+        = add(EnableBinding.create(owner,view,data.asLiveData(),boolConvert,alphaOnDisabled))
+fun Binder.enableBinding(view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder
+        = add(EnableBinding.create(requireOwner,view,data,boolConvert,alphaOnDisabled))
+fun Binder.enableBinding(view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder
+        = add(EnableBinding.create(requireOwner,view,data.asLiveData(),boolConvert,alphaOnDisabled))
+
+fun Binder.multiEnableBinding(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder
+        = add(MultiEnableBinding.create(owner, views=views, data, boolConvert, alphaOnDisabled))
+fun Binder.multiEnableBinding(owner: LifecycleOwner, vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder
+        = add(MultiEnableBinding.create(owner, views=views, data.asLiveData(), boolConvert, alphaOnDisabled))
+fun Binder.multiEnableBinding(vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder
+        = add(MultiEnableBinding.create(requireOwner, views=views, data, boolConvert, alphaOnDisabled))
+fun Binder.multiEnableBinding(vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f):Binder
+        = add(MultiEnableBinding.create(requireOwner, views=views, data.asLiveData(), boolConvert, alphaOnDisabled))

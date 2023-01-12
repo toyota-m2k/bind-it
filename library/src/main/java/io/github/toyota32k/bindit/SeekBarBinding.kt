@@ -61,15 +61,20 @@ open class SeekBarBinding(
     }
 }
 
-fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null) : Binder {
-    return add(SeekBarBinding.create(owner,view,data,min,max))
-}
-fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data: Flow<Int>, min:LiveData<Int>?=null, max:LiveData<Int>?=null) : Binder {
-    return add(SeekBarBinding.create(owner,view,data.asLiveData(),min,max))
-}
-fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:MutableLiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay) : Binder {
-    return add(SeekBarBinding.create(owner,view,data,min,max,mode))
-}
-fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:MutableStateFlow<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay) : Binder {
-    return add(SeekBarBinding.create(owner,view,data.asMutableLiveData(owner),min,max,mode))
-}
+fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null) : Binder
+        = add(SeekBarBinding.create(owner,view,data,min,max))
+fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data: Flow<Int>, min:LiveData<Int>?=null, max:LiveData<Int>?=null) : Binder
+        = add(SeekBarBinding.create(owner,view,data.asLiveData(),min,max))
+fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:MutableLiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay) : Binder
+        = add(SeekBarBinding.create(owner,view,data,min,max,mode))
+fun Binder.seekBarBinding(owner: LifecycleOwner, view:SeekBar, data:MutableStateFlow<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay) : Binder
+        = add(SeekBarBinding.create(owner,view,data.asMutableLiveData(owner),min,max,mode))
+
+fun Binder.seekBarBinding(view:SeekBar, data:LiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null) : Binder
+        = add(SeekBarBinding.create(requireOwner,view,data,min,max))
+fun Binder.seekBarBinding(view:SeekBar, data: Flow<Int>, min:LiveData<Int>?=null, max:LiveData<Int>?=null) : Binder
+        = add(SeekBarBinding.create(requireOwner,view,data.asLiveData(),min,max))
+fun Binder.seekBarBinding(view:SeekBar, data:MutableLiveData<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay) : Binder
+        = add(SeekBarBinding.create(requireOwner,view,data,min,max,mode))
+fun Binder.seekBarBinding(view:SeekBar, data:MutableStateFlow<Int>,min:LiveData<Int>?=null, max:LiveData<Int>?=null,mode:BindingMode=BindingMode.TwoWay) : Binder
+        = add(SeekBarBinding.create(requireOwner,view,data.asMutableLiveData(requireOwner),min,max,mode))

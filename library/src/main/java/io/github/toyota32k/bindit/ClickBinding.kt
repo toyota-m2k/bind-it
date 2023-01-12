@@ -63,4 +63,7 @@ class LongClickBinding<V>(
 }
 
 fun <V:View> Binder.longClickBinding(owner: LifecycleOwner, view:V, fn:(V)->Boolean) : Binder
-    = add(LongClickBinding(owner,view,fn))
+        = add(LongClickBinding(owner,view,fn))
+
+fun <V:View> Binder.longClickBinding(view:V, fn:(V)->Boolean) : Binder
+        = add(LongClickBinding(requireOwner,view,fn))

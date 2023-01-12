@@ -8,6 +8,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlin.coroutines.CoroutineContext
 
@@ -22,6 +23,8 @@ class DisposableFlowObserver<T> constructor(flow: Flow<T>, coroutineContext: Cor
         CoroutineScope(coroutineContext+ SupervisorJob()).apply {
             flow.onEach {
                 callback(it)
+            }.onCompletion {
+                UtLog.libLogger.debug("disposed.")
             }.launchIn(this)
         }
 

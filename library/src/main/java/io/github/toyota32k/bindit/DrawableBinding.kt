@@ -28,3 +28,13 @@ class BackgroundBinding(data:LiveData<Drawable>) : DrawableBinding<View>(data, {
         }
     }
 }
+
+fun <V:View> Binder.drawableBinding(owner: LifecycleOwner, view:V, data:LiveData<Drawable>, apply:(V,Drawable)->Unit):Binder
+        = add(DrawableBinding(data,apply).apply { connect(owner,view) })
+fun <V:View> Binder.drawableBinding(view:V, data:LiveData<Drawable>, apply:(V,Drawable)->Unit):Binder
+        = add(DrawableBinding(data,apply).apply { connect(requireOwner,view) })
+
+fun Binder.backgroundBinding(owner: LifecycleOwner, view:View, data:LiveData<Drawable>):Binder
+        = add(BackgroundBinding.create(owner,view,data))
+fun Binder.backgroundBinding(view:View, data:LiveData<Drawable>):Binder
+        = add(BackgroundBinding.create(requireOwner,view,data))

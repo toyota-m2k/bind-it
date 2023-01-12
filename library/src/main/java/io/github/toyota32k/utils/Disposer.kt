@@ -1,18 +1,30 @@
 package io.github.toyota32k.utils
 
+import io.github.toyota32k.bindit.Binder
+
 open class Disposer : IDisposableEx {
     final override var disposed: Boolean = false
         private set
 
+    open operator fun plus(disposable:IDisposable): Disposer {
+        return register(disposable)
+    }
+    open operator fun minus(disposable:IDisposable): Disposer {
+        return unregister(disposable)
+    }
+
     protected val disposables = mutableListOf<IDisposable>()
+    val count get() = disposables.size
+
     override fun dispose() {
         if(!disposed) {
-            disposed = true
             reset()
+            disposed = true
         }
     }
 
     fun register(vararg disposables:IDisposable):Disposer {
+        disposed = false
         for(b in disposables) {
             this.disposables.add(b)
         }
@@ -34,6 +46,7 @@ open class Disposer : IDisposableEx {
     fun reset() {
         disposables.forEach { it.dispose() }
         disposables.clear()
+        disposed = false
 
         // clientData が disposableならdispose()してnullにする。
         // disposableでなければ何もしない。

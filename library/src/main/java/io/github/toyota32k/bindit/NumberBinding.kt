@@ -73,44 +73,56 @@ class EditLongBinding(data: MutableLiveData<Long>, mode:BindingMode=BindingMode.
 class FloatBinding(data: LiveData<Float>) : NumberBinding<Float>(data)
 class EditFloatBinding(data: MutableLiveData<Float>, mode:BindingMode=BindingMode.TwoWay) : EditNumberBinding<Float>(data,mode,{it?.toFloatOrNull()})
 
-fun Binder.intBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Int>):Binder {
-    return add(NumberBinding.create(owner,view,data))
-}
-fun Binder.intBinding(owner: LifecycleOwner, view: TextView, data: Flow<Int>):Binder {
-    return add(NumberBinding.create(owner,view,data.asLiveData()))
-}
+fun Binder.intBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Int>):Binder
+        = add(NumberBinding.create(owner,view,data))
+fun Binder.intBinding(owner: LifecycleOwner, view: TextView, data: Flow<Int>):Binder
+        = add(NumberBinding.create(owner,view,data.asLiveData()))
+fun Binder.intBinding(view: TextView, data: LiveData<Int>):Binder
+        = add(NumberBinding.create(requireOwner,view,data))
+fun Binder.intBinding(view: TextView, data: Flow<Int>):Binder
+        = add(NumberBinding.create(requireOwner,view,data.asLiveData()))
 
-fun Binder.longBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Long>):Binder {
-    return add(NumberBinding.create(owner,view,data))
-}
-fun Binder.longBinding(owner: LifecycleOwner, view: TextView, data: Flow<Long>):Binder {
-    return add(NumberBinding.create(owner,view,data.asLiveData()))
-}
+fun Binder.longBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Long>):Binder
+        = add(NumberBinding.create(owner,view,data))
+fun Binder.longBinding(owner: LifecycleOwner, view: TextView, data: Flow<Long>):Binder
+        = add(NumberBinding.create(owner,view,data.asLiveData()))
+fun Binder.longBinding(view: TextView, data: LiveData<Long>):Binder
+        = add(NumberBinding.create(requireOwner,view,data))
+fun Binder.longBinding(view: TextView, data: Flow<Long>):Binder
+        = add(NumberBinding.create(requireOwner,view,data.asLiveData()))
 
-fun Binder.floatBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Float>):Binder {
-    return add(NumberBinding.create(owner,view,data))
-}
-fun Binder.floatBinding(owner: LifecycleOwner, view: TextView, data: Flow<Float>):Binder {
-    return add(NumberBinding.create(owner,view,data.asLiveData()))
-}
+fun Binder.floatBinding(owner: LifecycleOwner, view: TextView, data: LiveData<Float>):Binder
+        = add(NumberBinding.create(owner,view,data))
+fun Binder.floatBinding(owner: LifecycleOwner, view: TextView, data: Flow<Float>):Binder
+        = add(NumberBinding.create(owner,view,data.asLiveData()))
+fun Binder.floatBinding(view: TextView, data: LiveData<Float>):Binder
+        = add(NumberBinding.create(requireOwner,view,data))
+fun Binder.floatBinding(view: TextView, data: Flow<Float>):Binder
+        = add(NumberBinding.create(requireOwner,view,data.asLiveData()))
 
-fun Binder.editIntBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Int>, mode: BindingMode = BindingMode.TwoWay):Binder {
-    return add(EditNumberBinding.create(owner,view,data,mode))
-}
-fun Binder.editIntBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Int>, mode: BindingMode = BindingMode.TwoWay):Binder {
-    return add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
-}
+fun Binder.editIntBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Int>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(owner,view,data,mode))
+fun Binder.editIntBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Int>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
+fun Binder.editIntBinding(view: EditText, data: MutableLiveData<Int>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(requireOwner,view,data,mode))
+fun Binder.editIntBinding(view: EditText, data: MutableStateFlow<Int>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(requireOwner,view,data.asMutableLiveData(requireOwner),mode))
 
-fun Binder.editLongBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Long>, mode: BindingMode = BindingMode.TwoWay):Binder {
-    return add(EditNumberBinding.create(owner,view,data,mode))
-}
-fun Binder.editLongBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Long>, mode: BindingMode = BindingMode.TwoWay):Binder {
-    return add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
-}
+fun Binder.editLongBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Long>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(owner,view,data,mode))
+fun Binder.editLongBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Long>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
+fun Binder.editLongBinding(view: EditText, data: MutableLiveData<Long>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(requireOwner,view,data,mode))
+fun Binder.editLongBinding(view: EditText, data: MutableStateFlow<Long>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(requireOwner,view,data.asMutableLiveData(requireOwner),mode))
 
-fun Binder.editFloatBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Float>, mode: BindingMode = BindingMode.TwoWay):Binder {
-    return add(EditNumberBinding.create(owner,view,data,mode))
-}
-fun Binder.editFloatBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Float>, mode: BindingMode = BindingMode.TwoWay):Binder {
-    return add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
-}
+fun Binder.editFloatBinding(owner: LifecycleOwner, view: EditText, data: MutableLiveData<Float>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(owner,view,data,mode))
+fun Binder.editFloatBinding(owner: LifecycleOwner, view: EditText, data: MutableStateFlow<Float>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(owner,view,data.asMutableLiveData(owner),mode))
+fun Binder.editFloatBinding(view: EditText, data: MutableLiveData<Float>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(requireOwner,view,data,mode))
+fun Binder.editFloatBinding(view: EditText, data: MutableStateFlow<Float>, mode: BindingMode = BindingMode.TwoWay):Binder
+        = add(EditNumberBinding.create(requireOwner,view,data.asMutableLiveData(requireOwner),mode))

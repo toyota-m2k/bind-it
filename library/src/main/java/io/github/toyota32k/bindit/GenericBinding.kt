@@ -24,6 +24,7 @@ open class GenericBinding<V,T>(
     }
 }
 
-fun <V:View,T> Binder.genericBinding(owner: LifecycleOwner, view:V, data:LiveData<T>, action:(V,T?)->Unit):Binder {
-    return add(GenericBinding.create(owner, view, data, action))
-}
+fun <V:View,T> Binder.genericBinding(owner: LifecycleOwner, view:V, data:LiveData<T>, action:(V,T?)->Unit):Binder
+    = add(GenericBinding.create(owner, view, data, action))
+fun <V:View,T> Binder.genericBinding(view:V, data:LiveData<T>, action:(V,T?)->Unit):Binder
+        = add(GenericBinding.create(requireOwner, view, data, action))

@@ -122,11 +122,6 @@ class FadeInOutBinding(
     }
 }
 
-fun Binder.fadeInOutBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
-    = add(FadeInOutBinding.create(owner,view, data, boolConvert, duration))
-fun Binder.fadeInOutBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
-    = add(FadeInOutBinding.create(owner,view, data.asLiveData(), boolConvert, duration))
-
 class MultiFadeInOutBinding(
     data: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
@@ -164,7 +159,21 @@ class MultiFadeInOutBinding(
     }
 }
 
+fun Binder.fadeInOutBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+        = add(FadeInOutBinding.create(owner,view, data, boolConvert, duration))
+fun Binder.fadeInOutBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+        = add(FadeInOutBinding.create(owner,view, data.asLiveData(), boolConvert, duration))
+fun Binder.fadeInOutBinding(view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+        = add(FadeInOutBinding.create(requireOwner,view, data, boolConvert, duration))
+fun Binder.fadeInOutBinding(view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+        = add(FadeInOutBinding.create(requireOwner,view, data.asLiveData(), boolConvert, duration))
+
+
 fun Binder.multiFadeInOutBinding(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
-    = add(MultiFadeInOutBinding(data, boolConvert, duration).apply { connectAll(owner, *views) })
+        = add(MultiFadeInOutBinding(data, boolConvert, duration).apply { connectAll(owner, *views) })
 fun Binder.multiFadeInOutBinding(owner: LifecycleOwner, vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
-    = add(MultiFadeInOutBinding(data.asLiveData(), boolConvert, duration).apply { connectAll(owner, *views) })
+        = add(MultiFadeInOutBinding(data.asLiveData(), boolConvert, duration).apply { connectAll(owner, *views) })
+fun Binder.multiFadeInOutBinding(vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+        = add(MultiFadeInOutBinding(data, boolConvert, duration).apply { connectAll(requireOwner, *views) })
+fun Binder.multiFadeInOutBinding(vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, duration:Long=500):Binder
+        = add(MultiFadeInOutBinding(data.asLiveData(), boolConvert, duration).apply { connectAll(requireOwner, *views) })

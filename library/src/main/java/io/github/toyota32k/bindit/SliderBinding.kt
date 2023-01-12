@@ -128,16 +128,20 @@ open class SliderBinding (
     }
 }
 
-fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder {
-    return add(SliderBinding.create(owner,view,data,min,max))
-}
-fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data: Flow<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder {
-    return add(SliderBinding.create(owner,view,data.asLiveData(),min,max))
-}
+fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder
+        = add(SliderBinding.create(owner,view,data,min,max))
+fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data: Flow<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder
+        = add(SliderBinding.create(owner,view,data.asLiveData(),min,max))
+fun Binder.sliderBinding(view: Slider, data:LiveData<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder
+        = add(SliderBinding.create(requireOwner,view,data,min,max))
+fun Binder.sliderBinding(view: Slider, data: Flow<Float>, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder
+        = add(SliderBinding.create(requireOwner,view,data.asLiveData(),min,max))
 
-fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:MutableLiveData<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder {
-    return add(SliderBinding.create(owner,view,data,mode,min,max))
-}
-fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:MutableStateFlow<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder {
-    return add(SliderBinding.create(owner,view,data.asMutableLiveData(owner),mode,min,max))
-}
+fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:MutableLiveData<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder
+        = add(SliderBinding.create(owner,view,data,mode,min,max))
+fun Binder.sliderBinding(owner: LifecycleOwner, view: Slider, data:MutableStateFlow<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder
+        = add(SliderBinding.create(owner,view,data.asMutableLiveData(owner),mode,min,max))
+fun Binder.sliderBinding(view: Slider, data:MutableLiveData<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder
+        = add(SliderBinding.create(requireOwner,view,data,mode,min,max))
+fun Binder.sliderBinding(view: Slider, data:MutableStateFlow<Float>, mode: BindingMode=BindingMode.TwoWay, min:LiveData<Float>?=null, max:LiveData<Float>?=null):Binder
+        = add(SliderBinding.create(requireOwner,view,data.asMutableLiveData(requireOwner),mode,min,max))

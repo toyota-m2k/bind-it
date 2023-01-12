@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.view.View
@@ -53,3 +55,5 @@ class AnimationBinding(
 
 fun Binder.animationBinding(owner:LifecycleOwner, animation:IReversibleAnimation,data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyLastState:Boolean):Binder
     = add(AnimationBinding(data,boolConvert).apply { setAnimation(owner, animation, applyLastState) })
+fun Binder.animationBinding(animation:IReversibleAnimation,data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyLastState:Boolean):Binder
+    = add(AnimationBinding(data,boolConvert).apply { setAnimation(requireOwner, animation, applyLastState) })

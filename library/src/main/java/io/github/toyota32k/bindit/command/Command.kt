@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference
  * ただし、ボタンクリック以外に、サブスレッド（タスク）からinvoke され、ActivityやViewを操作するようなハンドラを呼び出す必要があるときは、
  * ReliableCommand を使うべき。
  */
+//@Deprecated("use LiteCommand or ReliableCommand instead.")
 class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDisposable {
     // 永続的ハンドラをbindするコンストラクタ
     // Command().apply { bindForever(fn) } と書いていたのをちょっと簡略化
@@ -95,10 +96,14 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDispos
 //    }
 
     @MainThread
-    fun connectAndBind(owner: LifecycleOwner, view:View, fn:((View?)->Unit)):IDisposable {
+    fun attachAndBind(owner: LifecycleOwner, view:View, fn:((View?)->Unit)):IDisposable {
         connectView(view)
         return ClickListenerDisposer(view, bind(owner,fn))
     }
+
+    @MainThread
+    fun connectAndBind(owner: LifecycleOwner, view:View, fn:((View?)->Unit)):IDisposable
+        = attachAndBind(owner,view,fn)
 
     @MainThread
     fun reset() {

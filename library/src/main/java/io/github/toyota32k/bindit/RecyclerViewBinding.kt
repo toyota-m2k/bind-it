@@ -4,12 +4,14 @@ package io.github.toyota32k.bindit
 
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.github.toyota32k.bindit.list.ObservableList
 import io.github.toyota32k.bindit.list.RecyclerViewAdapter
 import io.github.toyota32k.utils.IDisposable
+import kotlinx.coroutines.flow.Flow
 
 class RecyclerViewBinding<T>(
     val list: ObservableList<T>,
@@ -91,6 +93,37 @@ fun <T> Binder.recyclerViewBinding(
     owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int,
     fixedSize:Boolean = true,
     layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(view.context),
+    bindView:(Binder, View, T)->Unit):Binder
+    = add(RecyclerViewBinding.create(owner,view,list,itemViewLayoutId,fixedSize,layoutManager,bindView))
+
+fun <T> Binder.recyclerViewBinding(
+    owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int,
+    fixedSize:Boolean = true,
+    dragAndDrop:Boolean,
+    layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(view.context),
+    bindView:(Binder, View, T)->Unit):Binder
+    = add(RecyclerViewBinding.create(owner,view,list,itemViewLayoutId,fixedSize,layoutManager,bindView).apply { enableDragAndDrop(dragAndDrop) })
+
+
+fun <T> Binder.recyclerViewBinding(
+    owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int,
+    fixedSize:Boolean = true,
+    dragAndDrop: LiveData<Boolean>,
+    layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(view.context),
     bindView:(Binder, View, T)->Unit):Binder {
-    return add(RecyclerViewBinding.create(owner,view,list,itemViewLayoutId,fixedSize,layoutManager,bindView))
+    val b = RecyclerViewBinding.create(owner,view,list,itemViewLayoutId,fixedSize,layoutManager,bindView)
+    return genericBoolBinding(owner, view, dragAndDrop) {_,dd-> b.enableDragAndDrop(dd) }
+            .recyclerViewBinding(owner,view,list,itemViewLayoutId,fixedSize,layoutManager,bindView)
 }
+
+fun <T> Binder.recyclerViewBinding(
+    owner: LifecycleOwner, view: RecyclerView, list: ObservableList<T>, itemViewLayoutId:Int,
+    fixedSize:Boolean = true,
+    dragAndDrop: Flow<Boolean>,
+    layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(view.context),
+    bindView:(Binder, View, T)->Unit):Binder {
+    val b = RecyclerViewBinding.create(owner,view,list,itemViewLayoutId,fixedSize,layoutManager,bindView)
+    return genericBoolBinding(owner, view, dragAndDrop) { _,dd-> b.enableDragAndDrop(dd) }
+        .recyclerViewBinding(owner,view,list,itemViewLayoutId,fixedSize,layoutManager,bindView)
+}
+

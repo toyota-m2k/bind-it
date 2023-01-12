@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         val multiVisible = MutableLiveData<Boolean>(true)
 
         val commandTextMessage = MutableLiveData<String>()
-        val commandTest = LiteUnitCommand(this::onCommandTest)
+        val commandTest = LiteUnitCommand { onCommandTest() }
 
         val liteCommand = LiteCommand<Boolean> {
             logger.info("LiteCommand called.")

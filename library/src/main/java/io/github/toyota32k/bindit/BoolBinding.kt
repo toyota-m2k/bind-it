@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.view.View
@@ -19,8 +21,6 @@ abstract class BoolBinding(
     override val data:LiveData<Boolean> = if(boolConvert==BoolConvert.Straight) rawData else ConvertLiveData<Boolean,Boolean>(rawData as MutableLiveData<Boolean>, { it!=true }, {it!=true})
 }
 
-
-@Suppress("unused")
 open class GenericBoolBinding(
     rawData: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
@@ -45,14 +45,6 @@ open class GenericBoolBinding(
     }
 }
 
-fun Binder.genericBoolBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit):Binder {
-    return add(GenericBoolBinding.create(owner,view,data,boolConvert,applyValue))
-}
-fun Binder.genericBoolBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit):Binder {
-    return add(GenericBoolBinding.create(owner,view,data,boolConvert,applyValue))
-}
-
-@Suppress("unused")
 open class GenericBoolMultiBinding(
     rawData: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
@@ -96,9 +88,20 @@ open class GenericBoolMultiBinding(
     }
 }
 
-fun Binder.genericBoolMultiBinding(owner: LifecycleOwner, vararg targets:View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue:(List<View>,Boolean)->Unit):Binder {
-    return add(GenericBoolMultiBinding.create(owner, targets=targets, data, boolConvert, applyValue))
-}
-fun Binder.genericBoolMultiBinding(owner: LifecycleOwner, vararg targets:View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue:(List<View>,Boolean)->Unit):Binder {
-    return add(GenericBoolMultiBinding.create(owner, targets=targets, data, boolConvert, applyValue))
-}
+fun Binder.genericBoolBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit):Binder
+        = add(GenericBoolBinding.create(owner,view,data,boolConvert,applyValue))
+fun Binder.genericBoolBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit):Binder
+        = add(GenericBoolBinding.create(owner,view,data,boolConvert,applyValue))
+fun Binder.genericBoolBinding(view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit):Binder
+        = add(GenericBoolBinding.create(requireOwner,view,data,boolConvert,applyValue))
+fun Binder.genericBoolBinding(view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue: (View, Boolean) -> Unit):Binder
+        = add(GenericBoolBinding.create(requireOwner,view,data,boolConvert,applyValue))
+
+fun Binder.genericBoolMultiBinding(owner: LifecycleOwner, vararg targets:View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue:(List<View>,Boolean)->Unit):Binder
+        = add(GenericBoolMultiBinding.create(owner, targets=targets, data, boolConvert, applyValue))
+fun Binder.genericBoolMultiBinding(owner: LifecycleOwner, vararg targets:View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue:(List<View>,Boolean)->Unit):Binder
+        = add(GenericBoolMultiBinding.create(owner, targets=targets, data, boolConvert, applyValue))
+fun Binder.genericBoolMultiBinding(vararg targets:View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue:(List<View>,Boolean)->Unit):Binder
+        = add(GenericBoolMultiBinding.create(requireOwner,targets=targets, data, boolConvert, applyValue))
+fun Binder.genericBoolMultiBinding(vararg targets:View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, applyValue:(List<View>,Boolean)->Unit):Binder
+        = add(GenericBoolMultiBinding.create(requireOwner, targets=targets, data, boolConvert, applyValue))
