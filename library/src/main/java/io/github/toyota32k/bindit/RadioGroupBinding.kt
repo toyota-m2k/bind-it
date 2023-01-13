@@ -55,9 +55,9 @@ class SimpleIdValueResolver<T>(private val valueIdMap: Map<T, Int>) : IIDValueRe
  * 当然のことながら、異なる値に対して同じ id を返すことがあるような関数を渡してしまうと、
  * 期待通りには動きません。
  */
-inline fun <reified T: Enum<T>> SimpleIdValueResolver(valueToId: (value: T) -> Int): SimpleIdValueResolver<T> {
-    return SimpleIdValueResolver(enumValues<T>().associateWith(valueToId))
-}
+@Suppress("FunctionName")
+inline fun <reified T: Enum<T>> SimpleIdValueResolver(valueToId: (value: T) -> Int): SimpleIdValueResolver<T>
+    = SimpleIdValueResolver(enumValues<T>().associateWith(valueToId))
 
 open class RadioGroupBinding<T> (
     override val data: LiveData<T>,
@@ -122,10 +122,18 @@ open class RadioGroupBinding<T> (
 }
 
 fun <T> Binder.radioGroupBinding(owner: LifecycleOwner, view: RadioGroup, data: LiveData<T>, idResolver: IIDValueResolver<T>):Binder
-    = add(RadioGroupBinding.create(owner,view,data,idResolver))
+        = add(RadioGroupBinding.create(owner,view,data,idResolver))
 fun <T> Binder.radioGroupBinding(owner: LifecycleOwner, view: RadioGroup, data: MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):Binder
-    = add(RadioGroupBinding.create(owner,view,data,idResolver,mode))
+        = add(RadioGroupBinding.create(owner,view,data,idResolver,mode))
 fun <T> Binder.radioGroupBinding(owner: LifecycleOwner, view: RadioGroup, data: Flow<T>, idResolver: IIDValueResolver<T>):Binder
-    = add(RadioGroupBinding.create(owner,view,data,idResolver))
+        = add(RadioGroupBinding.create(owner,view,data,idResolver))
 fun <T> Binder.radioGroupBinding(owner: LifecycleOwner, view: RadioGroup, data: MutableStateFlow<T>, idResolver: IIDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):Binder
-    = add(RadioGroupBinding.create(owner,view,data,idResolver,mode))
+        = add(RadioGroupBinding.create(owner,view,data,idResolver,mode))
+fun <T> Binder.radioGroupBinding(view: RadioGroup, data: LiveData<T>, idResolver: IIDValueResolver<T>):Binder
+        = add(RadioGroupBinding.create(requireOwner,view,data,idResolver))
+fun <T> Binder.radioGroupBinding(view: RadioGroup, data: MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):Binder
+        = add(RadioGroupBinding.create(requireOwner,view,data,idResolver,mode))
+fun <T> Binder.radioGroupBinding(view: RadioGroup, data: Flow<T>, idResolver: IIDValueResolver<T>):Binder
+        = add(RadioGroupBinding.create(requireOwner,view,data,idResolver))
+fun <T> Binder.radioGroupBinding(view: RadioGroup, data: MutableStateFlow<T>, idResolver: IIDValueResolver<T>, mode:BindingMode=BindingMode.TwoWay):Binder
+        = add(RadioGroupBinding.create(requireOwner,view,data,idResolver,mode))

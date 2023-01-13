@@ -5,7 +5,6 @@ package io.github.toyota32k.bindit
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import io.github.toyota32k.bindit.BindingMode
 
 class AlphaBinding(
     override val data:LiveData<Float>
@@ -26,3 +25,5 @@ class AlphaBinding(
 
 fun Binder.alphaBinding(owner: LifecycleOwner, view: View, data:LiveData<Float>):Binder
     = add(AlphaBinding.create(owner, view, data))
+fun Binder.alphaBinding(view: View, data:LiveData<Float>):Binder
+    = add(AlphaBinding.create(requireOwner, view, data))

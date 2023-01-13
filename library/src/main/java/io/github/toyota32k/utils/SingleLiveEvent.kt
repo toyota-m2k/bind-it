@@ -23,7 +23,6 @@ interface ISingleLiveEvent<T> {
  *  - observeForever()はサポートしない
  *
  */
-@Suppress("unused")
 class SingleLiveEvent<T:Any> : ISingleLiveEvent<T> {
     private val subject = SingleLiveData<T>()
 
@@ -68,7 +67,14 @@ class SingleLiveData<T> : MutableLiveData<T>(), Observer<T> {
     }
 
     override fun observeForever(observer: Observer<in T>) {
-        throw UnsupportedOperationException("SingleLiveData.observe prevent from registering multiple observers.")
+        if (hasActiveObservers()) {
+            UtLog.libLogger.error("only one observer can be registered to SingleLiveData")
+            throw IllegalStateException("SingleLiveData.observe prevent from registering multiple observers.")
+        }
+
+        // Observe the internal MutableLiveData
+        originalObserver = observer
+        super.observeForever(this)
     }
 
     override fun removeObservers(owner: LifecycleOwner) {

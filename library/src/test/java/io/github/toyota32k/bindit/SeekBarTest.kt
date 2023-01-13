@@ -186,4 +186,37 @@ class SeekBarTest {
         assertEquals(50, view.max)
         assertEquals(view.progress, data.value)
     }
+
+    @Test
+    fun binderTest() {
+        val activity = createActivity()
+        val view = SeekBar(activity).apply { min=0; max=100}
+        val lmin = MutableLiveData<Int>(0)
+        val lmax = MutableLiveData<Int>(100)
+        val data = MutableLiveData<Int>(40)
+        view.progress=50
+
+        val binder = Binder().owner(activity)
+        binder.seekBarBinding(view, data, lmin, lmax)
+        assertEquals(40, view.progress)     // Dataが優先
+        assertEquals(data.value, view.progress)
+
+        view.progress = 20
+        assertEquals(20, view.progress)
+        assertEquals(data.value, view.progress)
+
+        lmax.value = 300
+        lmin.value = 200
+        assertEquals(200, view.progress)
+        assertEquals(200, view.min)
+        assertEquals(300, view.max)
+        assertEquals(view.progress, data.value)
+
+        lmax.value = 50
+        lmin.value = 0
+        assertEquals(50, view.progress)
+        assertEquals(0, view.min)
+        assertEquals(50, view.max)
+        assertEquals(view.progress, data.value)
+    }
 }

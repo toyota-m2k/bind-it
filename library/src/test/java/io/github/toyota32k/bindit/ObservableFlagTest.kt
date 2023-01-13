@@ -5,6 +5,7 @@ import io.github.toyota32k.utils.UtObservableFlag
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import java.io.Closeable
 
 class ObservableFlagTest {
     @Before
@@ -14,39 +15,50 @@ class ObservableFlagTest {
     @Test
     fun flagTest() {
         val flag = UtObservableFlag()
-        assertFalse(flag.value)
-        assertTrue(flag.set())
-        assertFalse(flag.set())
-        assertTrue(flag.reset())
-        assertTrue(flag.set())
+        assertFalse(flag.flagged)
+        assertTrue(flag.trySetIfNot())
+        assertFalse(flag.trySetIfNot())
+        assertTrue(flag.flagged)
+        flag.reset()
+        assertFalse(flag.flagged)
+        assertTrue(flag.trySetIfNot())
 
-        var b = flag.ifSet(false) { true }
+        var b:Boolean
+        b = flag.withFlagIfNot{ true } ?: false
         assertFalse(b)
         flag.reset()
-        b = flag.ifSet(false) { true }
+        b = flag.withFlagIfNot { true } ?: false
         assertTrue(b)
-        assertFalse(flag.value)
+        assertFalse(flag.flagged)
 
-        b = false
-        flag.ifSet { b = true }
-        assertTrue(b)
-        assertFalse(flag.value)
-
-        var u = flag.closeableSetFlag()
-        assertNotNull(u)
-        assertTrue(flag.value)
-        u?.close()
-        assertFalse(flag.value)
-
-        assertTrue(flag.set())
-        u = flag.closeableSetFlag()
-        assertNull(u)
-
-        assertTrue(flag.reset())
-        flag.closeableSetFlag().use {
-            assertTrue(flag.value)
+        b = flag.withFlag {
+            assertTrue(flag.flagged)
+            true
         }
-        assertFalse(flag.value)
+        assertTrue(b)
+        assertFalse(flag.flagged)
+
+        var u:Closeable?
+        u = flag.closeableSet()
+        assertTrue(flag.flagged)
+        u.close()
+        assertFalse(flag.flagged)
+
+        u = flag.closeableTrySetIfNot()
+        assertNotNull(u)
+        assertTrue(flag.flagged)
+
+        val u2:Closeable?
+        u2 = flag.closeableTrySetIfNot()
+        assertNull(u2)
+
+        u?.close()
+        assertFalse(flag.flagged)
+
+        flag.closeableSet().use {
+            assertTrue(flag.flagged)
+        }
+        assertFalse(flag.flagged)
     }
 
     @Test

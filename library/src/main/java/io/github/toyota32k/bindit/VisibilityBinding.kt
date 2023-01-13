@@ -37,14 +37,6 @@ open class VisibilityBinding(
     }
 }
 
-fun Binder.visibilityBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder {
-    return add(VisibilityBinding.create(owner,view,data,boolConvert,hiddenMode))
-}
-fun Binder.visibilityBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder {
-    return add(VisibilityBinding.create(owner,view,data.asLiveData(),boolConvert,hiddenMode))
-}
-
-@Suppress("unused")
 class MultiVisibilityBinding(
     data: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,
@@ -88,20 +80,19 @@ class MultiVisibilityBinding(
     }
 }
 
-fun Binder.multiVisibilityBinding(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder {
-    return add(MultiVisibilityBinding.create(owner, views= views, data,boolConvert,hiddenMode))
-}
-fun Binder.multiVisibilityBinding(owner: LifecycleOwner, vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder {
-    return add(MultiVisibilityBinding.create(owner, views= views, data.asLiveData(),boolConvert,hiddenMode))
+interface ICombinatorialVisibilityBuilder {
+    fun straightGone(vararg args:View):ICombinatorialVisibilityBuilder
+    fun straightInvisible(vararg args:View):ICombinatorialVisibilityBuilder
+    fun inverseGone(vararg args:View):ICombinatorialVisibilityBuilder
+    fun inverseInvisible(vararg args:View):ICombinatorialVisibilityBuilder
 }
 
-
-@Suppress("unused")
 class CombinatorialVisibilityBinding(
     owner: LifecycleOwner,
     val data: LiveData<Boolean>,
-    ): IBinding {
+    ): IBinding, ICombinatorialVisibilityBuilder {
     override val mode: BindingMode = BindingMode.OneWay
+    private val views:MutableList<ViewOption> = mutableListOf<ViewOption>()
     private var observed: IDisposable? = data.disposableObserve(owner, this::onDataChanged)
 
     private data class ViewOption(val view:View, val conv:BoolConvert, val hiddenMode: VisibilityBinding.HiddenMode) {
@@ -117,11 +108,15 @@ class CombinatorialVisibilityBinding(
         }
     }
 
-    private val views = mutableListOf<ViewOption>()
+    private fun applyVisibility(list:List<ViewOption>, flag:Boolean?) {
+        flag ?: return
+        list.forEach { it.show(flag) }
+    }
 
     private fun onDataChanged(value: Boolean?) {
-        if(value==null) return
-        views.forEach { it.show(value) }
+        applyVisibility(views, value)
+//        if(value==null) return
+//        views.forEach { it.show(value) }
     }
 
     override fun dispose() {
@@ -129,20 +124,25 @@ class CombinatorialVisibilityBinding(
         observed = null
     }
 
-    fun straightGone(vararg args:View):CombinatorialVisibilityBinding {
-        views.addAll(args.map { ViewOption(it, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByGone)})
+    private fun addViews(list:List<ViewOption>) {
+        views.addAll(list)
+        applyVisibility(list, data.value)
+    }
+
+    override fun straightGone(vararg args:View):CombinatorialVisibilityBinding {
+        addViews(args.map { ViewOption(it, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByGone)})
         return this
     }
-    fun straightInvisible(vararg args:View):CombinatorialVisibilityBinding {
-        views.addAll(args.map { ViewOption(it, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByInvisible)})
+    override fun straightInvisible(vararg args:View):CombinatorialVisibilityBinding {
+        addViews(args.map { ViewOption(it, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByInvisible)})
         return this
     }
-    fun inverseGone(vararg args:View):CombinatorialVisibilityBinding {
-        views.addAll(args.map { ViewOption(it, BoolConvert.Inverse, VisibilityBinding.HiddenMode.HideByGone)})
+    override fun inverseGone(vararg args:View):CombinatorialVisibilityBinding {
+        addViews(args.map { ViewOption(it, BoolConvert.Inverse, VisibilityBinding.HiddenMode.HideByGone)})
         return this
     }
-    fun inverseInvisible(vararg args:View):CombinatorialVisibilityBinding {
-        views.addAll(args.map { ViewOption(it, BoolConvert.Inverse, VisibilityBinding.HiddenMode.HideByInvisible)})
+    override fun inverseInvisible(vararg args:View):CombinatorialVisibilityBinding {
+        addViews(args.map { ViewOption(it, BoolConvert.Inverse, VisibilityBinding.HiddenMode.HideByInvisible)})
         return this
     }
 
@@ -152,10 +152,32 @@ class CombinatorialVisibilityBinding(
         }
     }
 }
+fun Binder.visibilityBinding(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder
+        = add(VisibilityBinding.create(owner,view,data,boolConvert,hiddenMode))
+fun Binder.visibilityBinding(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder
+        = add(VisibilityBinding.create(owner,view,data.asLiveData(),boolConvert,hiddenMode))
 
-fun Binder.combinatorialVisibilityBinding(owner: LifecycleOwner, data:LiveData<Boolean>, fnBindView:(CombinatorialVisibilityBinding)->Unit):Binder {
-    return add(CombinatorialVisibilityBinding.create(owner,data).apply { fnBindView(this) })
-}
-fun Binder.combinatorialVisibilityBinding(owner: LifecycleOwner, data: Flow<Boolean>, fnBindView:(CombinatorialVisibilityBinding)->Unit):Binder {
-    return add(CombinatorialVisibilityBinding.create(owner,data.asLiveData()).apply { fnBindView(this) })
-}
+fun Binder.multiVisibilityBinding(owner: LifecycleOwner, views: Array<View>, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder
+        = add(MultiVisibilityBinding.create(owner, views= views, data,boolConvert,hiddenMode))
+fun Binder.multiVisibilityBinding(owner: LifecycleOwner, views: Array<View>, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder
+        = add(MultiVisibilityBinding.create(owner, views= views, data.asLiveData(),boolConvert,hiddenMode))
+
+fun Binder.combinatorialVisibilityBinding(owner: LifecycleOwner, data:LiveData<Boolean>, fnBindView:ICombinatorialVisibilityBuilder.()->Unit):Binder
+        = add(CombinatorialVisibilityBinding.create(owner,data).apply { fnBindView(this) })
+fun Binder.combinatorialVisibilityBinding(owner: LifecycleOwner, data: Flow<Boolean>, fnBindView:ICombinatorialVisibilityBuilder.()->Unit):Binder
+        = add(CombinatorialVisibilityBinding.create(owner,data.asLiveData()).apply { fnBindView(this) })
+
+fun Binder.visibilityBinding(view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder
+        = add(VisibilityBinding.create(requireOwner,view,data,boolConvert,hiddenMode))
+fun Binder.visibilityBinding(view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder
+        = add(VisibilityBinding.create(requireOwner,view,data.asLiveData(),boolConvert,hiddenMode))
+
+fun Binder.multiVisibilityBinding(views: Array<View>, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder
+        = add(MultiVisibilityBinding.create(requireOwner, views= views, data,boolConvert,hiddenMode))
+fun Binder.multiVisibilityBinding(views: Array<View>, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode: VisibilityBinding.HiddenMode = VisibilityBinding.HiddenMode.HideByGone):Binder
+        = add(MultiVisibilityBinding.create(requireOwner, views= views, data.asLiveData(),boolConvert,hiddenMode))
+
+fun Binder.combinatorialVisibilityBinding(data:LiveData<Boolean>, fnBindView:ICombinatorialVisibilityBuilder.()->Unit):Binder
+        = add(CombinatorialVisibilityBinding.create(requireOwner,data).apply { fnBindView(this) })
+fun Binder.combinatorialVisibilityBinding(data: Flow<Boolean>, fnBindView:ICombinatorialVisibilityBuilder.()->Unit):Binder
+        = add(CombinatorialVisibilityBinding.create(requireOwner,data.asLiveData()).apply { fnBindView(this) })

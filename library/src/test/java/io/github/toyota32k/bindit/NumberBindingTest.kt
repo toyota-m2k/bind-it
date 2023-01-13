@@ -91,7 +91,26 @@ class NumberBindingTest {
         data.value=333
         assertEquals("333", view.text.toString())
         assertEquals(333, data.value)
+    }
 
+    @Test
+    fun binderTest() {
+        val activity = createActivity()
+        val view = EditText(activity)
+        val data = MutableLiveData<Int>(111)
+        view.setText("222")
 
+        val binder = Binder().owner(activity)
+        binder.editIntBinding(activity, view, data)
+        assertEquals("111", view.text.toString())
+        assertEquals(111, data.value)
+
+        view.setText("444")
+        assertEquals("444", view.text.toString())
+        assertEquals(444, data.value)
+
+        data.value=333
+        assertEquals("333", view.text.toString())
+        assertEquals(333, data.value)
     }
 }

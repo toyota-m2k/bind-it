@@ -85,12 +85,6 @@ class MaterialRadioButtonGroupBinding<T>(
     }
 }
 
-fun <T> Binder.materialRadioButtonGroupBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
-    = add(MaterialRadioButtonGroupBinding.create(owner, view, data, idResolver, mode))
-
-fun <T> Binder.materialRadioButtonGroupBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableStateFlow<T>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
-    = add(MaterialRadioButtonGroupBinding.create(owner, view, data.asMutableLiveData(owner), idResolver, mode))
-
 /**
  * MaterialButtonToggleGroup を使ったトグルボタングループのバインディング
  * 各トグルボタンにT型のユニークキー（enumかR.id.xxxなど）が１：１に対応しているとして、そのListで選択状態をバインドする。
@@ -101,7 +95,7 @@ class MaterialToggleButtonGroupBinding<T>(
     mode:BindingMode = BindingMode.TwoWay
 ) : MaterialButtonGroupBindingBase<T,List<T>>(data,mode) {
 
-    private val selected = mutableSetOf<T>()
+//    private val selected = mutableSetOf<T>()
     private var busy = false
     private fun inBusy(fn:()->Unit) {
         if(!busy) {
@@ -117,7 +111,6 @@ class MaterialToggleButtonGroupBinding<T>(
     override fun connect(owner: LifecycleOwner,view: MaterialButtonToggleGroup,idResolver: IIDValueResolver<T>) {
         super.connect(owner, view, idResolver)
         if(mode==BindingMode.OneWayToSource||(mode== BindingMode.TwoWay &&  data.value==null)) {
-            selected.clear()
             for(c in toggleGroup?.checkedButtonIds ?:return) {
                 onButtonChecked(toggleGroup, c, true)
             }
@@ -128,9 +121,7 @@ class MaterialToggleButtonGroupBinding<T>(
         val view = toggleGroup ?: return
         inBusy {
             view.clearChecked()
-            selected.clear()
             if (!v.isNullOrEmpty()) {
-                selected.addAll(v)
                 v.forEach {
                     view.check(idResolver.value2id(it))
                 }
@@ -144,13 +135,8 @@ class MaterialToggleButtonGroupBinding<T>(
         isChecked: Boolean
     ) {
         inBusy {
-            val v = idResolver.id2value(checkedId) ?: return@inBusy
-            if(isChecked) {
-                selected.add(v)
-            } else {
-                selected.remove(v)
-            }
-            data.value = selected.toList()
+//            val v = idResolver.id2value(checkedId) ?: return@inBusy
+            data.value = group?.checkedButtonIds?.mapNotNull { idResolver.id2value(it) } ?: emptyList()
         }
     }
 
@@ -160,11 +146,6 @@ class MaterialToggleButtonGroupBinding<T>(
         }
     }
 }
-
-fun <T> Binder.materialToggleButtonGroupBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableLiveData<List<T>>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
-    = add(MaterialToggleButtonGroupBinding.create(owner,view,data,idResolver,mode))
-fun <T> Binder.materialToggleButtonGroupBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableStateFlow<List<T>>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
-        = add(MaterialToggleButtonGroupBinding.create(owner,view,data.asMutableLiveData(owner),idResolver,mode))
 
 /**
  * MaterialButtonToggleGroupに支配される、複数のボタンと、その選択状態(LiveData<Boolean>)を個々にバインドするクラス。
@@ -239,6 +220,19 @@ class MaterialToggleButtonsBinding (
         return this
     }
 
+    class Builder(val owner:LifecycleOwner,val target:MaterialToggleButtonsBinding) {
+        fun bind(button:View, data:MutableLiveData<Boolean>):Builder  {
+            target.add(owner, button, data)
+            return this
+        }
+    }
+
+    fun addViewsByBuilder(owner:LifecycleOwner, fn:Builder.()->Unit) {
+        Builder(owner, this).apply {
+            fn()
+        }
+    }
+
     private var disposed:Boolean = false
     override fun dispose() {
         if (mode != BindingMode.OneWayToSource) {
@@ -267,14 +261,40 @@ class MaterialToggleButtonsBinding (
         fun create(view:MaterialButtonToggleGroup, mode:BindingMode = BindingMode.TwoWay) : MaterialToggleButtonsBinding {
             return MaterialToggleButtonsBinding(mode).apply { connect(view) }
         }
-        fun create(owner: LifecycleOwner, view:MaterialButtonToggleGroup, mode:BindingMode, vararg buttons:ButtonAndData) : MaterialToggleButtonsBinding {
-            return MaterialToggleButtonsBinding(mode).apply {
-                connect(view)
+        fun create(owner: LifecycleOwner, view:MaterialButtonToggleGroup, mode:BindingMode = BindingMode.TwoWay, vararg buttons:ButtonAndData) : MaterialToggleButtonsBinding {
+            return create(view, mode).apply {
                 add(owner, *buttons)
+            }
+        }
+        fun create(owner: LifecycleOwner, view:MaterialButtonToggleGroup, mode:BindingMode = BindingMode.TwoWay, fnBindViews:MaterialToggleButtonsBinding.Builder.()->Unit): MaterialToggleButtonsBinding {
+            return create(view, mode).apply {
+                addViewsByBuilder(owner, fnBindViews)
             }
         }
     }
 }
 
-fun Binder.materialToggleButtonsBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, mode:BindingMode, vararg buttons: MaterialToggleButtonsBinding.ButtonAndData):Binder
-    = add(MaterialToggleButtonsBinding.create(owner,view,mode,*buttons))
+fun <T> Binder.materialRadioButtonGroupBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
+        = add(MaterialRadioButtonGroupBinding.create(owner, view, data, idResolver, mode))
+fun <T> Binder.materialRadioButtonGroupBinding(view:MaterialButtonToggleGroup, data:MutableLiveData<T>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
+        = add(MaterialRadioButtonGroupBinding.create(requireOwner, view, data, idResolver, mode))
+
+fun <T> Binder.materialRadioButtonGroupBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableStateFlow<T>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
+        = add(MaterialRadioButtonGroupBinding.create(owner, view, data.asMutableLiveData(owner), idResolver, mode))
+fun <T> Binder.materialRadioButtonGroupBinding(view:MaterialButtonToggleGroup, data:MutableStateFlow<T>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
+        = add(MaterialRadioButtonGroupBinding.create(requireOwner, view, data.asMutableLiveData(requireOwner), idResolver, mode))
+
+fun <T> Binder.materialToggleButtonGroupBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableLiveData<List<T>>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
+        = add(MaterialToggleButtonGroupBinding.create(owner,view,data,idResolver,mode))
+fun <T> Binder.materialToggleButtonGroupBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, data:MutableStateFlow<List<T>>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
+        = add(MaterialToggleButtonGroupBinding.create(owner,view,data.asMutableLiveData(owner),idResolver,mode))
+fun <T> Binder.materialToggleButtonGroupBinding(view:MaterialButtonToggleGroup, data:MutableLiveData<List<T>>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
+        = add(MaterialToggleButtonGroupBinding.create(requireOwner,view,data,idResolver,mode))
+fun <T> Binder.materialToggleButtonGroupBinding(view:MaterialButtonToggleGroup, data:MutableStateFlow<List<T>>, idResolver: IIDValueResolver<T>, mode:BindingMode = BindingMode.TwoWay):Binder
+        = add(MaterialToggleButtonGroupBinding.create(requireOwner,view,data.asMutableLiveData(requireOwner),idResolver,mode))
+
+
+fun Binder.materialToggleButtonsBinding(owner: LifecycleOwner, view:MaterialButtonToggleGroup, mode:BindingMode=BindingMode.TwoWay, fnBindViews:MaterialToggleButtonsBinding.Builder.()->Unit):Binder
+        = add(MaterialToggleButtonsBinding.create(owner, view, mode, fnBindViews))
+fun Binder.materialToggleButtonsBinding(view:MaterialButtonToggleGroup, mode:BindingMode=BindingMode.TwoWay, fnBindViews:MaterialToggleButtonsBinding.Builder.()->Unit):Binder
+        = add(MaterialToggleButtonsBinding.create(requireOwner, view, mode, fnBindViews))

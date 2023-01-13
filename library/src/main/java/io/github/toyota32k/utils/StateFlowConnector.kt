@@ -15,12 +15,13 @@ class StateFlowConnector<T>(source: Flow<T>, private val destination: MutableSta
     private var scope :CoroutineScope?
 
     init {
-        scope = CoroutineScope ((parentScope?.coroutineContext ?: Dispatchers.IO) + SupervisorJob())
+        val scope = CoroutineScope ((parentScope?.coroutineContext ?: Dispatchers.IO) + SupervisorJob())
         source.onEach {
             destination.value = it
         }.onCompletion {
             UtLog.libLogger.debug("disposed.")
-        }.launchIn(scope!!)
+        }.launchIn(scope)
+        this.scope = scope
     }
 
     override fun dispose() {
@@ -30,7 +31,7 @@ class StateFlowConnector<T>(source: Flow<T>, private val destination: MutableSta
     }
 
     companion object {
-        fun <T> StateFlow<T>.connectTo(destination:MutableStateFlow<T>, parentScope:CoroutineScope?=null):StateFlowConnector<T> =
+        fun <T> Flow<T>.connectTo(destination:MutableStateFlow<T>, parentScope:CoroutineScope?=null):StateFlowConnector<T> =
                 StateFlowConnector(this, destination, parentScope)
     }
 }

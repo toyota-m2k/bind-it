@@ -1,4 +1,4 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "PackageDirectoryMismatch")
 
 package io.github.toyota32k.bindit
 
@@ -15,9 +15,9 @@ import java.lang.ref.WeakReference
 
 /**
  * Button の onClickイベントにバインドできるコマンドクラス。
- * View引数が不要なら、LiteCommand がお勧め。
- * ただし、ボタンクリック以外に、サブスレッド（タスク）からinvoke され、ActivityやViewを操作するようなハンドラを呼び出す必要があるときは、
- * ReliableCommand を使うべき。
+ * コマンドハンドラに、タップされたビューが渡される。。。が、いままで、一度も、このビューを使ったことがない。
+ * 今後は、LiteUnitCommandや ReliableUnitCommand を使うように意識改革していきたい。
+ * ちなみに、この Command クラスのライフサイクル対応は、LiteUnitCommand 相当のため、サブスレッドから invoke()するような使い方は禁止。
  */
 class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDisposable {
     // 永続的ハンドラをbindするコンストラクタ
@@ -32,7 +32,7 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDispos
     }
 
     private val listeners = Listeners<View?>()
-    class ClickListenerDisposer(v:View, var bind:IDisposable?=null) : IDisposable {
+    class ClickListenerDisposer(v:View, private var bind:IDisposable?=null) : IDisposable {
         var view:WeakReference<View>? = WeakReference<View>(v)
 
         override fun dispose() {
@@ -95,10 +95,14 @@ class Command() : View.OnClickListener, TextView.OnEditorActionListener, IDispos
 //    }
 
     @MainThread
-    fun connectAndBind(owner: LifecycleOwner, view:View, fn:((View?)->Unit)):IDisposable {
+    fun attachAndBind(owner: LifecycleOwner, view:View, fn:((View?)->Unit)):IDisposable {
         connectView(view)
         return ClickListenerDisposer(view, bind(owner,fn))
     }
+
+    @MainThread
+    fun connectAndBind(owner: LifecycleOwner, view:View, fn:((View?)->Unit)):IDisposable
+        = attachAndBind(owner,view,fn)
 
     @MainThread
     fun reset() {

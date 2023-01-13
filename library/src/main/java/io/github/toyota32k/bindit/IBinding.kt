@@ -8,7 +8,6 @@ enum class BindingMode {
     TwoWay,
 }
 
-@Suppress("unused")
 enum class BoolConvert {
     Straight,   // true --> true
     Inverse,    // true --> false

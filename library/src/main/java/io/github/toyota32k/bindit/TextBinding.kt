@@ -48,13 +48,6 @@ open class TextBinding protected constructor(
     }
 }
 
-fun Binder.textBinding(owner:LifecycleOwner, view:TextView, data:LiveData<String>):Binder {
-    return add(TextBinding.create(owner,view,data))
-}
-fun Binder.textBinding(owner: LifecycleOwner, view: TextView, data: Flow<String>):Binder {
-    return add(TextBinding.create(owner,view,data))
-}
-
 open class EditTextBinding(
     data: MutableLiveData<String>,
     mode: BindingMode
@@ -109,9 +102,20 @@ open class EditTextBinding(
     }
 }
 
-fun Binder.editTextBinding(owner:LifecycleOwner, view:EditText, data:MutableLiveData<String>, mode:BindingMode=BindingMode.TwoWay):Binder {
-    return add(EditTextBinding.create(owner,view,data,mode))
-}
-fun Binder.editTextBinding(owner:LifecycleOwner, view:EditText, data:MutableStateFlow<String>, mode:BindingMode=BindingMode.TwoWay):Binder {
-    return add(EditTextBinding.create(owner,view,data,mode))
-}
+fun Binder.textBinding(owner:LifecycleOwner, view:TextView, data:LiveData<String>):Binder
+        = add(TextBinding.create(owner,view,data))
+fun Binder.textBinding(owner: LifecycleOwner, view: TextView, data: Flow<String>):Binder
+        = add(TextBinding.create(owner,view,data))
+fun Binder.textBinding(view:TextView, data:LiveData<String>):Binder
+        = add(TextBinding.create(requireOwner,view,data))
+fun Binder.textBinding(view: TextView, data: Flow<String>):Binder
+        = add(TextBinding.create(requireOwner,view,data))
+
+fun Binder.editTextBinding(owner:LifecycleOwner, view:EditText, data:MutableLiveData<String>, mode:BindingMode=BindingMode.TwoWay):Binder
+        = add(EditTextBinding.create(owner,view,data,mode))
+fun Binder.editTextBinding(owner:LifecycleOwner, view:EditText, data:MutableStateFlow<String>, mode:BindingMode=BindingMode.TwoWay):Binder
+        = add(EditTextBinding.create(owner,view,data,mode))
+fun Binder.editTextBinding(view:EditText, data:MutableLiveData<String>, mode:BindingMode=BindingMode.TwoWay):Binder
+        = add(EditTextBinding.create(requireOwner,view,data,mode))
+fun Binder.editTextBinding(view:EditText, data:MutableStateFlow<String>, mode:BindingMode=BindingMode.TwoWay):Binder
+        = add(EditTextBinding.create(requireOwner,view,data,mode))

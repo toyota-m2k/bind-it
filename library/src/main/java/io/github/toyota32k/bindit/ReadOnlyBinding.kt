@@ -40,9 +40,11 @@ class ReadOnlyBinding(
     }
 }
 
-fun Binder.readOnlyBinding(owner: LifecycleOwner, view: EditText, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight):Binder {
-    return add(ReadOnlyBinding.create(owner,view,data,boolConvert))
-}
-fun Binder.readOnlyBinding(owner: LifecycleOwner, view: EditText, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight):Binder {
-    return add(ReadOnlyBinding.create(owner,view,data.asLiveData(),boolConvert))
-}
+fun Binder.readOnlyBinding(owner: LifecycleOwner, view: EditText, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight):Binder
+        = add(ReadOnlyBinding.create(owner,view,data,boolConvert))
+fun Binder.readOnlyBinding(owner: LifecycleOwner, view: EditText, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight):Binder
+        = add(ReadOnlyBinding.create(owner,view,data.asLiveData(),boolConvert))
+fun Binder.readOnlyBinding(view: EditText, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight):Binder
+        = add(ReadOnlyBinding.create(requireOwner,view,data,boolConvert))
+fun Binder.readOnlyBinding(view: EditText, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight):Binder
+        = add(ReadOnlyBinding.create(requireOwner,view,data.asLiveData(),boolConvert))
