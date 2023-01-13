@@ -81,4 +81,33 @@ class ProgressBarBindingTest {
         assertEquals(0, view.min)
         assertEquals(100, view.max)
     }
+
+    @Test
+    fun binderTest() {
+        val activity = createActivity()
+        activity.setTheme(android.R.style.Theme)
+
+        val lmin = MutableLiveData<Int>(100)
+        val lmax = MutableLiveData<Int>(200)
+        val view = ProgressBar(activity, null, android.R.style.Widget_DeviceDefault_ProgressBar_Horizontal).apply { min = 0; max = 100; isIndeterminate=false }
+        val data = MutableLiveData<Int>(150)
+        view.progress=130
+
+        val binder = Binder().owner(activity)
+        binder.progressBarBinding(view, data, lmin, lmax)
+        assertEquals(data.value, view.progress)
+        assertEquals(150, view.progress)
+        assertEquals(100, view.min)
+        assertEquals(200, view.max)
+
+        lmin.value = 0
+        lmax.value = 100
+        assertEquals(150, data.value)
+        assertEquals(100, view.progress)
+        assertEquals(0, view.min)
+        assertEquals(100, view.max)
+
+        finish()
+    }
+
 }

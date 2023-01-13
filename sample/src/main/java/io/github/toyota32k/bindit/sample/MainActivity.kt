@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         Radio3(R.id.radio3, R.id.mtRadio3);
 
         class IDResolver: IIDValueResolver<RadioValue> {
-            override fun id2value(id:Int) : RadioValue? {
+            override fun id2value(id:Int) : RadioValue {
                 return valueOf(id)
             }
             override fun value2id(v: RadioValue): Int {
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         class MtIDResolver: IIDValueResolver<RadioValue> {
-            override fun id2value(id:Int) : RadioValue? {
+            override fun id2value(id:Int) : RadioValue {
                 return mtValueOf(id)
             }
             override fun value2id(v: RadioValue): Int {
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         Toggle3(R.id.toggle3);
 
         class IDResolver: IIDValueResolver<ToggleValue> {
-            override fun id2value(id:Int) : ToggleValue? {
+            override fun id2value(id:Int) : ToggleValue {
                 return valueOf(id)
             }
             override fun value2id(v: ToggleValue): Int {
@@ -71,37 +71,37 @@ class MainActivity : AppCompatActivity() {
 
         companion object {
             fun valueOf(resId: Int, def: ToggleValue = Toggle1): ToggleValue {
-                return ToggleValue.values().find { it.resId == resId } ?: def
+                return values().find { it.resId == resId } ?: def
             }
             val idResolver: IIDValueResolver<ToggleValue> by lazy { IDResolver() }
         }
     }
 
     class MainViewModel : ViewModel() {
-        val sliderValue = MutableLiveData<Float>(0f)
-        val sliderMin = MutableLiveData<Float>(0f)
-        val sliderMax = MutableLiveData<Float>(100f)
+        val sliderValue = MutableLiveData(0f)
+        val sliderMin = MutableLiveData(0f)
+        val sliderMax = MutableLiveData(100f)
 
-        val radioValue = MutableLiveData<RadioValue>(RadioValue.Radio1)
+        val radioValue = MutableLiveData(RadioValue.Radio1)
         val toggleValue = MutableLiveData<List<ToggleValue>>()
 
-        val tbState1 = MutableLiveData<Boolean>(false)
-        val tbState2 = MutableLiveData<Boolean>(true)
-        val tbState3 = MutableLiveData<Boolean>(false)
+        val tbState1 = MutableLiveData(false)
+        val tbState2 = MutableLiveData(true)
+        val tbState3 = MutableLiveData(false)
 
-        val multiVisible = MutableLiveData<Boolean>(true)
+        val multiVisible = MutableLiveData(true)
 
         val commandTextMessage = MutableLiveData<String>()
-        val commandTest = LiteUnitCommand { onCommandTest() }
+        val commandTest = LiteUnitCommand(::onCommandTest)
 
         val liteCommand = LiteCommand<Boolean> {
             logger.info("LiteCommand called.")
         }
-        val reliableCommand = ReliableCommand(false) {
+        val reliableCommand = ReliableCommand<Boolean> {
             logger.info("ReliableCommand called.")
         }
 
-        val textValue = MutableLiveData<String>("");
+        val textValue = MutableLiveData("")
 
         private fun onCommandTest() {
             commandTextMessage.value = "Testing..."
@@ -122,28 +122,27 @@ class MainActivity : AppCompatActivity() {
         companion object {
             fun instance(owner: FragmentActivity): MainViewModel {
                 logger.debug()
-                return ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory()).get(
-                    MainViewModel::class.java)
+                return ViewModelProvider(owner, ViewModelProvider.NewInstanceFactory())[MainViewModel::class.java]
             }
         }
     }
 
     inner class Binding(owner:LifecycleOwner, model: MainViewModel): Binder() {
-        val slider:Slider by lazy { findViewById(R.id.slider) }
-        val numberText:EditText by lazy { findViewById(R.id.numberText) }
-        val radioGroup: RadioGroup by lazy { findViewById(R.id.radioGroup)}
-        val radioValue: TextView by lazy { findViewById(R.id.radioValue)}
-        val toggleGroupAsRadio:MaterialButtonToggleGroup by lazy {findViewById(R.id.toggleGroupAsRadio)}
-        val toggleGroup:MaterialButtonToggleGroup by lazy {findViewById(R.id.toggleGroup)}
-        val toggleValue: TextView by lazy {findViewById(R.id.toggleValue)}
-        val toggleButtonGroup:MaterialButtonToggleGroup by lazy {findViewById(R.id.toggleButtons)}
-        val toggleButtonValue:TextView by lazy {findViewById(R.id.toggleButtonValue)}
-        val multiVisibleCheckBox: CheckBox by lazy { findViewById(R.id.multiVisibleCheckBox) }
-        val internalTestButton: Button by lazy { findViewById(R.id.internal_test_button) }
-        val commandTestButton:Button by lazy {findViewById(R.id.command_test)}
-        val commandTestText:TextView by lazy {findViewById(R.id.command_test_message)}
-        val textInput:EditText by lazy { findViewById(R.id.text_input) }
-        val textOutput:TextView by lazy { findViewById(R.id.text_output) }
+        private val slider:Slider by lazy { findViewById(R.id.slider) }
+        private val numberText:EditText by lazy { findViewById(R.id.numberText) }
+        private val radioGroup: RadioGroup by lazy { findViewById(R.id.radioGroup)}
+        private val radioValue: TextView by lazy { findViewById(R.id.radioValue)}
+        private val toggleGroupAsRadio:MaterialButtonToggleGroup by lazy {findViewById(R.id.toggleGroupAsRadio)}
+        private val toggleGroup:MaterialButtonToggleGroup by lazy {findViewById(R.id.toggleGroup)}
+        private val toggleValue: TextView by lazy {findViewById(R.id.toggleValue)}
+        private val toggleButtonGroup:MaterialButtonToggleGroup by lazy {findViewById(R.id.toggleButtons)}
+        private val toggleButtonValue:TextView by lazy {findViewById(R.id.toggleButtonValue)}
+        private val multiVisibleCheckBox: CheckBox by lazy { findViewById(R.id.multiVisibleCheckBox) }
+        private val internalTestButton: Button by lazy { findViewById(R.id.internal_test_button) }
+        private val commandTestButton:Button by lazy {findViewById(R.id.command_test)}
+        private val commandTestText:TextView by lazy {findViewById(R.id.command_test_message)}
+        private val textInput:EditText by lazy { findViewById(R.id.text_input) }
+        private val textOutput:TextView by lazy { findViewById(R.id.text_output) }
 
         init {
             logger.debug()
@@ -183,7 +182,7 @@ class MainActivity : AppCompatActivity() {
                     owner,
                     toggleValue,
                     model.toggleValue.map { list ->
-                        list.map { it.toString() }.joinToString(", ")
+                        list.joinToString(", ") { it.toString() }
                     }),
 
                 MaterialToggleButtonsBinding.create(
@@ -300,8 +299,8 @@ class MainActivity : AppCompatActivity() {
             val logger = UtLog("XXX", MainActivity.logger)
             if(AnimTestTarget.VALUE_ANIMATION_SIMPLE.enabled) {
                 logger.debug("Simple ValueAnimation")
-                async {
-                    var aniVal: Float = 0f
+                withContext(Dispatchers.Main) {
+                    var aniVal = 0f
                     val ani = ReversibleValueAnimation(1000).onUpdate {
                         aniVal = it * 100
                         logger.debug("value=${aniVal.toInt()}")
@@ -312,22 +311,22 @@ class MainActivity : AppCompatActivity() {
                     logger.debug("animation reverse")
                     r = ani.run(true)
                     logger.debug("animation reverse ... done:$r ($aniVal)")
-                }.await()
+                }
             }
 
             if(AnimTestTarget.VALUE_ANIMATION_CANCEL.enabled) {
                 logger.debug("ValueAnimation cancel and reverse")
-                async {
-                    var aniVal: Float = 0f
+                withContext(Dispatchers.Main) {
+                    var aniVal = 0f
                     var sc = 0
                     var ec = 0
                     val ani = ReversibleValueAnimation(1000).onUpdate {
                         aniVal = it * 100
                         logger.debug("xxx value=${aniVal.toInt()}")
-                    }.onStart {r,v->
+                    }.onStart { r, v ->
                         sc++
                         logger.debug("started($sc) from $v (reverse=$r)")
-                    }.onEnd {r,v ->
+                    }.onEnd { r, v ->
                         ec++
                         logger.debug("end($ec) at $v (reverse=$r)")
                     }
@@ -340,15 +339,15 @@ class MainActivity : AppCompatActivity() {
                     logger.debug("animation(2) reverse")
                     val r = ani.run(true)
                     logger.debug("animation reverse ... done:$r ($aniVal)")
-                }.await()
+                }
             }
 
             if(AnimTestTarget.SEQUENTIAL_SIMPLE.enabled) {
                 logger.debug("Sequential Animation")
-                async {
-                    var v1: Float = 0f
-                    var v2: Float = 0f
-                    var v3: Float = 0f
+                withContext(Dispatchers.Main) {
+                    var v1 = 0f
+                    var v2 = 0f
+                    var v3 = 0f
                     val ani = SequentialAnimation().add(
                         ReversibleValueAnimation(1000).onUpdate {
                             v1 = it * 100
@@ -369,15 +368,15 @@ class MainActivity : AppCompatActivity() {
                     logger.debug("SequentialAnimation:Reverse")
                     ani.run(true)
                     logger.debug("SequentialAnimation:Reverse ... end: v1=$v1, v2=$v2, v3=$v3")
-                }.await()
+                }
             }
 
             if(AnimTestTarget.SEQUENTIAL_CANCEL.enabled) {
                 logger.debug("Sequential Animation ... cancel and reverse")
-                async {
-                    var v1: Float = 0f
-                    var v2: Float = 0f
-                    var v3: Float = 0f
+                withContext(Dispatchers.Main) {
+                    var v1 = 0f
+                    var v2 = 0f
+                    var v3 = 0f
                     val ani = SequentialAnimation().add(
                         ReversibleValueAnimation(1000).onUpdate {
                             v1 = it * 100
@@ -401,17 +400,17 @@ class MainActivity : AppCompatActivity() {
                     logger.debug("SequentialAnimation:Reverse")
                     ani.run(true)
                     logger.debug("SequentialAnimation:Reverse ... end: v1=$v1, v2=$v2, v3=$v3")
-                }.await()
+                }
             }
 
 
 
             if(AnimTestTarget.PARALLEL_SIMPLE.enabled) {
                 logger.debug("Parallel Animation")
-                async {
-                    var v1: Float = 0f
-                    var v2: Float = 0f
-                    var v3: Float = 0f
+                withContext(Dispatchers.Main) {
+                    var v1 = 0f
+                    var v2 = 0f
+                    var v3 = 0f
                     val ani = ParallelAnimation().add(
                         ReversibleValueAnimation(1000).onUpdate {
                             v1 = it * 100
@@ -432,15 +431,15 @@ class MainActivity : AppCompatActivity() {
                     logger.debug("ParallelAnimation:Reverse")
                     ani.run(true)
                     logger.debug("ParallelAnimation:Reverse ... end: v1=$v1, v2=$v2, v3=$v3")
-                }.await()
+                }
             }
 
             if(AnimTestTarget.PARALLEL_CANCEL.enabled) {
                 logger.debug("Parallel Animation ... cancel and reverse")
-                async {
-                    var v1: Float = 0f
-                    var v2: Float = 0f
-                    var v3: Float = 0f
+                withContext(Dispatchers.Main) {
+                    var v1 = 0f
+                    var v2 = 0f
+                    var v3 = 0f
                     val ani = ParallelAnimation().add(
                         ReversibleValueAnimation(1000).onUpdate {
                             v1 = it * 100
@@ -464,7 +463,7 @@ class MainActivity : AppCompatActivity() {
                     logger.debug("ParallelAnimation:Reverse")
                     ani.run(true)
                     logger.debug("ParallelAnimation:Reverse ... end: v1=$v1, v2=$v2, v3=$v3")
-                }.await()
+                }
             }
        }
 

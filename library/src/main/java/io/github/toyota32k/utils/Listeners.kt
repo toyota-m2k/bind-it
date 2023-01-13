@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.utils
 
 import androidx.annotation.MainThread
@@ -9,7 +11,6 @@ interface ListenerKey<T>:IDisposable {
     fun invoke(arg:T)
 }
 
-@Suppress("unused")
 class Listeners<T> {
     interface IListener<T> {
         fun onChanged(value:T)

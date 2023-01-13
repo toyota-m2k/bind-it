@@ -142,4 +142,49 @@ class SliderBindingTest {
         assertEquals(60f, view.valueTo)
         assertEquals(40f, view.valueFrom)
     }
+    @Test
+    fun binderTest() {
+        val activity = createActivity();
+        val view = Slider(activity).apply { valueFrom=0f; valueTo=100f}
+        val data = MutableLiveData<Float>(50f)
+        val min = MutableLiveData<Float>(10f)
+        val max = MutableLiveData<Float>(90f)
+        view.value=60f
+
+        val binder = Binder().owner(activity)
+        binder.sliderBinding(view,data,BindingMode.TwoWay, min, max)
+        assertEquals(50f, view.value)
+        assertEquals(50f, data.value)
+        assertEquals(10f, view.valueFrom)
+        assertEquals(90f, view.valueTo)
+
+        view.value = 30f
+        assertEquals(30f, view.value)
+        assertEquals(data.value, view.value)
+
+        data.value= 20f
+        assertEquals(20f, data.value)
+        assertEquals(20f, view.value)
+
+        min.value = 40f
+        assertEquals(40f, data.value)
+        assertEquals(40f, view.value)
+        assertEquals(40f, view.valueFrom)
+
+        data.value = 0f
+        assertEquals(0f, data.value)
+        assertEquals(40f, view.value)
+        assertEquals(40f, view.valueFrom)
+
+        data.value = 80f
+        assertEquals(80f, data.value)
+        assertEquals(80f, view.value)
+        assertEquals(40f, view.valueFrom)
+
+        max.value = 60f
+        assertEquals(60f, data.value)
+        assertEquals(60f, view.value)
+        assertEquals(60f, view.valueTo)
+        assertEquals(40f, view.valueFrom)
+    }
 }

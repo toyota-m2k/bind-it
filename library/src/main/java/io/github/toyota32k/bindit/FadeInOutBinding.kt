@@ -100,7 +100,6 @@ abstract class FadeInOutBase (
     }
 }
 
-@Suppress("unused")
 class FadeInOutBinding(
     data: LiveData<Boolean>,
     boolConvert: BoolConvert = BoolConvert.Straight,

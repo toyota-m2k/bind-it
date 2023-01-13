@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.ListAdapter
 import androidx.annotation.LayoutRes
 import io.github.toyota32k.bindit.Binder
 import io.github.toyota32k.utils.IDisposable

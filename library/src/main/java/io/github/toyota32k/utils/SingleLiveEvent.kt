@@ -23,7 +23,6 @@ interface ISingleLiveEvent<T> {
  *  - observeForever()はサポートしない
  *
  */
-@Suppress("unused")
 class SingleLiveEvent<T:Any> : ISingleLiveEvent<T> {
     private val subject = SingleLiveData<T>()
 

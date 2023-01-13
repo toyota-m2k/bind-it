@@ -5,6 +5,8 @@ package io.github.toyota32k.bindit
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
+import kotlinx.coroutines.flow.Flow
 
 open class GenericBinding<V,T>(
     override val data: LiveData<T>,
@@ -25,6 +27,10 @@ open class GenericBinding<V,T>(
 }
 
 fun <V:View,T> Binder.genericBinding(owner: LifecycleOwner, view:V, data:LiveData<T>, action:(V,T?)->Unit):Binder
-    = add(GenericBinding.create(owner, view, data, action))
+        = add(GenericBinding.create(owner, view, data, action))
 fun <V:View,T> Binder.genericBinding(view:V, data:LiveData<T>, action:(V,T?)->Unit):Binder
         = add(GenericBinding.create(requireOwner, view, data, action))
+fun <V:View,T> Binder.genericBinding(owner: LifecycleOwner, view:V, data: Flow<T>, action:(V, T?)->Unit):Binder
+        = add(GenericBinding.create(owner, view, data.asLiveData(), action))
+fun <V:View,T> Binder.genericBinding(view:V, data:Flow<T>, action:(V,T?)->Unit):Binder
+        = add(GenericBinding.create(requireOwner, view, data.asLiveData(), action))

@@ -64,6 +64,7 @@ class RadioGroupBindingTest {
         view.check(TestEnum.E1.id)
         Assert.assertEquals(TestEnum.E1.id, view.checkedRadioButtonId)
         Assert.assertEquals(TestEnum.E2, data.value)
+        finish()
     }
     @Test
     fun oneWayToSourceCheckTest() {
@@ -83,6 +84,7 @@ class RadioGroupBindingTest {
         view.check(TestEnum.E0.id)
         Assert.assertEquals(TestEnum.E0.id, view.checkedRadioButtonId)
         Assert.assertEquals(TestEnum.E0, data.value)
+        finish()
     }
     @Test
     fun twoWayCheckTest() {
@@ -102,5 +104,29 @@ class RadioGroupBindingTest {
         view.check(TestEnum.E0.id)
         Assert.assertEquals(TestEnum.E0.id, view.checkedRadioButtonId)
         Assert.assertEquals(TestEnum.E0, data.value)
+        finish()
+    }
+
+    @Test
+    fun binderTest() {
+        val activity = createActivity()
+        val view = createRadioButton(activity)
+        val data = MutableLiveData<TestEnum>(TestEnum.E1)
+        view.check(TestEnum.E2.id)
+
+        val binder = Binder().owner(activity)
+        binder.radioGroupBinding(view, data, TestEnum.IDResolver)
+        Assert.assertEquals(TestEnum.E1.id, view.checkedRadioButtonId)
+        Assert.assertEquals(TestEnum.E1, data.value)
+
+        data.value = TestEnum.E1
+        Assert.assertEquals(TestEnum.E1.id, view.checkedRadioButtonId)
+        Assert.assertEquals(TestEnum.E1, data.value)
+
+        view.check(TestEnum.E0.id)
+        Assert.assertEquals(TestEnum.E0.id, view.checkedRadioButtonId)
+        Assert.assertEquals(TestEnum.E0, data.value)
+
+        finish()
     }
 }

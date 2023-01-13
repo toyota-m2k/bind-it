@@ -99,4 +99,25 @@ class TextBindingTest {
         assertEquals("xyz", data.value)
         assertEquals("xyz", view.text.toString())
     }
+
+    @Test
+    fun binderTest() {
+        val activity = createActivity()
+        val view = EditText(activity)
+        val data = MutableLiveData<String>("data")
+        view.setText("view")
+        val binder = Binder().owner(activity)
+        binder.editTextBinding(view, data)
+
+        assertEquals("data", data.value)
+        assertEquals("data", view.text.toString())
+
+        data.value = "abc"
+        assertEquals("abc", data.value)
+        assertEquals("abc", view.text.toString())
+
+        view.setText("xyz")
+        assertEquals("xyz", data.value)
+        assertEquals("xyz", view.text.toString())
+    }
 }

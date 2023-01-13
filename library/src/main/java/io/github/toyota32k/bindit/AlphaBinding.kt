@@ -5,7 +5,6 @@ package io.github.toyota32k.bindit
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import io.github.toyota32k.bindit.BindingMode
 
 class AlphaBinding(
     override val data:LiveData<Float>

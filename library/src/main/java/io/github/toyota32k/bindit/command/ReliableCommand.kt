@@ -1,19 +1,29 @@
-@file:Suppress("unused")
+@file:Suppress("PackageDirectoryMismatch")
 
-package io.github.toyota32k.bindit.command
+package io.github.toyota32k.bindit
 
 import androidx.lifecycle.LifecycleOwner
 import io.github.toyota32k.utils.*
 
 /**
  * LifecycleOwnerが死んでいる間にinvoke()されても、次に bind()した時点で、ちゃんとコールバックすることができるCommandクラス。
- * サブスレッドからコマンドを invoke()するとき、Activityが生きている保証がない場合に使用する。
- * ただし、bind()できるlifecycleOwnerとリスナーは１つに限定される。
- * bindForever()も実装してはいるが、Lifecycleを無視するなら、LiteCommandで十分のはず。
+ *
+ * LiteCommand, ReliableCommand ともに、コマンドハンドラにViewに対応した任意のパラメータを渡せるようにしているが、
+ * 通常、ボタン毎にコマンドインスタンスを割付ければ、これにパラメータを渡す必要は、ほぼ皆無。
+ * なので、普通は、LiteUnitCommand/ReliableUnitCommand を使えばよい。
+ *
+ * ちなみに、LiteUnitCommandは、ライフサイクルオーナー（通常はActivity）がdestroyされた状態でinvoke()すると、そのコマンドは捨てられ、
+ * その後、再作成されたライフサイクルオーナーで再バインドしても、ハンドラは実行されない。これに対して、ReliableCommandは、
+ * ライフサイクルオーナーが死んでいる間にinvokeされたコマンドは、新しいライフサイクルオーナーにバインドされたときに、ハンドラが実行される。
+ * したがって、ボタンクリックに対するハンドラとしては、LiteCommandで十分だが、ボタンクリック後、サブスレッドでごにょごにょしたあと、
+ * コマンドを実行する、というような場合、つまり、サブスレッドでの処理が終わった時、デバイス回転などの操作により、Activityがdestroyされている可能性がある場合には、
+ * ReliableCommandを使用する。ただし、ReliableCommandには、コマンドハンドラを１つしかバインドできない点に注意（複数回バインドすると例外が発生）。
+ * 尚、ICommand#bindForever()は、ライフサイクルを無視してハンドラを指定でき、ライフサイクルオーナーの生死にかかわらず、invoke()すると、必ず、ハンドラが呼びだされる。
+ * つまり、bindForever を利用する限り、LiteCommand と ReliableCommand の挙動に違いはないので、その場合は、より軽量なReliableCommand で十分のはず。
  */
 class ReliableCommand<T:Any>() : CommandBase<T>() {
-    constructor(callback:(T)->Unit):this() {
-        bindForever(callback)
+    constructor(fn:(T)->Unit):this() {
+        bindForever(fn)
     }
     private val subject = SingleLiveData<T>()
     private var disposable:IDisposable? = null
@@ -24,7 +34,6 @@ class ReliableCommand<T:Any>() : CommandBase<T>() {
     }
 
     override fun bindForever(fn: (T) -> Unit): IDisposable {
-        utTenderAssert(false) { "use LiteCommand instead." }
         disposable?.dispose()
         return subject.disposableObserveForever(fn).apply { disposable = this }
     }
@@ -48,5 +57,5 @@ class ReliableCommand<T:Any>() : CommandBase<T>() {
  */
 class ReliableUnitCommand private constructor(rc: ReliableCommand<Unit>): UnitCommand(rc) {
     constructor():this(ReliableCommand<Unit>())
-    constructor(callback:(Unit)->Unit):this(ReliableCommand(callback))
+    constructor(fn:()->Unit):this(ReliableCommand{ fn() })
 }

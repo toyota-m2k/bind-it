@@ -1,11 +1,9 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.utils
 
 import android.util.Log
-import java.io.PrintWriter
-import java.io.StringWriter
-import java.lang.Exception
 
-@Suppress("unused")
 interface IUtExternalLogger {
     fun debug(msg:String)
     fun warn(msg:String)
@@ -75,7 +73,7 @@ class UtLoggerInstance(private val tag:String) : IUtVaLogger {
 
     private val isAndroid: Boolean by lazy {
         val runtime = System.getProperty("java.runtime.name")
-        0 <= runtime?.indexOf("Android") ?: -1
+        0 <= (runtime?.indexOf("Android") ?: -1)
     }
 
     private fun target(level: Int): (String, String) -> Int {
@@ -109,7 +107,7 @@ class UtLoggerInstance(private val tag:String) : IUtVaLogger {
     @Suppress("MemberVisibilityCanBePrivate")
     override fun print(level: Int, s: String, vararg args: Any?) {
         var ss = s
-        if (args.count() > 0) {
+        if (args.isNotEmpty()) {
             ss = String.format(s, *args)
         }
         if(!logExternal(level, ss)) {

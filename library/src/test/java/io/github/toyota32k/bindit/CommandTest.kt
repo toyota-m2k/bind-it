@@ -2,8 +2,7 @@ package io.github.toyota32k.bindit
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import io.github.toyota32k.bindit.command.ReliableCommand
-import junit.framework.Assert.assertEquals
+import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -130,4 +129,111 @@ class CommandTest {
         finish()
     }
 
+    @Test
+    fun unitCommandTest() {
+        var activity = createActivity()
+        var liteValue:Int = 0
+        var reliableValue:Int = 0
+        val reliableCommand = ReliableUnitCommand()
+        val liteCommand = LiteUnitCommand()
+
+        reliableCommand.bind(activity) {
+            reliableValue++
+        }
+        liteCommand.bind(activity) {
+            liteValue++
+        }
+
+        assertEquals(0,liteValue)
+        assertEquals(0, reliableValue)
+
+        reliableCommand.invoke()
+        liteCommand.invoke()
+
+        assertEquals(1, liteValue)
+        assertEquals(1, reliableValue)
+
+        finish()
+
+        assertEquals(1, liteValue)
+        assertEquals(1, reliableValue)
+
+        reliableCommand.invoke()
+        liteCommand.invoke()
+
+        assertEquals(1, liteValue)
+        assertEquals(1, reliableValue)
+
+        activity = createActivity()
+        reliableCommand.bind(activity) {
+            reliableValue++
+        }
+        liteCommand.bind(activity) {
+            liteValue++
+        }
+        assertEquals(1, liteValue)
+        assertEquals(2, reliableValue)
+
+        finish()
+    }
+
+    @Test
+    fun foreverBindTest() {
+        var activity = createActivity()
+        var liteValue:Int = 0
+        var foreverLiteValue:Int = 0
+        var foreverReliableValue:Int = 0
+        val reliableCommand = ReliableUnitCommand() {
+            foreverReliableValue++
+        }
+        val liteCommand = LiteUnitCommand() {
+            foreverLiteValue++
+        }
+        liteCommand.bind(activity) {
+            liteValue++
+        }
+
+        assertEquals(0,liteValue)
+        assertEquals(0, foreverReliableValue)
+        assertEquals(0, foreverLiteValue)
+
+        reliableCommand.invoke()
+        liteCommand.invoke()
+
+        assertEquals(1, liteValue)
+        assertEquals(1, foreverReliableValue)
+        assertEquals(1, foreverLiteValue)
+
+        finish()
+
+        assertEquals(1, liteValue)
+        assertEquals(1, foreverReliableValue)
+        assertEquals(1, foreverLiteValue)
+
+        reliableCommand.invoke()
+        liteCommand.invoke()
+
+        assertEquals(1, liteValue)
+        assertEquals(2, foreverReliableValue)
+        assertEquals(2, foreverLiteValue)
+
+        activity = createActivity()
+        liteCommand.bind(activity) {
+            liteValue++
+        }
+        assertEquals(1, liteValue)
+        assertEquals(2, foreverReliableValue)
+        assertEquals(2, foreverLiteValue)
+
+        liteCommand.reset()
+        reliableCommand.reset()
+
+        reliableCommand.invoke()
+        liteCommand.invoke()
+        assertEquals(1, liteValue)
+        assertEquals(2, foreverReliableValue)
+        assertEquals(2, foreverLiteValue)
+
+        finish()
+    }
 }

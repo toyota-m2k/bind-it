@@ -1,4 +1,4 @@
-@file:Suppress("unused")
+@file:Suppress("unused", "PackageDirectoryMismatch")
 
 package io.github.toyota32k.utils
 
@@ -30,13 +30,14 @@ interface ICommand<T>: IDisposable {
     @MainThread
     fun reset()
 
+    @MainThread
     fun invoke(value:T)
 }
 
 /**
  * attachViewに関する共通実装
  */
-abstract class CommandBase<T>() : ICommand<T> {
+abstract class CommandBase<T> : ICommand<T> {
     class ClickListenerDisposer(v:View, var bind:IDisposable?=null) : IDisposable {
         var view: WeakReference<View>? = WeakReference<View>(v)
 
@@ -87,8 +88,13 @@ abstract class CommandBase<T>() : ICommand<T> {
  * ICommand<Unit> そのものなのだが、invoke(Unit) などと書かないといけないのは、かっちょ悪すぎるので。
  */
 interface IUnitCommand : ICommand<Unit> {
+    @MainThread
     fun invoke()
+
+    @MainThread
     fun attachAndBind(owner: LifecycleOwner, view: View, fn: () -> Unit): IDisposable
+
+    @MainThread
     fun attachView(view: View):IDisposable
 }
 
