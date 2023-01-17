@@ -11,6 +11,7 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ActivityController
+import org.w3c.dom.Text
 
 @RunWith(RobolectricTestRunner::class)
 class CommandTest {

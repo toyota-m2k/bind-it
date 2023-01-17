@@ -32,7 +32,7 @@ This activity has 2 controls, text input (EditText) and submit button (Button).
 Initially the submit button is disabled because the EditText is empty.
 When some characters are input to the EditText, the submit button is enabled.
 
-### Old-Style (for Ver. 1.x.x)
+### Old Style (Ver. 1.x ～)
 
 `MainViewModel.kt`
 ```kotlin
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity {
   }
 }
 ```
-### New-Style (for Ver. 2.x.x)
+### New Style (Ver. 2.x～)
 `MainViewModel.kt`
 ```kotlin
 class MainViewModel : ViewModel() {
@@ -103,10 +103,11 @@ class MainActivity : AppCompatActivity {
     setContentView(R.layout.activity_main)
 
     binder
+      // set this activity as lifecycle owner to the binder.      
       .owner(this)
-      // bind viewModel.text to EditText.text property in TwoWay mode. 
+      // bind viewModel.text to EditText#text property in TwoWay mode. 
       .editTextBinding(viewModel.text, findViewById<EditText>(R.id.text), BindingMode.TwoWay)
-      // bind viewModel.isReady to Button.isEnabled property in OneWay mode.
+      // bind viewModel.isReady to Button#isEnabled property in OneWay mode.
       .enableBinding(viewModel.isReady, findViewById<Button>(R.id.submit))
       // bind viewModel.submit command to Submit button.
       .bindCommand(viewModel.submit, findViewById<Button>(R.id.submit))
@@ -114,8 +115,8 @@ class MainActivity : AppCompatActivity {
 
   override fun onDestroy() {
     super.onDestroy()
-    // Neither binder.reset() nor binder.dispose() is not required.
-    // Binding objects (=disposables) are automatically disposed with lifecycle of the LifecycleOwner.
+    // `binder.reset()` is no more required.
+    // Binding objects (=disposables) are automatically disposed when the LifecycleOwner is destructed.
     // binder.reset()
   }
 }
@@ -138,19 +139,11 @@ class MainActivity : AppCompatActivity {
 
 ## Binding Classes
 
-Binding class named `*Binding` binds a LiveData as data source with a property of view,
-and these binding are automatically revoked when the lifecycle owner is destroyed.
-Every binding classes have `create()` APIs to create and initialize them.
-In 2.x version, extend functions of the Binder class to create the binding classes are available. 
-For example Binding#checkBinding() creates a CheckBinding instance, Binding#visibilityBinding() creates a CheckBinding instance and so on.
-
-### Using Kotlin Flow
-
-Though our library designed to use with `LiveData`/`MutableLiveData` originally,
-we recently prefer to use `Kotlin Flow` (especially StateFlow/MutableStateFlow) rather than LiveData.
-`StateFlow` can be convert into LiveData with `Flow.asLiveData()` extension function and can be used in `OneWay` bindings.
-And we provide `MutableStateFlow.asMutableLiveData()` extension function to convert `MutableStateFlow` to MutableLiveData for `TwoWay` bindings.
-These converters enable you to use Kotlin Flow with our library.
+Binding class named `*Binding` binds a `LiveData` as data source with a property of view.
+And these bindings are automatically revoked when the lifecycle owner is destroyed.
+Every binding classes have `create()` helper APIs to create and initialize them.
+Furthermore, extend functions of the Binder class to create the binding classes are available in ver.2.x. 
+For example, `Binding#visibilityBinding()` creates a VisibilityBinding instance and manage its disposition with lifecycle.
 
 ### Boolean Binding Classes
 
@@ -164,8 +157,8 @@ These converters enable you to use Kotlin Flow with our library.
 |FadeInOutBinding|Boolean|View|visibility with fade in/out effect|OneWay|
 |AnimationBinding|Boolean|View|animation effect|OneWay|
 
-Boolean Binding classes (inherited from `BoolBinding` abstract class) accept a BoolConvert argument. If BoolConvert.Inverse is set, inverted boolean value of source will be set to (and/or get from) the view.
-`VisibilityBinding` accepts a HiddenMode argument in its construction. HiddenMode.HideByGone uses View.GONE, and HiddenMode.HideByInvisible uses View.INVISIBLE to hide the view.
+Boolean Binding classes (inherited from `BoolBinding` abstract class) accept a `BoolConvert` argument. If `BoolConvert.Inverse` is set, inverted boolean value of source will be set to (and/or get from) the view.
+`VisibilityBinding` accepts a `HiddenMode` argument in its construction. `HiddenMode.HideByGone` uses `View.GONE`, and `HiddenMode.HideByInvisible` uses `View.INVISIBLE` to hide the view.
 `MultiEnableBinding` and `MultiVisibilityBinding` bind a boolean source to the property of one or more views in same options. 
 
 ### Text Binding Classes
@@ -219,6 +212,36 @@ And optionally, they can bind min/max parameters to the range property of the vi
 `IIDValueResolver` supplies bi-directional conversion between the value (for example enum class) and @ResId of the button.
 On the other hand `MaterialToggleButtonsBinding` binds sources (MutableLiveData) and Buttons one by one.  
 
+### Command
+
+`Command` class provides a mechanism of event listener which can bind to `View.OnClickListener` and/or `TextView.OnEditorActionListener` in IDisposable manner.
+It is possible to prepare a `Command` instance with a handler by it's constructor or `bind()` method, and associate view to it by `attachView()` method separately.
+The `bind()` and `attachView()` methods return a `IDisposable` instances and you can `dispose()` them to revoke corresponding listeners
+though they will be revoked automatically when it's lifecycleOwner is destroyed.
+
+New command classes `LiteCommand` and `ReliableCommand` come with ver.2.x.
+`LiteCommand` is similar to `Command`, but it can handle any type of parameter in callback.
+And in most cases, no parameter will be required in callback so you can use `LiteUnitCommand`.
+
+```kotlin
+// callback of Command always takes view argument.
+val command = Command { view:View-> }.attachView(view)
+// callback of LiteCommand takes any type of argument by generics.
+val liteCommand = LiteCommand<Int> {id:Int-> }.attachView(view,view.id)
+// callback of LiteUnitCommand takes no argument.
+val liteUnitCommand = LiteUnitCommand {}.attachView(view)
+```
+
+In some special case, Command and LiteCommand will not work as intended.
+For example, a long term network operation in background thread and
+when the operation is over, it will invoke a `LiteCommand`, unfortunately the lifecycle might be destroyed at the time and
+the invocation to `LiteCommand` would not work at all.
+
+In these cases, `ReliableCommand` will work as you had expected.
+The invocation to `ReliableCommand` in the dead time of lifecycle will be pending until the new listener is bound with a new lifecycle owner.
+As a limitation of `ReliableCommand`, only single listener can be bound to a `ReliableCommand`.
+
+
 ### ObservableList and RecyclerViewBinding
 
 |Binding Class|Source Type|View Type|Target Property|Mode|
@@ -226,17 +249,20 @@ On the other hand `MaterialToggleButtonsBinding` binds sources (MutableLiveData)
 |RecycleViewBinding|ObservableList|RecycleView|RecyclerViewAdapter|OneWay|
 
 `ObservableList` is inspired from ObservableCollection in .NET/XAML.
-RecyclerViewBinding class binds a ObservableList as source to RecycleView.
-The contents of RecycleView will be automatically updated whenever the elements of ObservableList is modified. 
-RecyclerViewBinding.create() method prepares a `Simple` RecyclerView.Adapter instance internally, which manage every chores about RecyclerView, 
+`RecyclerViewBinding` class binds a `ObservableList` to a `RecycleView`.
+The contents of `RecycleView` will be automatically updated whenever the elements of ObservableList is modified. 
+`RecyclerViewBinding` prepares a `Simple` RecyclerView.Adapter instance internally, which manage every chores about RecyclerView, 
 and all you have to do is to implement `bindView` as lambda that initialize a item view.   
 
 ```kotlin
 class VideoActivity : AppCompatActivity {
-  data class VideoItem(val title:String, val source:Uri)
-  class VideoViewModel : ViewModel() {
+  data class VideoItem(val title:String, val source: Uri)
+  class VideoViewModel {
     val videoSources = ObservableList<VideoItem>()
     val currentSource = MutableStateFlow<VideoItem?>(null)
+    fun selectItem(item:VideoItem) {
+      currentSource.value = item
+    }
   }
   
   val viewModel by lazy { ViewModelProvider(this,ViewModelProvider.NewInstanceFactory())[VideoViewModel::class.java] }
@@ -244,21 +270,19 @@ class VideoActivity : AppCompatActivity {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     val videoListView = findViewById<RecyclerView>(R.id.video_list_view)    // RecyclerView instance
-    binder.register(
+    binder.owner(this)
       // create a RecycleViewBinding on videoListView, of which item view will be inflated from R.layout.list_item_view.
-      RecycleViewBinding.create(this, videoListView, viewModel.videoSources, R.layout.list_item_view) { itemBinder, view, videoItem ->
-        // bindView lambda implements here! 
-        // show video title on item view.
-        view.findViewById<TextView>(R.id.video_item_text).text = videoItem.title
-        // itemBinder is prepared by RecycleViewBinding for binding contents in a item view, and it will be disposed when item view is recycled.
-        itemBinder.register(
-          // item selection on tapping item view
-          Command().connectAndBind(owner, textView) { viewModel.currentSource.value = videoItem },
-          // check mark at the current playing item
-          CheckBinding.create(owner, view.findViewById<CheckBox>(R.id.check_box), viewModel.currentSource.map { it?.id == videoItem.id }.asLiveData()),
-        )
-      },
-    )
+      .recyclerViewBinding(videoListView, viewModel.videoSources, R.layout.list_item_view) { itemBinder, view, videoItem ->
+        // bindView lambda!!
+        // itemBinder is Binder instance prepared by RecyclerViewBinding for each list item view.
+        itemBinder.owner(activity)
+          // show video title on item view.  
+          .textBinding(view.findViewById(R.id.video_item_text), ConstantLiveData(videoItem.title))
+          // item selection on tapping item view --> call viewModel.selectItem with a videoItem argument.
+          .bindCommand(LiteCommand<VideoItem>(), view, videoItem, viewModel::selectItem)
+          // let's show check mark at the current playing item
+          .checkBinding(view.findViewById<CheckBox>(R.id.check_box), viewModel.currentSource.map { it?.source == videoItem.source })
+      }
 
     // play the selected item    
     viewModel.currentSource.onEach {
@@ -268,34 +292,35 @@ class VideoActivity : AppCompatActivity {
 }
 ```
 
-### Command
+## Using Kotlin Flow
 
-`Command` class provides a mechanism of event listener which can bind to `View.OnClickListener' and/or `TextView.OnEditorActionListener` in IDisposable manner.
-It is possible to prepare a Command instance with a handler by it's constructor or `bind()` method, and associate view to it by `connectViewEx()` method separately.   
-The bind() and connectViewEx() methods return a `IDisposable` instances and you can `dispose()` them to revoke corresponding listeners 
-though they will be revoked automatically when lifecycle over is destroyed. 
+Though our library designed to use with `LiveData`/`MutableLiveData` originally,
+we recently prefer to use `Kotlin Flow` (especially StateFlow/MutableStateFlow) rather than LiveData.
+`StateFlow` can be convert into LiveData with `Flow.asLiveData()` extension function and can be used in `OneWay` bindings.
+And we provide `MutableStateFlow.asMutableLiveData()` extension function to convert `MutableStateFlow` to MutableLiveData for `TwoWay` bindings.
+These converters enable you to use Kotlin Flow with our library.
+
+## Binder
+
+In ver.1.x, `Binder` is a simple collection of IDisposable, and dispose all of registered IDisposables with reset() or dispose() methods.
+The `Binder` comes from ver.2 is aware of the lifecycle. `Binder#owner()` method associate a `LifecycleOwner` to the Binder and it will be reset() automatically when the lifecycle owner is destructed.
+Furthermore various extended functions of `Binder` are available, and which offer a simple way to use binding classes.
 
 ## Utilities
 
-- Binder
-
-  This is a simple collection of IDisposable, and dispose all of registered IDisposables with reset() or dispose() methods.
-
-- Callback
+- `Callback`
 
   Registering a single callback which will be revoked when the lifecycle owner is destroyed or dispose() method is invoked explicitly.
 
-- Listeners
+- `Listeners`
 
   Registering multiple callbacks which will be revoked when the lifecycle owner is destroyed or dispose() method is invoked explicitly.
 
-- UtLog
+- `UtLog`
 
   This is an internal logging system to write logs with class and method name.
   You can instantiate UtLog to use this logging system.
   Though it writes logs to LogCat by default, if you want to use other logging system, implement IUtVaLogger interface and put it to the UtLoggerInstance.externalLogger property.
-  
-- 
 
 
 

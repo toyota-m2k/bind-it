@@ -101,6 +101,11 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
     }
 
     @JvmOverloads
+    fun error(e:Throwable, msg:String?=null) {
+        logger.stackTrace(e, compose(msg))
+    }
+
+    @JvmOverloads
     fun info(msg: String?=null) {
         logger.info(compose(msg))
     }
@@ -120,6 +125,17 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
     @JvmOverloads
     fun stackTrace(e:Throwable, msg:String?=null) {
         logger.stackTrace(e, compose(msg))
+    }
+
+    @JvmOverloads
+    fun print(level:Int, msg:String?=null) {
+        when(level) {
+            Log.ERROR -> ::error
+            Log.WARN -> ::warn
+            Log.INFO -> ::info
+            Log.DEBUG -> ::debug
+            else->::verbose
+        }(compose(msg))
     }
 
     @JvmOverloads

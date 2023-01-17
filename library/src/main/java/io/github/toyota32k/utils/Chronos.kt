@@ -1,11 +1,12 @@
 package io.github.toyota32k.utils
 
+import android.util.Log
+
 /**
  * 時間計測用ログ出力クラス
  */
-@Suppress("unused")
-class Chronos(callerLogger:UtLog) {
-    var logger = UtLog("TIME", callerLogger, callerLogger.omissionNamespace).apply { stackOffset = 5 }
+class Chronos @JvmOverloads constructor(callerLogger:UtLog, tag:String="TIME", val logLevel:Int= Log.DEBUG) {
+    var logger = UtLog(tag, callerLogger, callerLogger.omissionNamespace).apply { stackOffset = 5 }
     var prev: Long
     var start: Long
 
@@ -23,16 +24,18 @@ class Chronos(callerLogger:UtLog) {
         }
     private val totalTime: Long get() = System.currentTimeMillis() - start
 
+    @JvmOverloads
     fun total(msg: String = "") {
-        logger.debug("total = ${formatMS(totalTime)} $msg")
+        logger.print(logLevel, "total = ${formatMS(totalTime)} $msg")
     }
 
     fun resetLap() {
         prev = System.currentTimeMillis()
     }
 
+    @JvmOverloads
     fun lap(msg: String = "") {
-        logger.debug("lap = ${formatMS(lapTime)} $msg")
+        logger.print(logLevel,"lap = ${formatMS(lapTime)} $msg")
     }
 
     fun formatMS(t: Long): String {
@@ -41,11 +44,11 @@ class Chronos(callerLogger:UtLog) {
 
     inline fun <T> measure(msg: String? = null, fn: () -> T): T {
         val begin = System.currentTimeMillis()
-        logger.debug("enter ${msg ?: ""}")
+        logger.print(logLevel,"enter ${msg ?: ""}")
         return try {
             fn()
         } finally {
-            logger.debug("exit ${formatMS(System.currentTimeMillis() - begin)} ${msg ?: ""}")
+            logger.print(logLevel, "exit ${formatMS(System.currentTimeMillis() - begin)} ${msg ?: ""}")
         }
     }
 

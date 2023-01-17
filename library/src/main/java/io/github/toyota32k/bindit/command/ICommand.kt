@@ -134,13 +134,19 @@ fun <T> Binder.bindCommand(owner: LifecycleOwner, cmd:ICommand<T>, vararg views:
 
 fun <T> Binder.bindCommand(cmd:ICommand<T>, vararg views:Pair<View,T>, callback:(T)->Unit): Binder
     = bindCommand(requireOwner, cmd, views=views, callback)
-
+fun <T> Binder.bindCommand(cmd:ICommand<T>, view:View, param:T, callback:(T)->Unit): Binder
+        = bindCommand(cmd, Pair(view,param),callback=callback)
 fun <T> Binder.bindCommand(cmd:ICommand<T>, vararg views:Pair<View,T>): Binder {
     views.forEach {  pair->
         add(cmd.attachView(pair.first, pair.second))
     }
     return this
 }
+fun <T> Binder.bindCommand(cmd:ICommand<T>, view:View, param:T): Binder
+    = bindCommand(cmd, Pair(view,param))
+
+
+
 
 fun Binder.bindCommand(cmd:IUnitCommand, vararg views:View): Binder {
     views.forEach { view->
