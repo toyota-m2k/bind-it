@@ -27,10 +27,12 @@ dependencies {
 ```
 ## Sample
 
-Sample codes below show you how to bind view model to views.
+Sample codes below show you how to bind a view model to views.
 This activity has 2 controls, text input (EditText) and submit button (Button).
 Initially the submit button is disabled because the EditText is empty.
 When some characters are input to the EditText, the submit button is enabled.
+
+### Old-Style (for Ver. 1.x.x)
 
 `MainViewModel.kt`
 ```kotlin
@@ -44,7 +46,6 @@ class MainViewModel : ViewModel() {
     }
 } 
 ```
-
 `MainActivity.kt`
 ```kotlin
 class MainActivity : AppCompatActivity {
@@ -59,22 +60,68 @@ class MainActivity : AppCompatActivity {
 
     binder.register(
       // bind viewModel.text to EditText.text property in TwoWay mode. 
-      EditTextBinding.create(viewModel.text, findViewById<EditText>(R.id.text), BindingMode.TwoWay),
+      EditTextBinding.create(this, viewModel.text, findViewById<EditText>(R.id.text), BindingMode.TwoWay),
       // bind viewModel.isReady to Button.isEnabled property in OneWay mode.
-      EnableBinding.create(viewModel.isReady, findViewById<Button>(R.id.submit)),
+      EnableBinding.create(this, viewModel.isReady, findViewById<Button>(R.id.submit)),
       // bind viewModel.submit command to Submit button.
-      viewModel.submit.bindViewEx(findViewById<Button>(R.id.submit))
+      viewModel.submit.attachView(findViewById<Button>(R.id.submit))
     )
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    // This 'reset()' may not be necessary.
-    // Observer of lifecycle will automatically dispose bindings.
+    // This 'reset()' may not be necessary because
+    // observer of lifecycle will automatically dispose bindings.
+    // But it should be called for cleanup of disposables.
     binder.reset()
   }
 }
 ```
+### New-Style (for Ver. 2.x.x)
+`MainViewModel.kt`
+```kotlin
+class MainViewModel : ViewModel() {
+    val text = MutableLiveData<String>("")
+    val isReady = text.map { !it.isNullOrEmpty() }
+    val submit = LiteUnitCommand(this::submit)
+  
+    private fun submit() {
+        // submit text to server, and so on...
+    }
+} 
+```
+
+```kotlin
+class MainActivity : AppCompatActivity {
+  val viewModel by lazy {
+    ViewModelProvider(this,ViewModelProvider.NewInstanceFactory())[MainViewModel::class.java]
+  }
+  val binder = Binder()
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+
+    binder
+      .owner(this)
+      // bind viewModel.text to EditText.text property in TwoWay mode. 
+      .editTextBinding(viewModel.text, findViewById<EditText>(R.id.text), BindingMode.TwoWay)
+      // bind viewModel.isReady to Button.isEnabled property in OneWay mode.
+      .enableBinding(viewModel.isReady, findViewById<Button>(R.id.submit))
+      // bind viewModel.submit command to Submit button.
+      .bindCommand(viewModel.submit, findViewById<Button>(R.id.submit))
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    // Neither binder.reset() nor binder.dispose() is not required.
+    // Binding objects (=disposables) are automatically disposed with lifecycle of the LifecycleOwner.
+    // binder.reset()
+  }
+}
+```
+
+
 ## Binding Mode
 
 - OneWay
@@ -93,7 +140,9 @@ class MainActivity : AppCompatActivity {
 
 Binding class named `*Binding` binds a LiveData as data source with a property of view,
 and these binding are automatically revoked when the lifecycle owner is destroyed.
-Every binding classes have `create()` APIs to create and initialize them and we recommend you to use them instead of using their constructor.
+Every binding classes have `create()` APIs to create and initialize them.
+In 2.x version, extend functions of the Binder class to create the binding classes are available. 
+For example Binding#checkBinding() creates a CheckBinding instance, Binding#visibilityBinding() creates a CheckBinding instance and so on.
 
 ### Using Kotlin Flow
 

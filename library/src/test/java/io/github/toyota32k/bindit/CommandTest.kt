@@ -1,7 +1,9 @@
 package io.github.toyota32k.bindit
 
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import io.github.toyota32k.utils.bindCommand
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -235,5 +237,61 @@ class CommandTest {
         assertEquals(2, foreverLiteValue)
 
         finish()
+    }
+
+    @Test
+    fun binderTest() {
+        var activity = createActivity()
+        var liteValue:Int = 0
+        var reliableValue:Int = 0
+        val reliableCommand = ReliableUnitCommand()
+        val liteCommand = LiteUnitCommand()
+        val binder = Binder()
+        binder
+            .owner(activity)
+            .bindCommand(liteCommand) {
+                liteValue++
+            }
+            .bindCommand(reliableCommand) {
+                reliableValue++
+            }
+
+        assertEquals(2, binder.count)
+        assertEquals(0,liteValue)
+        assertEquals(0, reliableValue)
+
+        reliableCommand.invoke()
+        liteCommand.invoke()
+
+        assertEquals(1, liteValue)
+        assertEquals(1, reliableValue)
+
+        finish()
+        assertEquals(0, binder.count)
+
+        assertEquals(1, liteValue)
+        assertEquals(1, reliableValue)
+
+        reliableCommand.invoke()
+        liteCommand.invoke()
+
+        assertEquals(1, liteValue)
+        assertEquals(1, reliableValue)
+
+        activity = createActivity()
+        binder
+            .owner(activity)
+            .bindCommand(liteCommand) {
+                liteValue++
+            }
+            .bindCommand(reliableCommand) {
+                reliableValue++
+            }
+
+        assertEquals(1, liteValue)
+        assertEquals(2, reliableValue)
+
+        finish()
+
     }
 }

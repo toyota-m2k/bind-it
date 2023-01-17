@@ -87,7 +87,7 @@ abstract class CommandBase<T> : ICommand<T> {
  * コールバックに引数を取らないコマンドクラスのi/f
  * ICommand<Unit> そのものなのだが、invoke(Unit) などと書かないといけないのは、かっちょ悪すぎるので。
  */
-interface IUnitCommand : ICommand<Unit> {
+interface IUnitCommand {
     @MainThread
     fun invoke()
 
@@ -96,15 +96,32 @@ interface IUnitCommand : ICommand<Unit> {
 
     @MainThread
     fun attachView(view: View):IDisposable
+
+    @MainThread
+    fun bind(owner: LifecycleOwner, fn: () -> Unit): IDisposable
+
+    @MainThread
+    fun bindForever(fn:()->Unit): IDisposable
+
+    @MainThread
+    fun reset()
 }
 
-open class UnitCommand(command:ICommand<Unit>) : IUnitCommand, ICommand<Unit> by command {
+open class UnitCommand(private val command:ICommand<Unit>) : IUnitCommand {
     override fun invoke()
-        = invoke(Unit)
+        = command.invoke(Unit)
     override fun attachAndBind(owner: LifecycleOwner, view: View, fn: () -> Unit): IDisposable
-        = attachAndBind(owner,view,Unit) { fn() }
+        = command.attachAndBind(owner,view,Unit) { fn() }
     override fun attachView(view: View):IDisposable
-        = attachView(view,Unit)
+        = command.attachView(view,Unit)
+    override fun bind(owner: LifecycleOwner, fn: () -> Unit): IDisposable
+        = command.bind(owner) { fn() }
+
+    override fun bindForever(fn: () -> Unit): IDisposable
+        = command.bindForever { fn() }
+
+    override fun reset()
+        = command.reset()
 }
 
 fun <T> Binder.bindCommand(owner: LifecycleOwner, cmd:ICommand<T>, vararg views:Pair<View,T>, callback:(T)->Unit): Binder {
@@ -125,21 +142,16 @@ fun <T> Binder.bindCommand(cmd:ICommand<T>, vararg views:Pair<View,T>): Binder {
     return this
 }
 
-fun Binder.bindCommand(owner: LifecycleOwner, cmd:IUnitCommand, vararg views:View, callback:(Unit)->Unit): Binder {
-    views.forEach { view->
-        add(cmd.attachView(view))
-    }
-    add(cmd.bind(owner,callback))
-    return this
-}
-
-fun Binder.bindCommand(cmd:IUnitCommand, callback:(Unit)->Unit, vararg views:View): Binder
-        = bindCommand(requireOwner, cmd, views=views, callback)
-
 fun Binder.bindCommand(cmd:IUnitCommand, vararg views:View): Binder {
     views.forEach { view->
         add(cmd.attachView(view))
     }
     return this
 }
+fun Binder.bindCommand(owner: LifecycleOwner, cmd:IUnitCommand, vararg views:View, callback:()->Unit): Binder
+        = bindCommand(cmd,*views).add(cmd.bind(owner,callback))
+
+fun Binder.bindCommand(cmd:IUnitCommand, vararg views:View, callback:()->Unit): Binder
+        = bindCommand(requireOwner, cmd, views=views, callback)
+
 
