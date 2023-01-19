@@ -32,7 +32,7 @@ This activity has 2 controls, text input (EditText) and submit button (Button).
 Initially the submit button is disabled because the EditText is empty.
 When some characters are input to the EditText, the submit button is enabled.
 
-### Old Style (Ver. 1.x ～)
+### Old Style (v1)
 
 `MainViewModel.kt`
 ```kotlin
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity {
   }
 }
 ```
-### New Style (Ver. 2.x～)
+### New Style (v2)
 `MainViewModel.kt`
 ```kotlin
 class MainViewModel : ViewModel() {
@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity {
 Binding class named `*Binding` binds a `LiveData` as data source with a property of view.
 And these bindings are automatically revoked when the lifecycle owner is destroyed.
 Every binding classes have `create()` helper APIs to create and initialize them.
-Furthermore, extend functions of the Binder class to create the binding classes are available in ver.2.x. 
+Furthermore, extend functions of the Binder class to create the binding classes are available in v2. 
 For example, `Binding#visibilityBinding()` creates a VisibilityBinding instance and manage its disposition with lifecycle.
 
 ### Boolean Binding Classes
@@ -219,7 +219,7 @@ It is possible to prepare a `Command` instance with a handler by it's constructo
 The `bind()` and `attachView()` methods return a `IDisposable` instances and you can `dispose()` them to revoke corresponding listeners
 though they will be revoked automatically when it's lifecycleOwner is destroyed.
 
-New command classes `LiteCommand` and `ReliableCommand` come with ver.2.x.
+New command classes `LiteCommand` and `ReliableCommand` come with v2.
 `LiteCommand` is similar to `Command`, but it can handle any type of parameter in callback.
 And in most cases, no parameter will be required in callback so you can use `LiteUnitCommand`.
 
@@ -302,8 +302,8 @@ These converters enable you to use Kotlin Flow with our library.
 
 ## Binder
 
-In ver.1.x, `Binder` is a simple collection of IDisposable, and dispose all of registered IDisposables with reset() or dispose() methods.
-The `Binder` comes from ver.2 is aware of the lifecycle. `Binder#owner()` method associate a `LifecycleOwner` to the Binder and it will be reset() automatically when the lifecycle owner is destructed.
+In v1, `Binder` is a simple collection of IDisposable, and dispose all of registered IDisposables with reset() or dispose() methods.
+The `Binder` comes from v2 is aware of the lifecycle. `Binder#owner()` method associate a `LifecycleOwner` to the Binder and it will be reset() automatically when the lifecycle owner is destructed.
 Furthermore various extended functions of `Binder` are available, and which offer a simple way to use binding classes.
 
 ## Utilities
