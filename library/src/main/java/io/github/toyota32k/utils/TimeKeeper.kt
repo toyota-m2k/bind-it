@@ -2,20 +2,21 @@
 
 package io.github.toyota32k.utils
 
-import io.github.toyota32k.utils.UtLog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import java.lang.Long.max
+import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
 /**
  * タイムアウトを監視するクラス
  */
-class TimeKeeper(ownerScope: CoroutineScope, private val nameForDebug:String) {
+class TimeKeeper(ownerContext: CoroutineContext, private val nameForDebug:String) {
+    constructor(ownerScope: CoroutineScope, nameForDebug: String) : this(ownerScope.coroutineContext, nameForDebug)
     private var startTick:Long = 0L
-    private val scope = CoroutineScope(ownerScope.coroutineContext)
+    private val scope = CoroutineScope(ownerContext)
     private var paused = MutableStateFlow(0)
     private var job: Job? = null
     private var timeout:Long = -1
