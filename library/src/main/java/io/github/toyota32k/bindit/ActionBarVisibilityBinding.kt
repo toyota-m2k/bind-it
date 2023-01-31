@@ -15,8 +15,8 @@ import io.github.toyota32k.utils.LifecycleOwnerHolder
  */
 class ActionBarVisibilityBinding(
     data: LiveData<Boolean>,
-    val interlockWithStatusBar:Boolean,
-    boolConvert: BoolConvert) : BoolBinding(data,BindingMode.OneWay, boolConvert) {
+    boolConvert: BoolConvert,
+    private val interlockWithStatusBar:Boolean) : BoolBinding(data,BindingMode.OneWay, boolConvert) {
     override fun onDataChanged(v: Boolean?) {
         when(v?:return) {
             true-> {
@@ -83,4 +83,16 @@ class ActionBarVisibilityBinding(
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN)
         }
     }
+
+    companion object {
+        fun create(activity:AppCompatActivity, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true):ActionBarVisibilityBinding {
+            return ActionBarVisibilityBinding(data, boolConvert, interlockWithStatusBar).apply { attachActivity(activity) }
+        }
+    }
 }
+
+fun Binder.actionBarVisibilityBinding(activity:AppCompatActivity, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true)
+        = ActionBarVisibilityBinding.create(activity, data, boolConvert, interlockWithStatusBar)
+
+fun Binder.actionBarVisibilityBinding(data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true)
+        = ActionBarVisibilityBinding.create(requireOwner as AppCompatActivity, data, boolConvert, interlockWithStatusBar)
