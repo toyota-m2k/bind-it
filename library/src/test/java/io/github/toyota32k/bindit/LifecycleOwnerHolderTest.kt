@@ -42,7 +42,7 @@ class LifecycleOwnerHolderTest {
 
         disposed = false
         activity = createActivity()
-        holder.lifecycleOwner = activity
+        holder.attachOwner(activity)
         assertFalse(disposed)
 
         finish()

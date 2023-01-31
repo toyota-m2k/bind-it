@@ -11,6 +11,10 @@ open class LifecycleDisposer(owner:LifecycleOwner?=null) : Disposer() {
     var lifecycleOwner:LifecycleOwner?
         get() = lifecycleOwnerHolder.lifecycleOwner
         set(v) {
-            lifecycleOwnerHolder.lifecycleOwner = v
+            if(v!=null) {
+                lifecycleOwnerHolder.attachOwner(v)
+            } else {
+                lifecycleOwnerHolder.detachOwner()
+            }
         }
 }
