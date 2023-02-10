@@ -5,9 +5,11 @@ import android.view.View
 import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import io.github.toyota32k.bindit.*
 import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.LifecycleOwnerHolder
+import kotlinx.coroutines.flow.Flow
 
 /**
  * ActionBar（アプリのタイトルバー的なやつ）の表示・非表示をビューモデルにバインドするためのクラス
@@ -97,3 +99,9 @@ fun Binder.actionBarVisibilityBinding(activity:AppCompatActivity, data: LiveData
 
 fun Binder.actionBarVisibilityBinding(data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true):Binder
         = add(ActionBarVisibilityBinding.create(requireOwner as AppCompatActivity, data, boolConvert, interlockWithStatusBar))
+
+fun Binder.actionBarVisibilityBinding(activity:AppCompatActivity, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true):Binder
+        = add(ActionBarVisibilityBinding.create(activity, data.asLiveData(), boolConvert, interlockWithStatusBar))
+
+fun Binder.actionBarVisibilityBinding(data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true):Binder
+        = add(ActionBarVisibilityBinding.create(requireOwner as AppCompatActivity, data.asLiveData(), boolConvert, interlockWithStatusBar))
