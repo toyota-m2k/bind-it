@@ -40,6 +40,7 @@ class ActionBarVisibilityBinding(
     fun attachActivity(activity:AppCompatActivity): IDisposable {
         return LifecycleOwnerHolder(activity) { dispose() }.apply {
             activityOwner = this
+            onDataChanged(data.value)
         }
     }
 
@@ -91,8 +92,8 @@ class ActionBarVisibilityBinding(
     }
 }
 
-fun Binder.actionBarVisibilityBinding(activity:AppCompatActivity, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true)
-        = ActionBarVisibilityBinding.create(activity, data, boolConvert, interlockWithStatusBar)
+fun Binder.actionBarVisibilityBinding(activity:AppCompatActivity, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true):Binder
+        = add(ActionBarVisibilityBinding.create(activity, data, boolConvert, interlockWithStatusBar))
 
-fun Binder.actionBarVisibilityBinding(data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true)
-        = ActionBarVisibilityBinding.create(requireOwner as AppCompatActivity, data, boolConvert, interlockWithStatusBar)
+fun Binder.actionBarVisibilityBinding(data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, interlockWithStatusBar:Boolean=true):Binder
+        = add(ActionBarVisibilityBinding.create(requireOwner as AppCompatActivity, data, boolConvert, interlockWithStatusBar))
