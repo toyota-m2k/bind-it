@@ -32,20 +32,6 @@ open class LiteCommand<T>() : CommandBase<T>() {
 
     private val listeners = Listeners<T>()
 
-    private fun internalAttachView(view: View, value: T) {
-        if(view is EditText) {
-            view.setOnEditorActionListener {_,actionId,event-> if (actionId == EditorInfo.IME_ACTION_DONE || event?.action == KeyEvent.ACTION_DOWN && (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)) {
-                    invoke(value)
-                    false
-                } else false
-            }
-        } else {
-            view.setOnClickListener {
-                invoke(value)
-            }
-        }
-    }
-
     override fun bind(owner: LifecycleOwner, fn: (T) -> Unit): IDisposable {
         return listeners.add(owner,fn)
     }
@@ -70,7 +56,7 @@ open class LiteCommand<T>() : CommandBase<T>() {
 /**
  * コールバックに引数を取らないコマンドクラス
  */
-class LiteUnitCommand private constructor(rc:LiteCommand<Unit>): UnitCommand(rc) {
+open class LiteUnitCommand private constructor(rc:LiteCommand<Unit>): UnitCommand(rc) {
     constructor():this(LiteCommand<Unit>())
     constructor(fn:()->Unit):this(LiteCommand { fn() })
 }
