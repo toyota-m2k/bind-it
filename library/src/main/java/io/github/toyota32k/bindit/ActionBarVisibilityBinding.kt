@@ -46,6 +46,7 @@ class ActionBarVisibilityBinding(
     private val activity: AppCompatActivity? get() = activityOwner?.lifecycleOwner as? AppCompatActivity
 
     fun attachActivity(activity:AppCompatActivity): IDisposable {
+        connect(activity)
         return LifecycleOwnerHolder(activity) { dispose() }.apply {
             activityOwner = this
         }
