@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import androidx.lifecycle.LifecycleOwner
@@ -7,8 +9,13 @@ import io.github.toyota32k.utils.IDisposable
 import io.github.toyota32k.utils.disposableObserve
 import kotlinx.coroutines.flow.Flow
 
-open class HeadlessBinding<T>(val data: LiveData<T>, val callback:(T?)->Unit) : IBinding {
-    protected var observed: IDisposable? = null
+open class HeadlessBinding<T>(val data: LiveData<T>, callback:((T?)->Unit)?=null) : IBinding {
+    private var observed: IDisposable? = null
+    protected var onValueChanged:((T?)->Unit)? = callback
+
+    fun setCallback(callback: ((T?) -> Unit)?) {
+        onValueChanged = callback
+    }
 
     override val mode: BindingMode = BindingMode.OneWay
     override fun dispose() {
@@ -17,7 +24,7 @@ open class HeadlessBinding<T>(val data: LiveData<T>, val callback:(T?)->Unit) : 
     }
 
     fun connect(owner:LifecycleOwner) {
-        observed = data.disposableObserve(owner,callback)
+        observed = data.disposableObserve(owner) { onValueChanged?.invoke(it) }
     }
 
     companion object {

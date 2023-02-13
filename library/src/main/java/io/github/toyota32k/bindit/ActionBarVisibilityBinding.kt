@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit
 
 import android.os.Build
@@ -17,10 +19,14 @@ import kotlinx.coroutines.flow.Flow
  */
 class ActionBarVisibilityBinding(
     data: LiveData<Boolean>,
-    boolConvert: BoolConvert,
-    private val interlockWithStatusBar:Boolean) : BoolBinding(data,BindingMode.OneWay, boolConvert) {
-    override fun onDataChanged(v: Boolean?) {
-        when(v?:return) {
+    private val boolConvert: BoolConvert,
+    private val interlockWithStatusBar:Boolean) : HeadlessBinding<Boolean>(data) {
+    init {
+        onValueChanged = this::action
+    }
+    private fun action(v: Boolean?) {
+        val sw = boolConvert.conv(v?:return)
+        when(sw) {
             true-> {
                 showActionBar()
                 if(interlockWithStatusBar) {
@@ -42,7 +48,6 @@ class ActionBarVisibilityBinding(
     fun attachActivity(activity:AppCompatActivity): IDisposable {
         return LifecycleOwnerHolder(activity) { dispose() }.apply {
             activityOwner = this
-            onDataChanged(data.value)
         }
     }
 
