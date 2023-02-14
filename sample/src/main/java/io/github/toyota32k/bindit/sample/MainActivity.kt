@@ -323,12 +323,12 @@ class MainActivity : AppCompatActivity() {
                     val ani = ReversibleValueAnimation(1000).onUpdate {
                         aniVal = it * 100
                         logger.debug("xxx value=${aniVal.toInt()}")
-                    }.onStart { r, v ->
+                    }.onStart { r ->
                         sc++
-                        logger.debug("started($sc) from $v (reverse=$r)")
-                    }.onEnd { r, v ->
+                        logger.debug("started($sc) - reverse=$r")
+                    }.onEnd { r ->
                         ec++
-                        logger.debug("end($ec) at $v (reverse=$r)")
+                        logger.debug("end($ec) - reverse=$r")
                     }
                     launch {
                         logger.debug("animation straight")

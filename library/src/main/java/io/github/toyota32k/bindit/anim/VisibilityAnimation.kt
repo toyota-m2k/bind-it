@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package io.github.toyota32k.bindit.anim
 
 import android.view.View
@@ -25,7 +27,7 @@ class VisibilityAnimation private constructor(private val valueAnimation: Revers
         return this
     }
 
-    private fun onStart(reverse:Boolean,value:Float){
+    private fun onStart(reverse:Boolean){
         if(!reverse) {
             // invisible --> visible
             views.forEach { view->
@@ -34,7 +36,7 @@ class VisibilityAnimation private constructor(private val valueAnimation: Revers
             }
         }
     }
-    private fun onEnd(reverse:Boolean,value:Float){
+    private fun onEnd(reverse:Boolean){
         if(reverse) {
             // visible-->invisible
             views.forEach { view->

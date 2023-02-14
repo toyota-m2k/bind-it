@@ -48,7 +48,7 @@ class ReversibleValueAnimation(override val duration:Long) : IReversibleAnimatio
             animator.addListener(this)
             this.continuation = continuation
             if(needStartEvent) {
-                startEvent?.invoke(reverse,correctedValue)
+                startEvent?.invoke(reverse)
             }
             animator.start()
         }
@@ -80,7 +80,7 @@ class ReversibleValueAnimation(override val duration:Long) : IReversibleAnimatio
         override fun onAnimationEnd(animation: Animator) {
             logger.debug()
             if(!closed) {
-                endEvent?.invoke(reverse, correctedValue)
+                endEvent?.invoke(reverse)
                 close(true)
             }
         }
@@ -122,18 +122,18 @@ class ReversibleValueAnimation(override val duration:Long) : IReversibleAnimatio
     override fun invokeLastState(reverse: Boolean) {
         val v = correctValue(1f, 1f, reverse = reverse)
         updateEvent?.invoke(v)
-        endEvent?.invoke(reverse,v)
+        endEvent?.invoke(reverse)
     }
 
-    private var startEvent: ((reverse:Boolean,value:Float)->Unit)? = null
-    private var endEvent: ((reverse:Boolean,value:Float)->Unit)? = null
+    private var startEvent: ((reverse:Boolean)->Unit)? = null
+    private var endEvent: ((reverse:Boolean)->Unit)? = null
     private var updateEvent: ((value:Float)->Unit)? = null
 
-    fun onStart(fn:(reverse:Boolean,value:Float)->Unit):ReversibleValueAnimation {
+    fun onStart(fn:(reverse:Boolean)->Unit):ReversibleValueAnimation {
         startEvent = fn
         return this
     }
-    fun onEnd(fn:(reverse:Boolean, value:Float)->Unit):ReversibleValueAnimation {
+    fun onEnd(fn:(reverse:Boolean)->Unit):ReversibleValueAnimation {
         endEvent = fn
         return this
     }

@@ -46,5 +46,5 @@ fun <T> LiveData<T>.disposableObserveForever(fn:(v:T)->Unit) : IDisposable
 
 fun <T> LiveData<T>.closableObserve(owner: LifecycleOwner, fn:(v:T)->Unit) : Closeable
         = DisposableObserver(this,owner,fn)
-fun <T> LiveData<T>.closableObserveForever(owner: LifecycleOwner, fn:(v:T)->Unit) : Closeable
+fun <T> LiveData<T>.closableObserveForever(fn:(v:T)->Unit) : Closeable
         = DisposableForeverObserver(this,fn)
