@@ -13,6 +13,7 @@ import io.github.toyota32k.bindit.anim.ParallelAnimation
 import io.github.toyota32k.bindit.anim.ReversibleValueAnimation
 import io.github.toyota32k.bindit.anim.SequentialAnimation
 import io.github.toyota32k.utils.UtLog
+import io.github.toyota32k.utils.bindCommand
 import io.github.toyota32k.utils.combineLatest
 import kotlinx.coroutines.*
 
@@ -146,91 +147,34 @@ class MainActivity : AppCompatActivity() {
 
         init {
             logger.debug()
-            register(
-                SliderBinding.create(
-                    owner,
-                    slider,
-                    model.sliderValue,
-                    BindingMode.TwoWay,
-                    model.sliderMin,
-                    model.sliderMax
-                ),
-                EditNumberBinding.create(owner, numberText, model.sliderValue, BindingMode.TwoWay),
-
-                RadioGroupBinding.create(
-                    owner,
-                    radioGroup,
-                    model.radioValue,
-                    RadioValue.idResolver,
-                    BindingMode.TwoWay
-                ),
-                TextBinding.create(owner, radioValue, model.radioValue.map { it.toString() }),
-                MaterialRadioButtonGroupBinding.create(
-                    owner,
-                    toggleGroupAsRadio,
-                    model.radioValue,
-                    RadioValue.mtIdResolver
-                ),
-
-                MaterialToggleButtonGroupBinding.create(
-                    owner,
-                    toggleGroup,
-                    model.toggleValue,
-                    ToggleValue.idResolver
-                ),
-                TextBinding.create(
-                    owner,
-                    toggleValue,
-                    model.toggleValue.map { list ->
-                        list.joinToString(", ") { it.toString() }
-                    }),
-
-                MaterialToggleButtonsBinding.create(
-                    owner, toggleButtonGroup, BindingMode.TwoWay,
-                    MaterialToggleButtonsBinding.ButtonAndData(
-                        findViewById(R.id.toggleButton1),
-                        model.tbState1
-                    ),
-                    MaterialToggleButtonsBinding.ButtonAndData(
-                        findViewById(R.id.toggleButton2),
-                        model.tbState2
-                    ),
-                    MaterialToggleButtonsBinding.ButtonAndData(
-                        findViewById(R.id.toggleButton3),
-                        model.tbState3
-                    ),
-                ),
-                TextBinding.create(
-                    owner,
-                    toggleButtonValue,
-                    combineLatest(
-                        model.tbState1,
-                        model.tbState2,
-                        model.tbState3
-                    ) { v1, v2, v3 -> "${v1},${v2},${v3}" }),
-
-                MultiFadeInOutBinding(model.multiVisible)
-                    .connectAll(owner, radioGroup, toggleGroupAsRadio,toggleGroup, toggleButtonGroup),
-
-//                MultiVisibilityBinding(model.multiVisible, BoolConvert.Straight, VisibilityBinding.HiddenMode.HideByInvisible)
-//                    .connectAll(owner, radioGroup, toggleGroupAsRadio,toggleGroup, toggleButtonGroup),
-                CheckBinding.create(owner, multiVisibleCheckBox, model.multiVisible),
-                ClickBinding(owner, internalTestButton) {
+            owner(owner)
+                .sliderBinding(slider, model.sliderValue, BindingMode.TwoWay, model.sliderMin, model.sliderMax)
+                .editFloatBinding(numberText, model.sliderValue, BindingMode.TwoWay)
+                .radioGroupBinding(radioGroup, model.radioValue, RadioValue.idResolver, BindingMode.TwoWay)
+                .textBinding(radioValue, model.radioValue.map { it.toString() })
+                .materialRadioButtonGroupBinding(toggleGroupAsRadio, model.radioValue, RadioValue.mtIdResolver)
+                .materialToggleButtonGroupBinding(toggleGroup, model.toggleValue, ToggleValue.idResolver)
+                .textBinding(toggleValue, model.toggleValue.map { list-> list.joinToString(", ") { it.toString() } })
+                .materialToggleButtonsBinding(toggleButtonGroup, BindingMode.TwoWay) {
+                    bind(findViewById(R.id.toggleButton1), model.tbState1)
+                    bind(findViewById(R.id.toggleButton2), model.tbState2)
+                    bind(findViewById(R.id.toggleButton3), model.tbState3)
+                }
+                .textBinding(toggleButtonValue, combineLatest(
+                    model.tbState1,
+                    model.tbState2,
+                    model.tbState3
+                ) { v1, v2, v3 -> "${v1},${v2},${v3}" })
+                .multiFadeInOutBinding(arrayOf(radioGroup, toggleGroupAsRadio,toggleGroup, toggleButtonGroup), model.multiVisible)
+                .checkBinding(multiVisibleCheckBox, model.multiVisible)
+                .textBinding(commandTestText, model.commandTextMessage)
+                .bindCommand(model.commandTest, commandTestButton)
+                .bindCommand(model.commandTest, textOutput)
+                .editTextBinding(textInput, model.textValue, BindingMode.TwoWay)
+                .textBinding(textOutput, model.textValue)
+                .clickBinding(internalTestButton) {
                     internalTest()
-                },
-
-                TextBinding.create(owner, commandTestText, model.commandTextMessage),
-                model.commandTest.attachView(commandTestButton),
-                model.liteCommand.bind(owner) {
-                    logger.info("liteCommand bound to owner is called")
-                },
-                model.reliableCommand.bind(owner) {
-                    logger.info("reliableCommand bound to owner is called")
-                },
-                EditTextBinding.create(owner, textInput, model.textValue),
-                model.commandTest.attachView(textInput),
-                TextBinding.create(owner, textOutput, model.textValue),
-            )
+                }
         }
     }
     private lateinit var model: MainViewModel

@@ -255,17 +255,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:nextFocusDown="@+id/text_input"
         />
-    <EditText
-        android:id="@+id/text_input_2"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:inputType="text"
-        android:imeOptions="actionDone"
-        app:layout_constraintTop_toBottomOf="@+id/text_input"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

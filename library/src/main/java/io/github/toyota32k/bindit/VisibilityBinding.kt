@@ -34,6 +34,9 @@ open class VisibilityBinding(
         fun create(owner: LifecycleOwner, view: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode:HiddenMode = HiddenMode.HideByGone) : VisibilityBinding {
             return VisibilityBinding(data, boolConvert, hiddenMode).apply { connect(owner, view) }
         }
+        fun create(owner: LifecycleOwner, view: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, hiddenMode:HiddenMode = HiddenMode.HideByGone) : VisibilityBinding {
+            return VisibilityBinding(data.asLiveData(), boolConvert, hiddenMode).apply { connect(owner, view) }
+        }
     }
 }
 
@@ -149,6 +152,9 @@ class CombinatorialVisibilityBinding(
     companion object {
         fun create(owner: LifecycleOwner, data:LiveData<Boolean>):CombinatorialVisibilityBinding {
             return CombinatorialVisibilityBinding(owner, data)
+        }
+        fun create(owner: LifecycleOwner, data: Flow<Boolean>):CombinatorialVisibilityBinding {
+            return CombinatorialVisibilityBinding(owner, data.asLiveData())
         }
     }
 }

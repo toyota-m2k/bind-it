@@ -76,6 +76,9 @@ class MultiEnableBinding(
         fun create(owner: LifecycleOwner, vararg views: View, data: LiveData<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f) : MultiEnableBinding {
             return MultiEnableBinding(data, boolConvert, alphaOnDisabled).apply { connectAll(owner, *views) }
         }
+        fun create(owner: LifecycleOwner, vararg views: View, data: Flow<Boolean>, boolConvert: BoolConvert = BoolConvert.Straight, alphaOnDisabled: Float=1f) : MultiEnableBinding {
+            return MultiEnableBinding(data.asLiveData(), boolConvert, alphaOnDisabled).apply { connectAll(owner, *views) }
+        }
     }
 }
 

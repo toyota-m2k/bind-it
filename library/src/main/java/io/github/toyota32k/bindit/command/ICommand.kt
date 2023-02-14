@@ -55,7 +55,7 @@ abstract class CommandBase<T> : ICommand<T> {
         }
     }
 
-    open protected fun internalAttachView(view: View, value: T) {
+    protected open fun internalAttachView(view: View, value: T) {
         if(view is EditText) {
             view.setOnEditorActionListener {_,actionId,event->
                 if (actionId == EditorInfo.IME_ACTION_DONE || event?.action == KeyEvent.ACTION_DOWN && (event.keyCode == KeyEvent.KEYCODE_ENTER || event.keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER)) {
