@@ -68,3 +68,19 @@ fun String?.contentOrDefault(fn:()->String) : String {
 fun String?.contentOrDefault(def:String) : String {
     return if(this.isNullOrEmpty()) def else this
 }
+
+/**
+ * Builder のチェーンの中に条件分岐を入れたいとき用
+ * Some.Builder()
+ *  .foo()
+ *  .bar()
+ *  .conditional(flag) { baz() }
+ *  .apply( if(flag) baz() }
+ *  .qux()
+ */
+fun <T> T.conditional(condition:Boolean, fn:T.()->Unit):T {
+    if(condition) {
+        fn()
+    }
+    return this
+}
