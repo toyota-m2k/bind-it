@@ -34,13 +34,11 @@ open class ProgressBarBinding protected constructor(
         view.isIndeterminate = false
         if(min!=null) {
             minObserver = Observer<Int> {
-                if(it!=null) {
-                    if(view.max < it) {
-                        view.max = it
-                    }
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        view.min = it
-                    }
+                if(view.max < it) {
+                    view.max = it
+                }
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    view.min = it
                 }
             }.apply {
                 min.observe(owner,this)
@@ -48,14 +46,12 @@ open class ProgressBarBinding protected constructor(
         }
         if(max!=null) {
             maxObserver = Observer<Int> {
-                if(it!=null) {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        if (view.min > it) {
-                            view.min = it
-                        }
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    if (view.min > it) {
+                        view.min = it
                     }
-                    view.max = it
                 }
+                view.max = it
             }.apply {
                 max.observe(owner,this)
             }

@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import io.github.toyota32k.utils.IDisposableEx
 import io.github.toyota32k.utils.LifecycleDisposer
-import junit.framework.Assert.*
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

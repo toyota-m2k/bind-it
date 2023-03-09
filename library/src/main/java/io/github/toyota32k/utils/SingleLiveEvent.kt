@@ -88,9 +88,9 @@ class SingleLiveData<T> : MutableLiveData<T>(), Observer<T> {
         super.setValue(t)
     }
 
-    override fun onChanged(t: T) {
+    override fun onChanged(value: T) {
         if (pending.compareAndSet(true, false)) {
-            originalObserver?.onChanged(t)
+            originalObserver?.onChanged(value)
         }
     }
 }

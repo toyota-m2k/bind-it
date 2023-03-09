@@ -1,10 +1,8 @@
 package io.github.toyota32k.utils
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 /**
  * MutableStateFlow を MutableLiveData として利用するための変換クラス
@@ -21,24 +19,24 @@ class UtMutableStateFlowLiveData<T>(val flow: MutableStateFlow<T>, lifecycleOwne
     fun attachToLifecycle(lifecycleOwner: LifecycleOwner) {
         observe(lifecycleOwner, this)
         // これが、今後推奨される方法だと思うが、repeatOnLifecycle を使うには、lifecycle_version = "2.4.0" が必要で、これがまだ alpha なので、当面は利用を見合わせる。
-        //        lifecycleOwner.lifecycleScope.launch {
-        //            repeatOnLifecycle(Lifecycle.State.STARTED) {
-        //                flow.collect {
-        //                    postValue(it)
-        //                }
-        //            }
-        //        }
-        lifecycleOwner.lifecycleScope.launchWhenStarted {
-            flow.collect {
-                if(value!==it) {
-                    value = it
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                flow.collect {
+                    postValue(it)
                 }
             }
         }
+//        lifecycleOwner.lifecycleScope.launchWhenStarted {
+//            flow.collect {
+//                if(value!==it) {
+//                    value = it
+//                }
+//            }
+//        }
     }
 
-    override fun onChanged(t: T) {
-        flow.value = t
+    override fun onChanged(value: T) {
+        flow.value = value
     }
 }
 

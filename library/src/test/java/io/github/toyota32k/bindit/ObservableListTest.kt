@@ -31,6 +31,8 @@ class ObservableListTest {
             }
 
         private val observers = mutableListOf<LifecycleObserver>()
+        override val currentState: State
+            get() = state
 
         override fun addObserver(observer: LifecycleObserver) {
             if(state==State.DESTROYED) {
@@ -43,9 +45,9 @@ class ObservableListTest {
             observers.remove(observer)
         }
 
-        override fun getCurrentState(): State {
-            return state
-        }
+//        override fun getCurrentState(): State {
+//            return state
+//        }
 
         fun next():Boolean {
             state = when(state) {
@@ -59,10 +61,10 @@ class ObservableListTest {
         }
     }
     class DummyLifecycleOwner : LifecycleOwner {
-        private val lifecycle = DummyLifecycle(this)
-        override fun getLifecycle(): Lifecycle {
-            return lifecycle
-        }
+        override val lifecycle = DummyLifecycle(this)
+//        override fun getLifecycle(): Lifecycle {
+//            return lifecycle
+//        }
 
         fun onCreated(fn:()->Unit):Boolean {
             do {

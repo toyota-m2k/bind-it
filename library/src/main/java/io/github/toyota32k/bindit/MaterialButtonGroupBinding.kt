@@ -176,10 +176,10 @@ class MaterialToggleButtonsBinding (
             data.removeObserver(this)
         }
 
-        override fun onChanged(t: Boolean?) {
+        override fun onChanged(value: Boolean) {
             val view = toggleGroup ?: return
             val cur = view.checkedButtonIds.contains(button.id)
-            if(t==true) {
+            if(value) {
                 if(!cur) {
                     view.check(button.id)
                 }

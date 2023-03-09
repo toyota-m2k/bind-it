@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import io.github.toyota32k.utils.SingleLiveEvent
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,8 +34,8 @@ class SingleLiveEventTest {
         val event = SingleLiveEvent<Int>()
         var value = 0
         val observer = object: Observer<Int> {
-            override fun onChanged(t: Int?) {
-                value = t ?: -1
+            override fun onChanged(t: Int) {
+                value = t
             }
         }
 

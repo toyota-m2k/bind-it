@@ -4,14 +4,14 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 
 object ApplicationViewModelStoreOwner : ViewModelStoreOwner {
-    val mViewModelStore:ViewModelStore by lazy { ViewModelStore() }
+    private val mViewModelStore:ViewModelStore by lazy { ViewModelStore() }
 
-    override fun getViewModelStore(): ViewModelStore {
-        return mViewModelStore
-    }
+    override val viewModelStore: ViewModelStore
+        get() = mViewModelStore
 
     // to be called from Application.onTerminate()
     fun releaseViewModelStore() {
         mViewModelStore.clear()
     }
+
 }

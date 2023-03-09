@@ -11,8 +11,8 @@ import java.io.Closeable
  * LiveDataのobserverをIDisposable#dispose()やCloseable#close() によって登録解除できるようにするクラス
  */
 abstract class DisposableObserverBase<T>(private var data: LiveData<T>?, private val callback: (v: T) -> Unit) : Observer<T>, IDisposableEx, Closeable {
-    override fun onChanged(t: T) {
-        callback(t)
+    override fun onChanged(value: T) {
+        callback(value)
     }
     override fun dispose() {
         data?.removeObserver(this)
