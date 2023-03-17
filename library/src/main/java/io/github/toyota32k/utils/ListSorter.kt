@@ -2,8 +2,10 @@ package io.github.toyota32k.utils
 
 /**
  * MutableList（主に、ObservableListを想定）を内包し、ソートされた状態を維持して、add (insert) できるようにする。
+ * 当然の事ながら、ListSorter#add 以外の手段 (list.add / list.set / list.iterator.add / list.listIterator.add / list.listIterator.set)
+ * によってリスト要素を変更するとぐずぐずになるので注意。
  */
-class Sorter<T>(val list:MutableList<T>, val allowDuplication:Boolean, val comparator:Comparator<T>):MutableList<T> by list {
+class ListSorter<T>(val list:MutableList<T>, val allowDuplication:Boolean, val comparator:Comparator<T>) {
     init {
         if(list.size>1) {
             list.sortWith(comparator)
@@ -23,7 +25,7 @@ class Sorter<T>(val list:MutableList<T>, val allowDuplication:Boolean, val compa
         list.addAll(elements.sortedWith(comparator))
     }
 
-    override fun add(element:T):Int {
+    fun add(element:T):Int {
         synchronized(this) {
             if (find(list, comparator, element, pos) >= 0 && !allowDuplication) {
                 return -1
@@ -104,6 +106,4 @@ class Sorter<T>(val list:MutableList<T>, val allowDuplication:Boolean, val compa
             return -1
         }
     }
-
-
 }
