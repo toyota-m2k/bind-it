@@ -124,40 +124,94 @@ open class UnitCommand(private val command:ICommand<Unit>) : IUnitCommand {
         = command.reset()
 }
 
-fun <T> Binder.bindCommand(owner: LifecycleOwner, cmd:ICommand<T>, vararg views:Pair<View,T>, callback:(T)->Unit): Binder {
-    views.forEach {  pair->
-        add(cmd.attachView(pair.first, pair.second))
-    }
-    add(cmd.bind(owner,callback))
-    return this
-}
+// region ICommand<T> binding
 
-fun <T> Binder.bindCommand(cmd:ICommand<T>, vararg views:Pair<View,T>, callback:(T)->Unit): Binder
-    = bindCommand(requireOwner, cmd, views=views, callback)
-fun <T> Binder.bindCommand(cmd:ICommand<T>, view:View, param:T, callback:(T)->Unit): Binder
-        = bindCommand(cmd, Pair(view,param),callback=callback)
+/**
+ * コマンドにビューを１つずつアタッチする。
+ */
+fun <T> Binder.bindCommand(cmd:ICommand<T>, view:View, param:T): Binder
+        = bindCommand(cmd, Pair(view,param))
+
+/**
+ * コマンドに１つ以上のビューをまとめてアッタッチする
+ */
 fun <T> Binder.bindCommand(cmd:ICommand<T>, vararg views:Pair<View,T>): Binder {
     views.forEach {  pair->
         add(cmd.attachView(pair.first, pair.second))
     }
     return this
 }
-fun <T> Binder.bindCommand(cmd:ICommand<T>, view:View, param:T): Binder
-    = bindCommand(cmd, Pair(view,param))
+
+/**
+ * コマンドにハンドラ（コールバック）をバインドする
+ */
+fun <T> Binder.bindCommand(owner: LifecycleOwner, cmd:ICommand<T>, callback:(T)->Unit): Binder {
+    add(cmd.bind(owner,callback))
+    return this
+}
+
+/**
+ * コマンドにビューをアタッチし、ハンドラ（コールバック）をバインドする
+ */
+fun <T> Binder.bindCommand(owner: LifecycleOwner, cmd:ICommand<T>, vararg views:Pair<View,T>, callback:(T)->Unit): Binder {
+    bindCommand(cmd, *views)
+    add(cmd.bind(owner,callback))
+    return this
+}
+
+/**
+ * コマンドにハンドラ（コールバック）をバインドする
+ * Ownerなし版
+ */
+fun <T> Binder.bindCommand(cmd:ICommand<T>, callback:(T)->Unit): Binder
+        = bindCommand(requireOwner, cmd, callback)
+
+/**
+ * コマンドにビューをアタッチし、ハンドラ（コールバック）をバインドする
+ * Ownerなし版
+ */
+fun <T> Binder.bindCommand(cmd:ICommand<T>, vararg views:Pair<View,T>, callback:(T)->Unit): Binder
+        = bindCommand(requireOwner, cmd, views=views, callback)
+
+// endregion
 
 
+// region IUnitCommand binding
 
-
+/**
+ * コマンドにビューをアッタッチする
+ */
 fun Binder.bindCommand(cmd:IUnitCommand, vararg views:View): Binder {
     views.forEach { view->
         add(cmd.attachView(view))
     }
     return this
 }
+
+/**
+ * コマンドにハンドラ(callback)をバインドする
+ */
+fun Binder.bindCommand(owner: LifecycleOwner, cmd:IUnitCommand, callback:()->Unit): Binder
+        = add(cmd.bind(owner,callback))
+
+/**
+ * コマンドにビューをアタッチし、ハンドラ (callback) をバインドする
+ */
 fun Binder.bindCommand(owner: LifecycleOwner, cmd:IUnitCommand, vararg views:View, callback:()->Unit): Binder
         = bindCommand(cmd,*views).add(cmd.bind(owner,callback))
 
+/**
+ * コマンドにハンドラ(callback)をバインドする
+ * ownerなし版
+ */
+fun Binder.bindCommand(cmd:IUnitCommand, callback:()->Unit): Binder
+        = add(cmd.bind(requireOwner,callback))
+/**
+ * コマンドにビューをアタッチし、ハンドラ (callback) をバインドする
+ * ownerなし版
+ */
 fun Binder.bindCommand(cmd:IUnitCommand, vararg views:View, callback:()->Unit): Binder
         = bindCommand(requireOwner, cmd, views=views, callback)
 
 
+// endregion

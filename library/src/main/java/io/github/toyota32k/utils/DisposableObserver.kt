@@ -5,6 +5,7 @@ package io.github.toyota32k.utils
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import io.github.toyota32k.bindit.Binder
 import java.io.Closeable
 
 /**
@@ -39,12 +40,19 @@ class DisposableForeverObserver<T>(data:LiveData<T>, callback: (v: T) -> Unit):D
 /**
  * LiveDataにオブザーバーを登録し、登録解除用の IDisposable または、Closeable を返す。
  */
-fun <T> LiveData<T>.disposableObserve(owner: LifecycleOwner, fn:(v:T)->Unit) : IDisposable
+fun <T> LiveData<T>.disposableObserve(owner: LifecycleOwner, fn:(value:T)->Unit) : IDisposable
         = DisposableObserver(this,owner,fn)
-fun <T> LiveData<T>.disposableObserveForever(fn:(v:T)->Unit) : IDisposable
+fun <T> LiveData<T>.disposableObserveForever(fn:(value:T)->Unit) : IDisposable
         = DisposableForeverObserver(this,fn)
 
-fun <T> LiveData<T>.closableObserve(owner: LifecycleOwner, fn:(v:T)->Unit) : Closeable
+fun <T> LiveData<T>.closableObserve(owner: LifecycleOwner, fn:(value:T)->Unit) : Closeable
         = DisposableObserver(this,owner,fn)
-fun <T> LiveData<T>.closableObserveForever(fn:(v:T)->Unit) : Closeable
+fun <T> LiveData<T>.closableObserveForever(fn:(value:T)->Unit) : Closeable
         = DisposableForeverObserver(this,fn)
+
+
+fun <T> Binder.observe(owner:LifecycleOwner, data:LiveData<T>,fn:(value:T)->Unit):Binder
+        = add(data.disposableObserve(owner,fn))
+fun <T> Binder.observe(data:LiveData<T>,fn:(value:T)->Unit):Binder
+        = observe(requireOwner, data, fn)
+

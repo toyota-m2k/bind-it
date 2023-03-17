@@ -2,6 +2,7 @@ package io.github.toyota32k.utils
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import io.github.toyota32k.bindit.Binder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,10 +41,17 @@ class DisposableFlowObserver<T> constructor(flow: Flow<T>, coroutineContext: Cor
 /**
  * Flow にオブザーバーを登録し、登録解除用の IDisposable を返す。
  */
-fun <T> Flow<T>.disposableObserve(owner: LifecycleOwner, callback:(v:T)->Unit):DisposableFlowObserver<T> =
+fun <T> Flow<T>.disposableObserve(owner: LifecycleOwner, callback:(value:T)->Unit):DisposableFlowObserver<T> =
     DisposableFlowObserver(this, owner, callback)
 /**
  * Flow にオブザーバーを登録し、登録解除用の Closeable を返す。
  */
-fun <T> Flow<T>.disposableObserve(coroutineContext: CoroutineContext, callback:(v:T)->Unit):DisposableFlowObserver<T> =
+fun <T> Flow<T>.disposableObserve(coroutineContext: CoroutineContext, callback:(value:T)->Unit):DisposableFlowObserver<T> =
     DisposableFlowObserver(this, coroutineContext, callback)
+
+
+fun <T> Binder.observe(owner:LifecycleOwner, data:Flow<T>, callback:(value:T)->Unit):Binder
+    = add(data.disposableObserve(owner,callback))
+
+fun <T> Binder.observe(data:Flow<T>, callback:(value:T)->Unit):Binder
+        = add(data.disposableObserve(requireOwner,callback))
