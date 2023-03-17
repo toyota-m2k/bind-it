@@ -41,12 +41,20 @@ class RecyclerViewBinding<T>(
     private var itemTouchHelper: ItemTouchHelper? = null
 
     interface IDeletion {
+        /**
+         * アイテムの削除確定 --> 実体の削除などを行う。
+         */
         fun commit()
     }
     interface IPendingDeletion : IDeletion {
         //fun deleting(deletingItem:T):String
         val itemLabel:String
         val undoButtonLabel:String?
+
+        /**
+         * 削除中止 --> リストは自動的に更新されるので、通常はなにもしなくてよい。
+         * リストの選択を元に戻すなら、このタイミングで。
+         */
         fun rollback()
     }
 
@@ -86,8 +94,8 @@ class RecyclerViewBinding<T>(
                     if(!swipeToDelete) return
                     val pos = viewHolder.bindingAdapterPosition
                     val item = list[pos]
+                    val deletion = deletionHandler?.invoke(item)    // itemを削除する前（まだitemが存在するタイミングで）呼ぶので、リストの選択を変更するなら、このタイミングでやる。
                     list.removeAt(pos)
-                    val deletion = deletionHandler?.invoke(item)
                     if(deletion !is IPendingDeletion) {
                         // Undo無効 --> 即通知
                         deletion?.commit()
@@ -98,8 +106,8 @@ class RecyclerViewBinding<T>(
                         // below line is to display our snackbar with action.
                         Snackbar.make(view, label, Snackbar.LENGTH_LONG).setAction(deletion.undoButtonLabel?:"Undo") {
                             undo = true
-                            deletion.rollback()
                             list.add(pos, item)
+                            deletion.rollback()     // リストは自動的に更新されるから、通常はなにもしなくてok、リスト選択を戻すならこのタイミングでやる。
                         }.addCallback(object: BaseCallback<Snackbar>() {
                             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                                 if(!undo) {
