@@ -18,6 +18,9 @@ open class Binder : LifecycleDisposer() {
         return remove(disposable)
     }
 
+    val hasOwner : Boolean
+        get() = lifecycleOwner != null
+
     val requireOwner: LifecycleOwner
         get() = lifecycleOwner ?: throw IllegalStateException("lifecycleOwner has not be set, call owner() at first.")
 
