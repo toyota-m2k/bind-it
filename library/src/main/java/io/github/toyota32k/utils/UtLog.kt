@@ -6,6 +6,7 @@ import java.io.Closeable
 import java.lang.Exception
 
 class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, val omissionNamespace:String?=parent?.omissionNamespace, private val outputClassName:Boolean=true, private val outputMethodName:Boolean=true) {
+    constructor(tag:String, parent:UtLog?, omissionNamespaceClass:Class<*>, outputClassName:Boolean=true, outputMethodName:Boolean=true):this(tag, parent, namespaceOfClass(omissionNamespaceClass), outputClassName, outputMethodName)
     companion object {
         var logLevel = Log.DEBUG
 
@@ -14,6 +15,16 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
                 "${hierarchicTag(parent.tag, parent.parent)}.${tag}"
             } else {
                 tag
+            }
+        }
+
+        fun namespaceOfClass(clazz:Class<*>):String {
+            return clazz.name.substringBeforeLast(".", "").run {
+                if(isEmpty()) {
+                    clazz.name
+                } else {
+                    "$this."
+                }
             }
         }
 //        fun className():String {
@@ -46,7 +57,7 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
 
     private val logger = UtLoggerInstance(hierarchicTag(tag,parent))
 
-    fun stripNamespace(classname:String):String {
+    private fun stripNamespace(classname:String):String {
         if(!omissionNamespace.isNullOrBlank() && classname.startsWith(omissionNamespace)) {
             return classname.substring(omissionNamespace.length)
         } else {
@@ -54,18 +65,29 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
         }
     }
 
-    var stackOffset:Int = 4
+//    var stackOffset:Int = 4
 
-    private fun compose(message:String?):String {
+    private fun getCallerStack():StackTraceElement {
+        val stack = Throwable().stackTrace  // Thread.currentThread().stackTrace  Throwable().stackTraceの方が速いらしい。
+        val loggerClassName = this.javaClass.name
+        val chronosClassName = Chronos::class.java.name
+        var n = 0
+        while(n<stack.size-1 && !stack[n].className.startsWith(loggerClassName)) { n++ }
+        while(n<stack.size-1 && (stack[n].className.startsWith(loggerClassName)||stack[n].className.startsWith(chronosClassName))) { n++ }
+        return stack[n]
+    }
+
+    fun compose(message:String?):String {
         return if(outputClassName||outputMethodName) {
-            val stack = Thread.currentThread().stackTrace
-            var n:Int = stackOffset
-            var e = stack[n]
-            while(e.className == this.javaClass.name) {
-//            while(e.methodName.endsWith("\$default") && n<stack.size) {
-                n++
-                e = stack[n]
-            }
+//            val stack = Thread.currentThread().stackTrace
+//            var n:Int = stackOffset
+//            var e = stack[n]
+//            while(e.className == this.javaClass.name) {
+////            while(e.methodName.endsWith("\$default") && n<stack.size) {
+//                n++
+//                e = stack[n]
+//            }
+            val e = getCallerStack()
             if(!outputClassName) {
                 if(message!=null) "${e.methodName}: $message" else e.methodName
             } else if(!outputMethodName) {
@@ -84,8 +106,13 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
             logger.debug(compose(msg))
         }
     }
-    fun debug(fn:()->String) {
+    fun debug(fn:()->String?) {
         if(logLevel<=Log.DEBUG) {
+            logger.debug(compose(fn()?:return))
+        }
+    }
+    fun debug(flag:Boolean, fn:()->String) {
+        if(flag && logLevel<=Log.DEBUG) {
             logger.debug(compose(fn()))
         }
     }
@@ -135,7 +162,7 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
             Log.INFO -> ::info
             Log.DEBUG -> ::debug
             else->::verbose
-        }(compose(msg))
+        }(msg)
     }
 
     @JvmOverloads
@@ -160,7 +187,7 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
     fun scopeWatch(msg:String?=null) : Closeable {
         val composed = compose(msg)
         logger.debug("$composed - enter")
-        return ScopeWatcher { logger.debug("$composed - leave") }
+        return ScopeWatcher { logger.debug("$composed - exit") }
     }
 
     private class ScopeWatcher(val leaving:()->Unit) : Closeable {
@@ -168,4 +195,21 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
             leaving()
         }
     }
+
+    inline fun <T> scopeCheck(msg:String?=null, level: Int=Log.DEBUG, fn:()->T):T {
+        return try {
+            print(level, "$msg - enter")
+            fn()
+        } finally {
+            print(level, "$msg - exit")
+        }
+    }
+
+    @JvmOverloads
+    inline fun <T> chronos(msg:String?=null, level: Int=Log.DEBUG,  fn:()->T):T {
+        return Chronos(this, logLevel = level).measure(msg) {
+            fn()
+        }
+    }
+
 }
