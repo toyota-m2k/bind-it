@@ -115,7 +115,9 @@ class RecyclerViewBinding<T>(
                                     deletion.commit()
                                 }
                             }
-                        }).show()
+                        }).apply {
+                          view.setOnClickListener { dismiss() }
+                        }.show()
                     }
                 }
             }).apply { attachToRecyclerView(view) }
