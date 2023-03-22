@@ -96,7 +96,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.github.toyota-m2k'
                 artifactId = 'bind-it'
-                version = '1.2'
+                version = '2.3.0'
             }
         }
     }
