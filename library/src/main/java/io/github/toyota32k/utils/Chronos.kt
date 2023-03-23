@@ -7,10 +7,14 @@ import android.util.Log
  */
 class Chronos @JvmOverloads constructor(callerLogger:UtLog, tag:String="TIME", val logLevel:Int= Log.DEBUG) {
     var logger = UtLog(tag, callerLogger, callerLogger.omissionNamespace)
-    var prev: Long
-    var start: Long
+    var prev: Long = 0
+    var start: Long = 0
 
     init {
+        reset()
+    }
+
+    fun reset() {
         prev = System.currentTimeMillis()
         start = prev
     }
