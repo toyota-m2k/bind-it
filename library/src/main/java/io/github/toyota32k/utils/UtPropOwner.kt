@@ -2,6 +2,7 @@ package io.github.toyota32k.utils
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -42,7 +43,7 @@ import kotlinx.coroutines.flow.StateFlow
  * アクセスすると、IllegalCast違反で死ぬだろう（あえて型チェックなんかせず、死ぬようにしている）が、そのあたりは、プログラマの責任で。
  */
 interface IUtPropOwner {
-    val <T> StateFlow<T>.mutable: MutableStateFlow<T>
+    val <T> Flow<T>.mutable: MutableStateFlow<T>
         get() = this as MutableStateFlow<T>
     val <T> LiveData<T>.mutable: MutableLiveData<T>
         get() = this as MutableLiveData<T>

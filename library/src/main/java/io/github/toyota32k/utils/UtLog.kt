@@ -206,10 +206,15 @@ class UtLog @JvmOverloads constructor(val tag:String, val parent:UtLog?=null, va
     }
 
     @JvmOverloads
-    inline fun <T> chronos(msg:String?=null, level: Int=Log.DEBUG,  fn:()->T):T {
-        return Chronos(this, logLevel = level).measure(msg) {
-            fn()
-        }
+    inline fun <T> chronos(tag:String="TIME", msg:String?=null, level: Int=Log.DEBUG,  fn:()->T):T {
+        return if(when(level) {
+            Log.DEBUG,Log.VERBOSE -> BuildConfig.DEBUG
+            else -> true
+        }) {
+            Chronos(this, tag = tag, logLevel = level).measure(msg) {
+                fn()
+            }
+        } else fn()
     }
 
 }
