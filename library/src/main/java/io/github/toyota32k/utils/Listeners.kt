@@ -140,4 +140,24 @@ class Listeners<T> {
     }
 }
 
+class UnitListeners {
+    private val listeners = Listeners<Unit>()
+    @MainThread
+    fun add(owner:LifecycleOwner, fn:()->Unit): IDisposable {
+        return listeners.add(owner) { fn() }
+    }
 
+
+    @MainThread
+    fun addForever(fn:()->Unit):IDisposable {
+        return listeners.addForever { fn() }
+    }
+
+    fun clear() {
+        listeners.clear()
+    }
+
+    fun invoke() {
+        listeners.invoke(Unit)
+    }
+}
