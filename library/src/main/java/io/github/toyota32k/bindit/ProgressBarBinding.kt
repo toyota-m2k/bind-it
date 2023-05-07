@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
  * 注意
  * AndroidのProgressBarには、indeterminateモード（ぐるぐる回ったり、行ったり来たりして、実行中であることを示すだけのモード）と、
  * 進捗率を表示するモード（いわゆるプログレスバー）がある。ProgressBarBindingを使うには、進捗率表示モードにする必要があるが、
- * > ProgressBar#isIntdeterminate = false
+ *   ProgressBar#isIndeterminate = false
  * とするだけではだめで、スタイルに "@android:style/Widget.Holo.Light.ProgressBar.Horizontal" など、進捗表示可能なものを指定しなければならない。
  */
 open class ProgressBarBinding protected constructor(
